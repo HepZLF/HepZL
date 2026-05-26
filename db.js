@@ -1,8 +1,6 @@
-// Menginisialisasi koneksi ke Supabase
-const supabaseUrl = 'https://safbzgsfjwuuosuvzgbe.supabase.co';
-// Ganti dengan anon key Anda yang dari file .env tadi
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhZmJ6Z3Nmand1dW9zdXZ6Z2JlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3OTI4ODcsImV4cCI6MjA5NTM2ODg4N30.e8qKMyA9-3pmI0ueDpAJHOkZYyS2dTdYJzWzcDKUQZw'; 
+// db.js
+const supabaseUrl = 'https://igrhhxyxjiqharbgyfau.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlncmhoeHl4amlxaGFyYmd5ZmF1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4MDA3NTMsImV4cCI6MjA5NTM3Njc1M30.LfKfEtnPwQ37OCLc7xzrP5cb-iI6nseJMYSy2l59Li4';
 
-const supabase = supabaseJs.createClient(supabaseUrl, supabaseKey);
-
-// Sekarang variabel 'supabase' sudah siap digunakan di file JS Anda yang lain!
+// GANTI NAMA VARIABEL MENJADI supabaseClient
+const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
