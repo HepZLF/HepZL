@@ -1,132 +1,287 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Internal - Nusantara Cuy</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; background-color: #f4f6f9; display: flex; flex-direction: column; }
-        .sidebar { width: 100%; background: #5d4037; color: white; padding: 15px; box-sizing: border-box; }
-        .sidebar h2 { text-align: center; font-size: 1.2em; margin: 0 0 10px 0; border-bottom: 2px solid #8d6e63; padding-bottom: 10px; }
-        .sidebar menu { list-style: none; padding: 0; margin: 0; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
-        .sidebar menu li { padding: 10px; cursor: pointer; border-radius: 6px; background: #8d6e63; text-align: center; font-weight: bold; font-size: 0.85em; flex: 1; min-width: 120px; }
-        .main-content { padding: 20px; width: 100%; box-sizing: border-box; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); margin-bottom: 25px; }
-        .form-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
-        .form-group { margin-bottom: 15px; display: flex; flex-direction: column; }
-        .form-group label { font-weight: bold; margin-bottom: 6px; color: #5d4037; }
-        .form-group input, .form-group textarea, .form-group select { padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 1em; width: 100%; box-sizing: border-box; }
-        button { background: #ff6e40; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; }
-        .table-responsive { width: 100%; overflow-x: auto; margin-top: 15px; }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #8d6e63; color: white; }
-        @media (min-width: 768px) {
-            body { flex-direction: row; }
-            .sidebar { width: 250px; height: 100vh; position: fixed; }
-            .sidebar menu { flex-direction: column; }
-            .main-content { margin-left: 250px; width: calc(100% - 250px); padding: 40px; }
-            .form-grid { grid-template-columns: 1fr 1fr; }
-            button { width: auto; padding: 12px 30px; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Admin - Nusantara Cuy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #8B4513;
+      --secondary: #D2691E;
+      --success: #2e7d32;
+      --danger: #c62828;
+      --bg: #f9f6f0;
+      --white: #ffffff;
+      --text: #2c1e15;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Poppins', sans-serif; }
+    body { background: var(--bg); color: var(--text); padding: 25px; }
+    
+    .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #e3dec3; padding-bottom: 15px; }
+    .nav-header h2 { color: var(--primary); font-weight: 700; }
+    .btn-logout { background: var(--danger); color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+
+    /* Ringkasan Finansial Widget */
+    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 35px; }
+    .card-stat { background: var(--white); padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border-left: 5px solid var(--primary); }
+    .card-stat.masuk { border-left-color: var(--success); }
+    .card-stat.keluar { border-left-color: var(--danger); }
+    .card-stat h4 { font-size: 13px; color: #777; text-transform: uppercase; letter-spacing: 0.5px; }
+    .card-stat p { font-size: 22px; font-weight: 700; margin-top: 5px; }
+
+    /* Form Input Migrasi Data */
+    .input-section { background: var(--white); padding: 25px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 35px; }
+    .input-section h3 { margin-bottom: 15px; color: var(--primary); font-size: 18px; }
+    .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+    .form-group { display: flex; flex-direction: column; }
+    .form-group label { font-size: 12px; font-weight: 600; margin-bottom: 5px; }
+    .form-group input, .form-group select { padding: 10px; border: 1px solid #d3cbb8; border-radius: 6px; font-size: 14px; }
+    .btn-submit { background: var(--success); color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: 600; margin-top: 15px; width: 100%; }
+
+    /* Pengaturan Tabel */
+    .table-container { background: var(--white); padding: 25px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 35px; }
+    .table-container h3 { margin-bottom: 15px; color: var(--primary); border-left: 4px solid var(--secondary); padding-left: 10px; font-size: 18px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+    th { background: #f2ebd9; color: var(--text); font-weight: 600; text-align: left; padding: 12px; border-bottom: 2px solid #e3dec3; }
+    td { padding: 12px; border-bottom: 1px solid #f0e9dc; }
+    tr:hover { background-color: #faf8f5; }
+    
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+    .badge.pemasukan { background: #e8f5e9; color: var(--success); }
+    .badge.pengeluaran { background: #ffebee; color: var(--danger); }
+  </style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <h2>Dashboard Admin</h2>
-        <menu>
-            <li onclick="location.href='#section-produk'">📦 Perbarui Harga & Foto</li>
-            <li onclick="location.href='#section-penjualan'">💰 Pencatatan Penjualan</li>
-            <li onclick="prosesLogout()" style="background: #c62828;">🚪 Logout</li>
-        </menu>
+  <div class="nav-header">
+    <h2>Nusantara Cuy Admin Panel Dashboard</h2>
+    <button class="btn-logout" onclick="logoutAdmin()">Keluar Aplikasi</button>
+  </div>
+
+  <div class="summary-grid">
+    <div class="card-stat masuk">
+      <h4>Total Omset Penjualan</h4>
+      <p id="stat-omset">Rp 0</p>
     </div>
-
-    <div class="main-content">
-        <div id="section-produk" class="card">
-            <h2>Manajemen Katalog Produk (Ubah Harga / Foto)</h2>
-            <form id="form-produk" onsubmit="event.preventDefault(); tambahAtauUpdateProduk();">
-                <input type="hidden" id="edit-id-produk">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Nama Produk</label>
-                        <input type="text" id="nama_produk" readonly placeholder="Klik tombol Edit di tabel bawah..." style="background: #eee;">
-                    </div>
-                    <div class="form-group">
-                        <label>Harga Baru (Rp)</label>
-                        <input type="number" id="harga" required placeholder="Contoh: 18000">
-                    </div>
-                    <div class="form-group" style="grid-column: span 1;">
-                        <label>URL Tautan Foto Produk</label>
-                        <input type="text" id="foto_url" placeholder="Paste link tautan gambar produk...">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Deskripsi</label>
-                    <textarea id="deskripsi" rows="2" readonly style="background: #eee;"></textarea>
-                </div>
-                <button type="submit" id="btn-simpan-produk">Simpan Perubahan Data</button>
-            </form>
-
-            <h3>Daftar 3 Produk Fiks</h3>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nama Produk</th>
-                            <th>Harga</th>
-                            <th>Foto URL</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabel-produk">
-                        <tr><td colspan="4" style="text-align:center;">Memeriksa database...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="section-penjualan" class="card">
-            <h2>Pencatatan Data Penjualan</h2>
-            <form id="form-penjualan" onsubmit="event.preventDefault(); simpanPenjualan();">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Produk Terjual</label>
-                        <select id="pilih_produk" required>
-                            <option value="">-- Memuat Produk --</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Jumlah (Kuantitas)</label>
-                        <input type="number" id="jumlah_terjual" required min="1" value="1">
-                    </div>
-                    <div class="form-group">
-                        <label>Nama Pelanggan / Pembeli</label>
-                        <input type="text" id="nama_pembeli" required placeholder="Nama pembeli...">
-                    </div>
-                    <div class="form-group">
-                        <label>Tanggal Transaksi</label>
-                        <input type="date" id="tanggal_penjualan" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Alamat Pengiriman / Pembeli</label>
-                    <textarea id="alamat_pembeli" rows="2" required placeholder="Alamat lengkap pembeli..."></textarea>
-                </div>
-                <button type="submit">Catat Transaksi Penjualan</button>
-            </form>
-        </div>
+    <div class="card-stat masuk">
+      <h4>Total Pemasukan Kas</h4>
+      <p id="stat-masuk">Rp 0</p>
     </div>
+    <div class="card-stat keluar">
+      <h4>Total Pengeluaran Operasional</h4>
+      <p id="stat-keluar">Rp 0</p>
+    </div>
+    <div class="card-stat">
+      <h4>Estimasi Saldo Bersih Buku</h4>
+      <p id="stat-bersih" style="color: var(--primary);">Rp 0</p>
+    </div>
+  </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="db.js"></script>
-    <script src="auth.js"></script>
-    <script src="admin.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (typeof proteksiHalamanAdmin === 'function') { proteksiHalamanAdmin(); }
-            setTimeout(() => { if(typeof memuatDasborAwal === 'function') { memuatDasborAwal(); } }, 200);
-        });
-    </script>
+  <div class="input-section">
+    <h3>Input Pembukuan Keuangan Baru</h3>
+    <form id="formTransaksiKeuangan" onsubmit="event.preventDefault(); simpanTransaksiKeuangan();">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tanggal Transaksi</label>
+          <input type="date" id="txTanggal" required>
+        </div>
+        <div class="form-group">
+          <label>Jenis Arus Kas</label>
+          <select id="txJenis" required>
+            <option value="Pemasukan">Pemasukan Kas (Uang Masuk)</option>
+            <option value="Pengeluaran">Pengeluaran Kas (Uang Keluar)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Kategori Alokasi</label>
+          <select id="txKategori" required>
+            <option value="Penjualan Produk">Penjualan Produk</option>
+            <option value="Bahan Baku">Bahan Baku & Rempah</option>
+            <option value="Operasional">Operasional & Gaji</option>
+            <option value="Iklan & Marketing">Iklan & Sosmed Marketing</option>
+            <option value="Lain-lain">Kebutuhan Lain-lain</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Nominal Rupiah (Rp)</label>
+          <input type="number" id="txNominal" placeholder="Contoh: 50000" required>
+        </div>
+        <div class="form-group">
+          <label>Keterangan Tambahan</label>
+          <input type="text" id="txKeterangan" placeholder="Contoh: Beli gula aren semut 2kg" required>
+        </div>
+      </div>
+      <button type="submit" class="btn-submit">Simpan ke Jurnal Keuangan</button>
+    </form>
+  </div>
+
+  <div class="table-container">
+    <h3>Laporan Saldo Posisi Kas</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Nama Rekening / Akun Tempat Penyimpanan Kas</th>
+          <th>Saldo Awal Aset</th>
+          <th>Total Dana Masuk</th>
+          <th>Total Dana Keluar</th>
+          <th>Saldo Akhir Riil Tersedia</th>
+        </tr>
+      </thead>
+      <tbody id="data-tabel-saldo">
+        <tr><td colspan="5" style="text-align: center; color: #888;">Memuat Neraca Saldo...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-container">
+    <h3>Daftar Detail Transaksi Penjualan Produk</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Tanggal</th>
+          <th>Nama Pelanggan / Pembeli</th>
+          <th>Jumlah Terjual</th>
+          <th>Total Penerimaan (Rp)</th>
+          <th>Metode Bayar</th>
+          <th>Catatan Informasi</th>
+        </tr>
+      </thead>
+      <tbody id="data-tabel-penjualan">
+        <tr><td colspan="6" style="text-align: center; color: #888;">Memuat log riwayat data penjualan...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-container">
+    <h3>Jurnal Laporan Arus Keuangan (Pemasukan & Pengeluaran)</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Tanggal</th>
+          <th>Tipe Arus Kas</th>
+          <th>Kategori Kelompok</th>
+          <th>Nominal Mutasi Dana</th>
+          <th>Deskripsi Mutasi Jurnal</th>
+        </tr>
+      </thead>
+      <tbody id="data-tabel-keuangan">
+        <tr><td colspan="5" style="text-align: center; color: #888;">Memuat ringkasan jurnal pembukuan...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="db.js"></script>
+  <script>
+    // Amankan halaman, harus login admin terlebih dahulu
+    document.addEventListener('DOMContentLoaded', () => {
+      const session = localStorage.getItem('admin_session');
+      if(!session) { window.location.href = 'index.html'; return; }
+      
+      // Atur default input tanggal hari ini
+      document.getElementById('txTanggal').valueAsDate = new Date();
+      
+      // Ambil dan visualisasikan seluruh tabel dari database Supabase
+      MuatSemuaLaporanDashboard();
+    });
+
+    async function MuatSemuaLaporanDashboard() {
+      try {
+        if(typeof supabaseClient === 'undefined') return;
+
+        // 1. Ambil Data Penjualan
+        const { data: jual } = await supabaseClient.from('penjualan').select('*').order('tanggal', { ascending: false });
+        // 2. Ambil Data Laporan Keuangan Arus Kas
+        const { data: keuangan } = await supabaseClient.from('laporan_keuangan').select('*').order('tanggal', { ascending: false });
+        // 3. Ambil Data Laporan Saldo Akun
+        const { data: saldo } = await supabaseClient.from('laporan_saldo').select('*').order('id', { ascending: true });
+
+        // Hitung Indikator Finansial Ringkasan
+        let totalOmset = 0; let totalMasuk = 0; let totalKeluar = 0;
+        
+        // Render Tabel Penjualan
+        const tbJual = document.getElementById('data-tabel-penjualan');
+        if(jual && jual.length > 0) {
+          tbJual.innerHTML = '';
+          jual.forEach(j => {
+            totalOmset += j.total_harga;
+            tbJual.innerHTML += `<tr>
+              <td>${j.tanggal}</td>
+              <td><strong>${j.nama_pembeli}</strong></td>
+              <td>${j.jumlah_terjual} Pcs</td>
+              <td>Rp ${Number(j.total_harga).toLocaleString('id-ID')}</td>
+              <td><span style="background:#e3f2fd; color:#0d47a1;" class="badge">${j.metode_pembayaran}</span></td>
+              <td>${j.keterangan || '-'}</td>
+            </tr>`;
+          });
+        } else { tbJual.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#999;">Belum ada record data penjualan.</td></tr>`; }
+
+        // Render Tabel Arus Kas Keuangan
+        const tbKeuangan = document.getElementById('data-tabel-keuangan');
+        if(keuangan && keuangan.length > 0) {
+          tbKeuangan.innerHTML = '';
+          keuangan.forEach(k => {
+            if(k.jenis_transaksi === 'Pemasukan') totalMasuk += k.nominal;
+            if(k.jenis_transaksi === 'Pengeluaran') totalKeluar += k.nominal;
+
+            tbKeuangan.innerHTML += `<tr>
+              <td>${k.tanggal}</td>
+              <td><span class="badge ${k.jenis_transaksi.toLowerCase()}">${k.jenis_transaksi}</span></td>
+              <td><strong>${k.kategori}</strong></td>
+              <td>Rp ${Number(k.nominal).toLocaleString('id-ID')}</td>
+              <td>${k.keterangan}</td>
+            </tr>`;
+          });
+        } else { tbKeuangan.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999;">Jurnal finansial masih kosong.</td></tr>`; }
+
+        // Render Tabel Neraca Saldo Akun
+        const tbSaldo = document.getElementById('data-tabel-saldo');
+        if(saldo && saldo.length > 0) {
+          tbSaldo.innerHTML = '';
+          saldo.forEach(s => {
+            tbSaldo.innerHTML += `<tr>
+              <td><strong>🏢 ${s.nama_akun}</strong></td>
+              <td>Rp ${Number(s.saldo_awal).toLocaleString('id-ID')}</td>
+              <td style="color:var(--success);">+ Rp ${Number(s.total_masuk).toLocaleString('id-ID')}</td>
+              <td style="color:var(--danger);">- Rp ${Number(s.total_keluar).toLocaleString('id-ID')}</td>
+              <td style="font-weight:700; color:var(--primary);">Rp ${Number(s.saldo_akhir).toLocaleString('id-ID')}</td>
+            </tr>`;
+          });
+        } else { tbSaldo.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999;">Belum ada pemetaan akun kas keuangan.</td></tr>`; }
+
+        // Pasang Angka Ringkasan Atas
+        document.getElementById('stat-omset').innerText = `Rp ${totalOmset.toLocaleString('id-ID')}`;
+        document.getElementById('stat-masuk').innerText = `Rp ${totalMasuk.toLocaleString('id-ID')}`;
+        document.getElementById('stat-keluar').innerText = `Rp ${totalKeluar.toLocaleString('id-ID')}`;
+        document.getElementById('stat-bersih').innerText = `Rp ${(totalMasuk - totalKeluar).toLocaleString('id-ID')}`;
+
+      } catch (err) { alert("Sistem gagal memuat database: " + err.message); }
+    }
+
+    // Fungsi Aksi Menyimpan Data Baru Hasil Input Manual Anda
+    async function simpanTransaksiKeuangan() {
+      const tanggal = document.getElementById('txTanggal').value;
+      const jenis_transaksi = document.getElementById('txJenis').value;
+      const kategori = document.getElementById('txKategori').value;
+      const nominal = parseInt(document.getElementById('txNominal').value);
+      const keterangan = document.getElementById('txKeterangan').value;
+
+      try {
+        const { error } = await supabaseClient.from('laporan_keuangan').insert([{ tanggal, jenis_transaksi, kategori, nominal, keterangan }]);
+        if(error) throw error;
+        
+        alert("✔️ Data pembukuan manual berhasil bermigrasi ke database cloud!");
+        document.getElementById('txNominal').value = '';
+        document.getElementById('txKeterangan').value = '';
+        MuatSemuaLaporanDashboard(); // Refresh data otomatis
+      } catch(err) { alert("Gagal menyimpan data: " + err.message); }
+    }
+
+    function logoutAdmin() {
+      localStorage.removeItem('admin_session');
+      window.location.href = 'index.html';
+    }
+  </script>
 </body>
 </html>
