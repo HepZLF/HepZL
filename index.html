@@ -160,7 +160,7 @@
     }
     .btn:hover { background: var(--accent); box-shadow: 0 6px 20px rgba(255, 99, 71, 0.4); transform: scale(1.02); }
 
-    /* --- Features Grid (10 Keunggulan) --- */
+    /* --- Features Grid --- */
     .features-bg { background: linear-gradient(rgba(139,69,19,0.03), rgba(139,69,19,0.03)); padding: 40px 20px; border-radius: 30px; margin: 40px 0; }
     .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
     .feature-box { background: var(--white); padding: 25px 20px; border-radius: 20px; text-align: center; transition: all 0.3s ease; border: 1px solid rgba(0,0,0,0.03); }
@@ -200,7 +200,7 @@
       <div class="tagline">Minuman Tradisional • Sentuhan Modern</div>
     </div>
     <div class="btn-login-container">
-      <button class="btn-login" onclick="openModal()">Login</button>
+      <button class="btn-login" onclick="openModal()">Login Admin</button>
     </div>
   </header>
 
@@ -358,11 +358,11 @@
           });
           JalankanAnimasi();
         } else {
-          grid.innerHTML = '<p style="text-align: center; color: red; grid-column: span 3;">Data produk kosong di database. Silakan jalankan script SQL Editor di dashboard.</p>';
+          grid.innerHTML = '<p style="text-align: center; color: #ff6347; grid-column: span 3; font-weight: 600;">Data produk kosong di database Supabase Anda.</p>';
         }
       } catch (err) {
         console.error("Error memuat produk:", err);
-        grid.innerHTML = `<p style="text-align: center; color: red; grid-column: span 3;">Gagal terhubung ke database: ${err.message}</p>';
+        grid.innerHTML = `<p style="text-align: center; color: red; grid-column: span 3;">Gagal terhubung ke database: ${err.message}</p>`;
       }
     });
   </script>
