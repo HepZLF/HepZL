@@ -28,7 +28,8 @@ async function tampilkanKatalog() {
 
             card.innerHTML = `
                 <div class="card-image">
-                    <img src="https://via.placeholder.com/150/FAFD FC/5D4037?text=Nusantara+Cuy" alt="${produk.nama_produk}">
+                    // Cari baris ini di katalog.js dan betulkan URL gambarnya:
+                        <img src="https://via.placeholder.com/150/faf3e0/5d4037?text=Nusantara+Cuy" alt="${produk.nama_produk}">
                 </div>
 
                 <div class="card-content">

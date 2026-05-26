@@ -1,17 +1,17 @@
 // admin.js
 async function tambahProduk() {
-    // 1. AMBIL NILAI DARI INPUT HTML (Perhatikan nama variabelnya)
-    const nama = document.getElementById('inputNamaProduk').value;
-    const harga = document.getElementById('inputHargaProduk').value;
-    const deskripsi = document.getElementById('inputDeskripsiProduk').value;
+    // 1. AMBIL NILAI DARI INPUT HTML (Sudah disesuaikan dengan ID di admin.html)
+    const nama = document.getElementById('nama_produk').value;
+    const harga = document.getElementById('harga').value;
+    const deskripsi = document.getElementById('deskripsi').value;
 
     try {
-        // 2. KIRIM KE SUPABASE (Pastikan nama variabel di atas dipanggil di sini)
+        // 2. KIRIM KE SUPABASE
         const { data, error } = await supabaseClient
             .from('produk')
             .insert([
                 { 
-                    nama_produk: nama,       // 'nama' diambil dari variabel di atas
+                    nama_produk: nama,       
                     harga: parseInt(harga),  // diubah ke angka (integer)
                     deskripsi: deskripsi 
                 }
@@ -21,8 +21,8 @@ async function tambahProduk() {
 
         alert('Produk berhasil disimpan ke Cloud Supabase Singapore!');
         
-        // Mengosongkan form kembali setelah sukses
-        document.getElementById('formProduk').reset();
+        // Mengosongkan form kembali setelah sukses (Sesuai ID form-produk)
+        document.getElementById('form-produk').reset();
 
     } catch (err) {
         console.error('Error saat menyimpan:', err.message);
