@@ -3,380 +3,366 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Nusantara Cuy - Minuman Tradisional Berkualitas</title>
+  <title>Nusantara Cuy - Minuman Tradisional Modern</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
 
   <style>
+    :root {
+      --primary: #8B4513;
+      --secondary: #D2691E;
+      --accent: #FF6347;
+      --bg: #fdf8f1;
+      --white: #ffffff;
+      --text: #3d2b1f;
+      --shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
 
     body {
-      font-family: 'Verdana', sans-serif;
+      font-family: 'Poppins', sans-serif;
       line-height: 1.6;
-      color: #333;
-      background: #f8efe2;
-      background-image:
-        radial-gradient(circle at top left, rgba(205,133,63,0.10) 0, transparent 30%),
-        radial-gradient(circle at bottom right, rgba(139,69,19,0.08) 0, transparent 25%);
-      min-height: 100vh;
+      color: var(--text);
+      background: var(--bg);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(210, 105, 30, 0.05) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(139, 69, 19, 0.05) 0%, transparent 20%);
     }
 
-    /* Layout */
     .container {
-      width: 100%;
-      max-width: 1100px;
+      width: 90%;
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 0 16px;
+      padding: 0 20px;
     }
 
+    /* --- Header --- */
     header {
-      background: linear-gradient(135deg, #7a3f0f 0%, #b16b34 100%);
-      color: #fff;
-      padding: 18px 0;
-      box-shadow: 0 6px 14px rgba(0,0,0,0.12);
-      border-bottom: 4px solid #6a3510;
+      background: linear-gradient(135deg, var(--primary) 0%, #5d2e0a 100%);
+      color: var(--white);
+      padding: 30px 0;
       text-align: center;
-    }
-
-    .brand {
-      display: grid;
-      gap: 6px;
-      justify-items: center;
-    }
-
-    .logo {
-      font-size: clamp(34px, 5vw, 60px);
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      line-height: 1;
-    }
-
-    .tagline {
-      font-size: 14px;
-      opacity: 0.95;
-      letter-spacing: 0.5px;
-    }
-
-    /* Top buttons */
-    .top-actions {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background: rgba(248,239,226,0.86);
-      backdrop-filter: blur(6px);
-      border-bottom: 2px solid rgba(106,53,16,0.15);
-    }
-
-    .top-actions-inner {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 0;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 10px 14px;
-      border-radius: 10px;
-      border: 2px solid rgba(0,0,0,0.85);
-      background: #fff;
-      color: #111;
-      text-decoration: none;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-      box-shadow: 4px 4px 0 rgba(0,0,0,0.2);
-      transition: transform .15s ease, box-shadow .15s ease;
-      user-select: none;
-    }
-
-    .btn:hover { transform: translateY(-2px); box-shadow: 6px 6px 0 rgba(0,0,0,0.2); }
-
-    .btn-primary {
-      background: #FF6347;
-      color: #fff;
-      border-color: rgba(0,0,0,0.85);
-    }
-
-    /* HERO */
-    .hero {
-      background: linear-gradient(135deg, #D2691E 0%, #CD853F 100%);
-      color: #fff;
-      padding: 34px 0;
-      text-align: center;
-      margin-top: 12px;
-      border-radius: 18px;
-      border: 3px solid rgba(0,0,0,0.35);
-      box-shadow: 0 14px 30px rgba(0,0,0,0.15);
-    }
-
-    .hero h1 { font-size: clamp(26px, 4.4vw, 42px); margin-bottom: 10px; }
-    .hero p { font-size: clamp(14px, 2.3vw, 18px); margin-bottom: 16px; opacity: 0.97; }
-
-    /* Products */
-    .products {
-      background: #FFF8DC;
-      border-radius: 18px;
-      border: 3px solid rgba(0,0,0,0.25);
-      box-shadow: 0 14px 30px rgba(0,0,0,0.10);
-      padding: 22px 0;
-      margin-top: 18px;
-    }
-
-    .section-title {
-      text-align: center;
-      font-size: clamp(22px, 3.4vw, 36px);
-      margin-bottom: 18px;
-      color: #8B4513;
-      font-weight: 900;
-    }
-
-    .products-grid {
-      width: 100%;
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 0 16px;
-      display: grid;
-      grid-template-columns: repeat( auto-fit, minmax(260px, 1fr) );
-      gap: 16px;
-      align-items: start;
-    }
-
-    .product-card {
-      background: rgba(255,255,255,0.95);
-      border-radius: 16px;
-      overflow: hidden;
-      border: 2px solid rgba(167,107,67,0.20);
-      box-shadow: 0 10px 26px rgba(0,0,0,0.10);
-    }
-
-    .product-image {
-      width: 100%;
-      height: 240px;
-      background: linear-gradient(135deg, #f5e6d2 0%, #d7b48b 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
+      border-bottom-left-radius: 50% 20px;
+      border-bottom-right-radius: 50% 20px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
       position: relative;
     }
 
-    .product-image img.product-main {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      max-width: 100%;
-      max-height: 100%;
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(36px, 6vw, 54px);
+      font-weight: 900;
+      letter-spacing: 2px;
+      margin-bottom: 5px;
+      text-shadow: 2px 4px 10px rgba(0,0,0,0.3);
     }
 
-    .product-info { padding: 14px 14px 16px; }
-    .product-info h3 { font-size: 18px; color: #8B4513; margin-bottom: 8px; }
-    .product-info p { font-size: 13px; color: #666; margin-bottom: 12px; }
-    .price { font-size: 17px; color: #FF6347; font-weight: 900; margin-bottom: 12px; }
+    .tagline {
+      font-size: clamp(12px, 1.5vw, 16px);
+      font-weight: 300;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      opacity: 0.9;
+    }
 
-    /* Sakura / Ornament Layer Animasi Jatuh */
-    .ornament-layer { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
-
-    .ornament {
+    .btn-login-container {
       position: absolute;
-      top: -40px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 90px;
-      height: auto;
-      opacity: 0.38;
-      filter: drop-shadow(0 6px 10px rgba(0,0,0,0.14));
-      animation: sakuraFall 6.5s ease-in-out infinite;
+      top: 20px;
+      right: 5%;
     }
 
-    .orn-1 { --x:-45px; --rot:-6deg; --delay:0s;   --dur:6.0s; --scale:0.75; width:80px; }
-    .orn-2 { --x:-5px;  --rot: 6deg; --delay:1.2s; --dur:6.8s; --scale:0.65; width:70px; }
-    .orn-3 { --x: 35px; --rot:-2deg; --delay:2.0s; --dur:7.2s; --scale:0.70; width:74px; }
-    .orn-4 { --x: 70px; --rot: 3deg; --delay:0.6s; --dur:6.4s; --scale:0.60; width:64px; }
+    .btn-login {
+      background: var(--accent);
+      color: var(--white);
+      border: none;
+      padding: 8px 20px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9em;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(255,99,71,0.2);
+    }
+    .btn-login:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(255,99,71,0.3); }
 
-    .orn-1, .orn-2, .orn-3, .orn-4 {
-      animation-duration: var(--dur);
-      animation-delay: var(--delay);
+    /* --- Hero Section --- */
+    .hero { padding: 40px 0 20px; text-align: center; }
+    .hero-card {
+      background: var(--white);
+      padding: 40px 30px;
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(139,69,19,0.1);
+    }
+    .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 4vw, 46px); color: var(--primary); margin-bottom: 15px; }
+    .hero p { font-size: 16px; max-width: 700px; margin: 0 auto; color: #666; }
+
+    /* --- Section Styling --- */
+    .section-title {
+      text-align: center;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(26px, 3.5vw, 38px);
+      margin: 50px 0 30px;
+      color: var(--primary);
+    }
+    .section-title::after {
+      content: ''; display: block; width: 60px; height: 4px; background: var(--accent); margin: 10px auto; border-radius: 2px;
     }
 
-    @keyframes sakuraFall {
-      0%   { top:-50px; opacity:0; transform:translateX(-50%) translateX(var(--x)) rotate(0deg) scale(var(--scale)); }
-      10%  { opacity:0.40; }
-      55%  { top:120px; opacity:0.30; transform:translateX(-50%) translateX(calc(var(--x) * 0.6)) rotate(var(--rot)) scale(var(--scale)); }
-      100% { top:300px; opacity:0; transform:translateX(-50%) translateX(calc(var(--x) * 0.9)) rotate(calc(var(--rot) * -1)) scale(var(--scale)); }
+    .section-card {
+      background: var(--white);
+      padding: 35px 30px;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(139,69,19,0.05);
+      margin-bottom: 40px;
+      text-align: center;
     }
+    .section-card h3 { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--primary); margin-bottom: 15px; }
 
-    /* Features */
-    .features {
-      background: rgba(255,255,255,0.95);
-      border-radius: 18px;
-      border: 3px solid rgba(0,0,0,0.20);
-      box-shadow: 0 14px 30px rgba(0,0,0,0.10);
-      padding: 22px 0;
-      margin-top: 18px;
-    }
-
-    .features-grid{
-      width: 100%;
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 0 16px;
+    /* --- Products Grid (Dynamic) --- */
+    .products-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 14px;
-      align-items: stretch;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-bottom: 50px;
     }
 
-    .feature-box{
-      text-align:center;
-      padding: 18px 14px;
-      background:#FFF8DC;
-      border-radius: 14px;
-      border: 2px solid rgba(167,107,67,0.18);
-    }
-
-    .feature-icon{ font-size: 32px; margin-bottom: 8px; }
-    .feature-box h3 { color:#8B4513; margin-bottom: 6px; font-size: 16px; font-weight: 900; }
-    .feature-box p { color:#666; font-size: 13px; }
-
-    /* Contact */
-    .contact {
-      background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
-      color: #fff;
-      border-radius: 18px;
-      border: 3px solid rgba(0,0,0,0.30);
-      box-shadow: 0 14px 30px rgba(0,0,0,0.15);
-      padding: 22px 0;
-      margin-top: 18px;
-    }
-
-    .contact-inner {
-      width: 100%;
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 0 16px;
+    .product-card {
+      background: var(--white);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 1px solid rgba(0,0,0,0.03);
       display: flex;
       flex-direction: column;
-      gap: 16px;
     }
+    .product-card:hover { transform: translateY(-12px); box-shadow: 0 20px 40px rgba(0,0,0,0.12); }
 
-    footer { text-align:center; padding: 18px 0 26px; font-size: 13px; color: #fff; }
-    @media (max-width: 820px){ .hero { margin-top: 10px; } }
+    .product-image {
+      height: 280px; background: #fdf1e1; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;
+    }
+    .product-image img.product-main { height: 85%; width: auto; object-fit: contain; z-index: 2; transition: transform 0.5s ease; }
+    .product-card:hover .product-main { transform: scale(1.08) rotate(2deg); }
+
+    .product-info { padding: 25px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; }
+    .product-info h3 { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--primary); margin-bottom: 12px; }
+    .product-info p { font-size: 14px; color: #777; margin-bottom: 18px; flex-grow: 1; }
+    .price { font-size: 22px; font-weight: 700; color: var(--accent); margin-bottom: 18px; }
+
+    .btn {
+      display: inline-block; padding: 12px 25px; background: var(--primary); color: white; text-decoration: none; border-radius: 50px; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(139, 69, 19, 0.3); width: 100%;
+    }
+    .btn:hover { background: var(--accent); box-shadow: 0 6px 20px rgba(255, 99, 71, 0.4); transform: scale(1.02); }
+
+    /* --- Features Grid (10 Keunggulan) --- */
+    .features-bg { background: linear-gradient(rgba(139,69,19,0.03), rgba(139,69,19,0.03)); padding: 40px 20px; border-radius: 30px; margin: 40px 0; }
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+    .feature-box { background: var(--white); padding: 25px 20px; border-radius: 20px; text-align: center; transition: all 0.3s ease; border: 1px solid rgba(0,0,0,0.03); }
+    .feature-box:hover { background: var(--primary); color: white; }
+    .feature-icon { font-size: 36px; margin-bottom: 12px; display: block; }
+    .feature-box h3 { font-size: 15px; margin-bottom: 8px; color: inherit; }
+    .feature-box p { font-size: 12px; opacity: 0.8; }
+    .feature-box:hover p { color: #fdf8f1; }
+
+    /* --- Contact --- */
+    .contact { background: linear-gradient(135deg, var(--primary) 0%, #5d2e0a 100%); color: white; padding: 60px 20px; border-radius: 30px; text-align: center; margin: 40px 0; }
+    .contact h2 { font-family: 'Playfair Display', serif; font-size: 32px; margin-bottom: 15px; }
+    .contact-links { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-top: 25px; }
+    .contact-item { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 12px 22px; border-radius: 12px; color: white; text-decoration: none; font-weight: 500; transition: all 0.3s ease; border: 1px solid rgba(255,255,255,0.2); }
+    .contact-item:hover { background: var(--white); color: var(--primary); transform: translateY(-3px); }
+
+    footer { text-align: center; padding: 30px 0; color: #888; font-size: 14px; }
+
+    /* Modal Login */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; padding: 20px; z-index: 1000; }
+    .modal-content { background: var(--white); padding: 30px; border-radius: 20px; width: 100%; max-width: 400px; position: relative; box-shadow: var(--shadow); }
+    .form-group { margin-bottom: 15px; text-align: left; }
+    .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9em; }
+    .form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
+    .btn-block { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 30px; cursor: pointer; font-weight: bold; }
+    .close-btn { position: absolute; right: 20px; top: 15px; cursor: pointer; font-size: 1.8em; color: #aaa; }
+
+    .animate { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .animate.show { opacity: 1; transform: translateY(0); }
   </style>
 </head>
 
 <body>
   <header>
-    <div class="container brand">
+    <div class="container">
       <div class="logo">NUSANTARA CUY</div>
-      <div class="tagline">Minuman Tradisional, Sentuhan Modern</div>
+      <div class="tagline">Minuman Tradisional • Sentuhan Modern</div>
+    </div>
+    <div class="btn-login-container">
+      <button class="btn-login" onclick="openModal()">Login Admin</button>
     </div>
   </header>
 
-  <div class="top-actions" role="navigation">
-    <div class="container top-actions-inner">
-      <div></div>
-      <button class="btn btn-outline" onclick="window.location.href='dashboard.html'">Login Admin</button>
-    </div>
-  </div>
+  <main class="container">
+    <section class="hero">
+      <div class="hero-card animate">
+        <h1>Rasa Nusantara, Segarnya Juara</h1>
+        <p>Kami menghadirkan kembali warisan rasa Indonesia dengan gaya yang lebih segar, modern, dan berkelas untuk menemani hari-harimu.</p>
+      </div>
+    </section>
 
-  <section class="hero" id="home">
-    <div class="container">
-      <h1>Rasa Nusantara, Segarnya Juara</h1>
-      <p>Meng-upgrade minuman tradisional Indonesia menjadi modern dan segar untuk generasi baru.</p>
-    </div>
-  </section>
+    <section class="section-card animate">
+      <h3>Filosofi Nusantara Cuy</h3>
+      <p>Kata <strong>"Nusantara"</strong> menggambarkan kekayaan budaya serta penggunaan bahan tradisional Indonesia yang melimpah sebagai dasar produk kami. Sementara kata <strong>"Cuy"</strong> mencerminkan nuansa modernitas dan kedekatan gaya hidup aktif generasi muda saat ini.</p>
+    </section>
 
-  <section class="products" id="produk">
-    <div class="container">
+    <section id="produk-section">
       <div class="section-title">Produk Kami</div>
       <div class="products-grid" id="katalog-produk-publik">
         <p style="text-align: center; grid-column: span 3; color: #999;">Menghubungkan ke database Supabase...</p>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="features" id="unggulan">
-    <div class="container">
-      <div class="section-title">Keunggulan</div>
+    <section class="features-bg animate">
+      <div class="section-title">10 Keunggulan Nusantara Cuy</div>
       <div class="features-grid">
-        <div class="feature-box"><div class="feature-icon">✅</div><h3>Bahan Alami</h3><p>100% bahan alami tanpa pengawet berbahaya.</p></div>
-        <div class="feature-box"><div class="feature-icon">👨‍🍳</div><h3>Resep Tradisional</h3><p>Dibuat dengan resep turun temurun Indonesia.</p></div>
-        <div class="feature-box"><div class="feature-icon">🌟</div><h3>Kualitas Premium</h3><p>Standar kualitas untuk produk lokal.</p></div>
-        <div class="feature-box"><div class="feature-icon">🚚</div><h3>Pengiriman Cepat</h3><p>Antar hari ke seluruh kota besar.</p></div>
-        <div class="feature-box"><div class="feature-icon">💰</div><h3>Harga Terjangkau</h3><p>Harga bersaing tanpa mengorbankan kualitas.</p></div>
-        <div class="feature-box"><div class="feature-icon">❤️</div><h3>Dipercaya Ribuan</h3><p>Sudah melayani pelanggan setia kami.</p></div>
-        <div class="feature-box"><div class="feature-icon">📦</div><h3>Kemasan Modern</h3><p>Praktis dan higienis, cocok dibawa ke mana saja.</p></div>
-        <div class="feature-box"><div class="feature-icon">🇮🇩</div><h3>Dukungan Lokal</h3><p>Mendukung petani rempah dan produsen lokal.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="contact" id="kontak">
-    <div class="contact-inner">
-      <div>
-        <h2>Siap Menikmati Kesegaran?</h2>
-        <p>Hubungi kami melalui WhatsApp atau kunjungi media sosial kami.</p>
-        <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 12px;"> 
-          <a href="https://wa.me/6289623286195" target="_blank" rel="noopener" style="text-decoration: none;"><span style="color:#fff; font-weight: bold;">📱 WhatsApp: 089623286195 (Admin Hep)</span></a>
-          <a href="https://www.tiktok.com/@Nusantara_cuy" target="_blank" rel="noopener" style="text-decoration: none;"><span style="color:#fff; font-size: 15px;">🎵 TikTok: @Nusantara_cuy</span></a>
-          <a href="https://www.instagram.com/Nusantara.cuy" target="_blank" rel="noopener" style="text-decoration: none;"><span style="color:#fff; font-size: 15px;">📷 Instagram: @Nusantara.cuy</span></a>
+        <div class="feature-box">
+          <span class="feature-icon">🌿</span>
+          <h3>1. 100% Alami</h3>
+          <p>Memanfaatkan kekayaan alam asli rempah tanpa pengawet buatan.</p>
+        </div>
+        <div class="feature-box">
+          <span class="feature-icon">✨</span>
+          <h3>2. Resep Autentik</h3>
+          <p>Warisan cita rasa tradisional legendaris nusantara turun temurun.</p>
+        </div>
+        <div class="feature-box">
+          <span class="feature-icon">💎</span>
+          <h3>3. Kualitas Premium</h3>
+          <p>Standarisasi bahan baku pilihan terbaik di setiap sajian cangkir.</p>
+        </div>
+        <div class="feature-box">
+          <span class="feature-icon">🥛</span>
+          <h3>4. Pengganti Sehat</h3>
+          <p>Menggunakan kebaikan susu evaporasi creamy pengganti santan kelapa.</p>
+        </div>
+        <div class="feature-box">
+          <span class="feature-icon">💥</span>
+          <h3>5. Inovasi Jamu Soda</h3>
+          <p>Eksplorasi unik jamu kunyit asam berpadu kesegaran sparkling soda.</p>
+        </div>
+        <div class="feature-box">
+          <span class="feature-icon">🔮</span>
+          <h3>6. Pewarna Alami</h3>
+          <p>Gradasi warna ungu estetik murni dari kelopak bunga telang asli.</p>
+        </div>
+        <div class="feature-box">
+          <span class="feature-icon">🧼</span>
+          <h3>7. Super Higienis</h3>
+          <p>Diproses bersih melalui standar sanitasi ketat dan aman konsumsi.</p>
+        </div>
+        <div class="feature-box">
+          <span class="feature-icon">💰</span>
+          <h3>8. Harga Kompetitif</h3>
+          <p>Kemewahan cita rasa hybrid beverage yang pas di kantong mahasiswa.</p>
+        </div>
+        <div class="feature-box">
+          <span class="feature-icon">🎯</span>
+          <h3>9. Gen Z Relevance</h3>
+          <p>Gaya visual kemasan estetik kekinian yang sangat ramah media sosial.</p>
+        </div>
+        <div class="feature-box">
+          <span class="feature-icon">🛵</span>
+          <h3>10. Delivery Instant</h3>
+          <p>Terintegrasi link order pemesanan langsung sampai ke depan pintu.</p>
         </div>
       </div>
+    </section>
+
+    <section class="contact animate" id="kontak">
+      <h2>Siap Menikmati Kesegaran?</h2>
+      <p>Pesan sekarang dan rasakan sensasi minuman tradisional dengan gaya masa kini.</p>
+      <div class="contact-links">
+        <a href="https://wa.me/6289623286195" target="_blank" class="contact-item">📱 WhatsApp: 089623286195</a>
+        <a href="https://www.tiktok.com/@Nusantara_cuy" target="_blank" class="contact-item">🎵 TikTok @Nusantara_cuy</a>
+        <a href="https://www.instagram.com/Nusantara.cuy" target="_blank" class="contact-item">📷 Instagram @Nusantara.cuy</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">© 2026 Nusantara Cuy. All Rights Reserved.</div>
+  </footer>
+
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal()">&times;</span>
+      <h3>Login Panel Admin</h3>
+      <form id="formLogin" onsubmit="event.preventDefault(); prosesLogin();">
+        <div class="form-group">
+          <label>Email Admin:</label>
+          <input type="email" id="loginEmail" required placeholder="admin@nusantaracuy.com">
+        </div>
+        <div class="form-group">
+          <label>Password:</label>
+          <input type="password" id="loginPassword" required placeholder="******">
+        </div>
+        <button type="submit" class="btn-block">Masuk ke Dashboard</button>
+      </form>
     </div>
-  </section>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="db.js"></script>
+  <script src="auth.js"></script>
   <script>
+    function openModal() { document.getElementById('loginModal').style.display = 'flex'; }
+    function closeModal() { document.getElementById('loginModal').style.display = 'none'; }
+
+    // Membaca data secara real-time dari database Supabase Anda
     document.addEventListener('DOMContentLoaded', async () => {
       const grid = document.getElementById('katalog-produk-publik');
+      
+      // Mengaktifkan efek scroll animasi
+      const JalankanAnimasi = () => {
+        document.querySelectorAll('.animate').forEach(el => {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= window.innerHeight * 0.85) { el.classList.add('show'); }
+        });
+      };
+      window.addEventListener('scroll', JalankanAnimasi);
+
       try {
         if (typeof supabaseClient === 'undefined') {
-          throw new Error("Koneksi database 'supabaseClient' di db.js tidak terdeteksi!");
+          throw new Error("Koneksi 'supabaseClient' tidak ditemukan. Periksa konfigurasi berkas db.js Anda!");
         }
 
         const { data: produk, error } = await supabaseClient.from('produk').select('*').order('id', { ascending: true });
         if (error) throw error;
-
+        
         if (produk && produk.length > 0) {
           grid.innerHTML = '';
-          produk.forEach(p => {
-            // Jika kolom ornamen_url kosong di database, gunakan placeholder default
-            const linkOrnamen = p.ornamen_url || 'https://lh3.googleusercontent.com/d/1WTYvTB9ymj8I93VL-92erfK4733d3YFU=w800';
-            
+          produk.forEach((p, index) => {
             grid.innerHTML += `
               <article class="product-card">
                 <div class="product-image">
                   <img class="product-main" src="${p.foto_url || 'https://via.placeholder.com/300'}" alt="${p.nama_produk}" />
-                  
-                  <div class="ornament-layer" aria-hidden="true">
-                    <img class="ornament orn-1" src="${linkOrnamen}" alt="" />
-                    <img class="ornament orn-2" src="${linkOrnamen}" alt="" />
-                    <img class="ornament orn-3" src="${linkOrnamen}" alt="" />
-                    <img class="ornament orn-4" src="${linkOrnamen}" alt="" />
-                  </div>
                 </div>
-
                 <div class="product-info">
                   <h3>${p.nama_produk}</h3>
-                  <p>${p.deskripsi || ''}</p>
+                  <p>${p.deskripsi || 'Sajian ramuan istimewa berkelas persembahan anak bangsa.'}</p>
                   <div class="price">Rp ${Number(p.harga).toLocaleString('id-ID')}</div>
-                  <a class="btn btn-primary" href="https://wa.me/6289623286195?text=Saya%20ingin%20pesan%20${encodeURIComponent(p.nama_produk)}" target="_blank" rel="noopener">Beli Sekarang</a>
+                  <a class="btn" href="https://wa.me/6289623286195?text=Saya%20ingin%20pesan%20${encodeURIComponent(p.nama_produk)}" target="_blank" rel="noopener">Pesan Sekarang</a>
                 </div>
               </article>
             `;
           });
+          JalankanAnimasi();
         } else {
-          grid.innerHTML = '<p style="text-align: center; color: red; grid-column: span 3;">Data produk kosong di database.</p>';
+          grid.innerHTML = '<p style="text-align: center; color: red; grid-column: span 3;">Data produk kosong di database. Silakan jalankan script SQL Editor di dashboard.</p>';
         }
       } catch (err) {
-        console.error(err);
-        grid.innerHTML = `<p style="text-align: center; color: red; grid-column: span 3;">Gagal memuat produk: ${err.message}</p>`;
+        console.error("Error memuat produk:", err);
+        grid.innerHTML = `<p style="text-align: center; color: red; grid-column: span 3;">Gagal terhubung ke database: ${err.message}</p>`;
       }
     });
   </script>
