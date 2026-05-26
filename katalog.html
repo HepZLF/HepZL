@@ -3,31 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Katalog Produk Toko</title>
+    <title>Katalog Produk Nusantara Cuy</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 40px; }
-        h1 { text-align: center; color: #333; }
-        .grid-produk { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; margin-top: 30px; }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .card h3 { margin-top: 0; color: #2ecc71; }
-        .harga { font-weight: bold; color: #e74c3c; font-size: 1.1em; }
-        .deskripsi { color: #666; font-size: 0.9em; margin-top: 8px; }
+        /* Gaya Global Nusantara Cuy */
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            background-color: #faf3e0; /* Krem background */
+            color: #5d4037; 
+        }
+
+        /* Gaya Header */
+        header {
+            background-color: #8d6e63; /* Cokelat header */
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        header h1 { margin: 0; font-size: 2.2em; text-transform: uppercase; letter-spacing: 2px; }
+        header p { margin: 5px 0 0; font-size: 1em; opacity: 0.9; }
+
+        /* Gaya Sub-Header Banner */
+        .sub-header-banner {
+            background-color: #d87e33; /* Orange sub-header */
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .sub-header-banner h2 { margin: 0; font-size: 2em; }
+        .sub-header-banner p { margin: 10px 0 0; font-size: 1.1em; opacity: 0.9; }
+
+        /* Section Produk */
+        .product-section {
+            background-color: #fffdec; /* Warna krem muda 'Produk Kami' */
+            padding: 40px 20px;
+            margin: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            text-align: center;
+            color: #8d6e63;
+            margin-bottom: 30px;
+            font-size: 1.8em;
+        }
+
+        /* Grid Produk */
+        .grid-produk { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 25px; 
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* GAYA CARD PRODUK (SESUAI GAMBAR IKLAN) */
+        .card { 
+            background: white; 
+            border-radius: 12px; 
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1); 
+            border: 1px solid #e0d0b0; /* Border emas tipis */
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+        .card:hover { transform: translateY(-5px); }
+
+        /* Gambar placeholder (Karena gambar belum dinamis dari DB) */
+        .card-image {
+            height: 200px;
+            background-color: #fafdfc; /* Warna krem placeholder gambar */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 1px solid #e0d0b0;
+        }
+        .card-image img { 
+            max-height: 90%; 
+            max-width: 90%;
+        }
+
+        /* Konten Teks di dalam Kartu */
+        .card-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .card h3 { 
+            margin: 0 0 10px; 
+            color: #8d6e63; /* Warna judul produk cokelat header */
+            font-size: 1.3em;
+        }
+
+        .deskripsi { 
+            color: #666; 
+            font-size: 0.95em; 
+            margin-top: 0;
+            margin-bottom: 15px;
+            line-height: 1.4;
+            flex-grow: 1;
+        }
+
+        .harga { 
+            font-weight: bold; 
+            color: #e74c3c; /* Warna harga merah */
+            font-size: 1.1em; 
+            margin-bottom: 15px;
+        }
+
+        /* Button style 'Beli Sekarang' */
+        .btn-beli { 
+            background-color: #ff6e40; /* Orange-merah tombol */
+            color: white; 
+            padding: 10px 15px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            text-align: center;
+            font-size: 1em; 
+            font-weight: bold;
+            text-decoration: none;
+            transition: background 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .btn-beli:hover { background-color: #e64a19; }
+
+        /* Tampilan Loading */
+        #container-produk p.loading-text { text-align: center; width: 100%; }
+
     </style>
 </head>
 <body>
 
-    <h1>Katalog Produk Kami 🛍️</h1>
-    
-    <!-- Tempat di mana daftar produk dari Supabase akan muncul -->
-    <div id="container-produk" class="grid-produk">
-        <p style="text-align: center; width: 100%;">Memuat produk...</p>
+    <header>
+        <h1>NUSANTARA CUY</h1>
+        <p>Minuman Tradisional, Sentuhan Modern</p>
+    </header>
+
+    <div class="sub-header-banner">
+        <h2>Rasa Nusantara, Segarnya Juara</h2>
+        <p>Meng-upgrade minuman tradisional Indonesia menjadi modern dan segar untuk generasi baru.</p>
     </div>
 
-    <!-- Menghubungkan ke SDK Supabase CDN -->
+    <div class="product-section">
+        <div class="section-title">Produk Kami</div>
+        
+        <div id="container-produk" class="grid-produk">
+            <p class="loading-text">Memuat produk...</p>
+        </div>
+    </div>
+
+    <div style="text-align: center; padding: 20px; margin-top: 20px; background-color: #faf3e0; border-top: 1px solid #e0d0b0; color: #8d6e63;">
+        <p>Butuh bantuan? <a href="index.html" style="color: #d87e33;">Tambah Produk (Admin)</a></p>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Menghubungkan ke file konfigurasi database kamu -->
     <script src="db.js"></script>
-    <!-- Menghubungkan ke logika penampilan data -->
     <script src="katalog.js"></script>
 </body>
 </html>

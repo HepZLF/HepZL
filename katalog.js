@@ -27,9 +27,16 @@ async function tampilkanKatalog() {
             card.className = 'card';
 
             card.innerHTML = `
-                <h3>${produk.nama_produk}</h3>
-                <p class="harga">Rp ${Number(produk.harga).toLocaleString('id-ID')}</p>
-                <p class="deskripsi">${produk.deskripsi || 'Tidak ada deskripsi.'}</p>
+                <div class="card-image">
+                    <img src="https://via.placeholder.com/150/FAFD FC/5D4037?text=Nusantara+Cuy" alt="${produk.nama_produk}">
+                </div>
+
+                <div class="card-content">
+                    <h3>${produk.nama_produk}</h3>
+                    <p class="deskripsi">${produk.deskripsi || 'Tidak ada deskripsi.'}</p>
+                    <p class="harga">Rp ${Number(produk.harga).toLocaleString('id-ID')}</p>
+                    <a href="#" class="btn-beli">Beli Sekarang</a>
+                </div>
             `;
 
             container.appendChild(card);

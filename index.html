@@ -3,42 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Halaman Admin - Input Produk</title>
+    <title>Admin - Tambah Produk Nusantara Cuy</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f4f9; }
-        .form-container { max-width: 400px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input, textarea { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-        button { background-color: #24b47e; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; width: 100%; font-size: 16px; }
-        button:hover { background-color: #1c8c62; }
+        /* Gaya Global Nusantara Cuy */
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            background-color: #faf3e0; /* Warna krem background */
+            color: #5d4037; /* Warna teks cokelat tua */
+        }
+
+        /* Gaya Header */
+        header {
+            background-color: #8d6e63; /* Cokelat header */
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        header h1 { margin: 0; font-size: 2.2em; text-transform: uppercase; letter-spacing: 2px; }
+        header p { margin: 5px 0 0; font-size: 1em; opacity: 0.9; }
+
+        /* Container & Card Admin */
+        .admin-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 120px);
+            padding: 20px;
+        }
+
+        .form-container { 
+            width: 100%;
+            max-width: 450px; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1); 
+            border: 1px solid #e0d0b0; /* Border emas tipis */
+        }
+
+        .form-container h2 { 
+            text-align: center; 
+            margin-top: 0; 
+            color: #d87e33; /* Warna orange sub-header */
+            margin-bottom: 25px;
+        }
+
+        /* Form styling */
+        .form-group { margin-bottom: 18px; }
+        label { display: block; margin-bottom: 6px; font-weight: bold; color: #8d6e63; }
+        input, textarea { 
+            width: 100%; 
+            padding: 12px; 
+            box-sizing: border-box; 
+            border: 1px solid #e0d0b0; 
+            border-radius: 6px; 
+            background-color: #fafdfc;
+            font-size: 1em;
+            color: #5d4037;
+        }
+        input:focus, textarea:focus {
+            outline: 2px solid #d87e33;
+            border-color: #d87e33;
+        }
+
+        /* Buttonstyling 'Beli Sekarang' style */
+        button { 
+            background-color: #ff6e40; /* Orange-merah tombol */
+            color: white; 
+            padding: 12px 18px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            width: 100%; 
+            font-size: 1.1em; 
+            font-weight: bold;
+            transition: background 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            text-transform: uppercase;
+        }
+        button:hover { background-color: #e64a19; }
+
+        /* Gaya untuk link katalog */
+        .nav-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #8d6e63;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+        .nav-link:hover { text-decoration: underline; }
+
     </style>
 </head>
 <body>
 
-    <div class="form-container">
-        <h2>Tambah Produk Baru</h2>
-        <form id="formProduk" onsubmit="event.preventDefault(); tambahProduk();">
-            <div class="form-group">
-                <label for="inputNamaProduk">Nama Produk:</label>
-                <input type="text" id="inputNamaProduk" required placeholder="Contoh: Kemeja Flanel">
-            </div>
-            
-            <div class="form-group">
-                <label for="inputHargaProduk">Harga (Rp):</label>
-                <input type="number" id="inputHargaProduk" required placeholder="Contoh: 150000">
-            </div>
-            
-            <div class="form-group">
-                <label for="inputDeskripsiProduk">Deskripsi:</label>
-                <textarea id="inputDeskripsiProduk" rows="3" placeholder="Deskripsi produk..."></textarea>
-            </div>
-            
-            <button type="submit">Simpan ke Supabase Cloud</button>
-        </form>
+    <header>
+        <h1>NUSANTARA CUY</h1>
+        <p>Minuman Tradisional, Sentuhan Modern</p>
+    </header>
+
+    <div class="admin-section">
+        <div class="form-container">
+            <h2>Tambah Produk Baru</h2>
+            <form id="formProduk" onsubmit="event.preventDefault(); tambahProduk();">
+                <div class="form-group">
+                    <label for="inputNamaProduk">Nama Produk:</label>
+                    <input type="text" id="inputNamaProduk" required placeholder="Misal: Es Doger Sultan">
+                </div>
+                
+                <div class="form-group">
+                    <label for="inputHargaProduk">Harga (Rp):</label>
+                    <input type="number" id="inputHargaProduk" required placeholder="Misal: 15000">
+                </div>
+                
+                <div class="form-group">
+                    <label for="inputDeskripsiProduk">Deskripsi (Untuk Kartu):</label>
+                    <textarea id="inputDeskripsiProduk" rows="3" placeholder="Misal: Campuran es serut dengan ketan hitam, pacar cina, dan roti tawar."></textarea>
+                </div>
+                
+                <button type="submit">Simpan ke Supabase Cloud</button>
+            </form>
+            <a href="katalog.html" class="nav-link">← Lihat Katalog Produk</a>
+        </div>
     </div>
 
-    <!-- Menghubungkan library dan logika file javascript -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="db.js"></script>
     <script src="admin.js"></script>
