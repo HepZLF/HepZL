@@ -26,8 +26,8 @@
       line-height: 1.6;
       color: var(--text);
       background: var(--bg);
-      background-image: 
-        radial-gradient(circle at 10% 20%, rgba(210, 105, 30, 0.05) 0%, transparent 20%),
+      background-image: \
+        radial-gradient(circle at 10% 20%, rgba(210, 105, 30, 0.05) 0%, transparent 20%),\
         radial-gradient(circle at 90% 80%, rgba(139, 69, 19, 0.05) 0%, transparent 20%);
     }
 
@@ -73,11 +73,12 @@
       right: 5%;
     }
 
+    /* Teks tombol diganti menjadi Login saja */
     .btn-login {
       background: var(--accent);
       color: var(--white);
       border: none;
-      padding: 8px 20px;
+      padding: 8px 24px;
       border-radius: 30px;
       cursor: pointer;
       font-weight: 600;
@@ -158,13 +159,13 @@
     }
     .btn:hover { background: var(--accent); box-shadow: 0 6px 20px rgba(255, 99, 71, 0.4); transform: scale(1.02); }
 
-    /* --- Features Grid (10 Keunggulan) --- */
+    /* --- Features Grid (Mengapa Nusantara Cuy?) --- */
     .features-bg { background: linear-gradient(rgba(139,69,19,0.03), rgba(139,69,19,0.03)); padding: 40px 20px; border-radius: 30px; margin: 40px 0; }
     .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
     .feature-box { background: var(--white); padding: 25px 20px; border-radius: 20px; text-align: center; transition: all 0.3s ease; border: 1px solid rgba(0,0,0,0.03); }
     .feature-box:hover { background: var(--primary); color: white; }
     .feature-icon { font-size: 36px; margin-bottom: 12px; display: block; }
-    .feature-box h3 { font-size: 15px; margin-bottom: 8px; color: inherit; }
+    .feature-box h3 { font-size: 15px; margin-bottom: 8px; color: inherit; font-weight: 700; }
     .feature-box p { font-size: 12px; opacity: 0.8; }
     .feature-box:hover p { color: #fdf8f1; }
 
@@ -198,7 +199,7 @@
       <div class="tagline">Minuman Tradisional • Sentuhan Modern</div>
     </div>
     <div class="btn-login-container">
-      <button class="btn-login" onclick="openModal()">Login Admin</button>
+      <button class="btn-login" onclick="openModal()">Login</button>
     </div>
   </header>
 
@@ -223,56 +224,56 @@
     </section>
 
     <section class="features-bg animate">
-      <div class="section-title">Mengapa Nusantara Cuy ?</div>
+      <div class="section-title">Mengapa Nusantara Cuy?</div>
       <div class="features-grid">
         <div class="feature-box">
           <span class="feature-icon">🌿</span>
-          <h3>1. 100% Alami</h3>
+          <h3>100% Alami</h3>
           <p>Memanfaatkan kekayaan alam asli rempah tanpa pengawet buatan.</p>
         </div>
         <div class="feature-box">
           <span class="feature-icon">✨</span>
-          <h3>2. Resep Autentik</h3>
+          <h3>Resep Autentik</h3>
           <p>Warisan cita rasa tradisional legendaris nusantara turun temurun.</p>
         </div>
         <div class="feature-box">
           <span class="feature-icon">💎</span>
-          <h3>3. Kualitas Premium</h3>
+          <h3>Kualitas Premium</h3>
           <p>Standarisasi bahan baku pilihan terbaik di setiap sajian cangkir.</p>
         </div>
         <div class="feature-box">
           <span class="feature-icon">🥛</span>
-          <h3>4. Pengganti Sehat</h3>
+          <h3>Pengganti Sehat</h3>
           <p>Menggunakan kebaikan susu evaporasi creamy pengganti santan kelapa.</p>
         </div>
         <div class="feature-box">
           <span class="feature-icon">💥</span>
-          <h3>5. Inovasi Jamu Soda</h3>
+          <h3>Inovasi Jamu Soda</h3>
           <p>Eksplorasi unik jamu kunyit asam berpadu kesegaran sparkling soda.</p>
         </div>
         <div class="feature-box">
           <span class="feature-icon">🔮</span>
-          <h3>6. Pewarna Alami</h3>
+          <h3>Pewarna Alami</h3>
           <p>Gradasi warna ungu estetik murni dari kelopak bunga telang asli.</p>
         </div>
         <div class="feature-box">
           <span class="feature-icon">🧼</span>
-          <h3>7. Super Higienis</h3>
+          <h3>Super Higienis</h3>
           <p>Diproses bersih melalui standar sanitasi ketat dan aman konsumsi.</p>
         </div>
         <div class="feature-box">
           <span class="feature-icon">💰</span>
-          <h3>8. Harga Kompetitif</h3>
+          <h3>Harga Kompetitif</h3>
           <p>Kemewahan cita rasa hybrid beverage yang pas di kantong mahasiswa.</p>
         </div>
         <div class="feature-box">
           <span class="feature-icon">🎯</span>
-          <h3>9. Gen Z Relevance</h3>
+          <h3>Gen Z Relevance</h3>
           <p>Gaya visual kemasan estetik kekinian yang sangat ramah media sosial.</p>
         </div>
         <div class="feature-box">
           <span class="feature-icon">🛵</span>
-          <h3>10. Delivery Instant</h3>
+          <h3>Delivery Instant</h3>
           <p>Terintegrasi link order pemesanan langsung sampai ke depan pintu.</p>
         </div>
       </div>
@@ -297,7 +298,7 @@
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal()">&times;</span>
       <h3>Login Panel Admin</h3>
-      <form id="formLogin" onsubmit="event.preventDefault(); prosesLogin();">
+      <form id="formLogin" onsubmit="event.preventDefault(); if(typeof prosesLogin === 'function') { prosesLogin(); } else { alert('Fungsi prosesLogin() di auth.js tidak ditemukan atau gagal dimuat.'); }">
         <div class="form-group">
           <label>Email Admin:</label>
           <input type="email" id="loginEmail" required placeholder="admin@nusantaracuy.com">
@@ -318,11 +319,9 @@
     function openModal() { document.getElementById('loginModal').style.display = 'flex'; }
     function closeModal() { document.getElementById('loginModal').style.display = 'none'; }
 
-    // Membaca data secara real-time dari database Supabase Anda
     document.addEventListener('DOMContentLoaded', async () => {
       const grid = document.getElementById('katalog-produk-publik');
       
-      // Mengaktifkan efek scroll animasi
       const JalankanAnimasi = () => {
         document.querySelectorAll('.animate').forEach(el => {
           const rect = el.getBoundingClientRect();
