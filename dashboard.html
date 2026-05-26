@@ -8,8 +8,8 @@
         body { font-family: Arial, sans-serif; margin: 0; background-color: #f4f6f9; display: flex; flex-direction: column; }
         .sidebar { width: 100%; background: #5d4037; color: white; padding: 15px; box-sizing: border-box; }
         .sidebar h2 { text-align: center; font-size: 1.2em; margin: 0 0 10px 0; border-bottom: 2px solid #8d6e63; padding-bottom: 10px; }
-        .sidebar menu { list-style: none; padding: 0; margin: 0; display: flex; gap: 8px; justify-content: center; }
-        .sidebar menu li { padding: 10px; cursor: pointer; border-radius: 6px; background: #8d6e63; text-align: center; font-weight: bold; font-size: 0.85em; flex: 1; }
+        .sidebar menu { list-style: none; padding: 0; margin: 0; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+        .sidebar menu li { padding: 10px; cursor: pointer; border-radius: 6px; background: #8d6e63; text-align: center; font-weight: bold; font-size: 0.85em; flex: 1; min-width: 120px; }
         .main-content { padding: 20px; width: 100%; box-sizing: border-box; }
         .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); margin-bottom: 25px; }
         .form-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
@@ -49,20 +49,20 @@
                 <input type="hidden" id="edit-id-produk">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="nama_produk">Nama Produk (Pilih dari Tabel di Bawah)</label>
+                        <label>Nama Produk</label>
                         <input type="text" id="nama_produk" readonly placeholder="Klik tombol Edit di tabel bawah..." style="background: #eee;">
                     </div>
                     <div class="form-group">
-                        <label for="harga">Harga Baru (Rp)</label>
+                        <label>Harga Baru (Rp)</label>
                         <input type="number" id="harga" required placeholder="Contoh: 18000">
                     </div>
                     <div class="form-group" style="grid-column: span 1;">
-                        <label for="foto_url">URL Tautan Foto Produk</label>
-                        <input type="text" id="foto_url" placeholder="Paste link foto produk disini...">
+                        <label>URL Tautan Foto Produk</label>
+                        <input type="text" id="foto_url" placeholder="Paste link tautan gambar produk...">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="deskripsi">Deskripsi</label>
+                    <label>Deskripsi</label>
                     <textarea id="deskripsi" rows="2" readonly style="background: #eee;"></textarea>
                 </div>
                 <button type="submit" id="btn-simpan-produk">Simpan Perubahan Data</button>
@@ -79,7 +79,9 @@
                             <th>Aksi</th>
                         </tr>
                     </thead>
-                    <tbody id="tabel-produk"></tbody>
+                    <tbody id="tabel-produk">
+                        <tr><td colspan="4" style="text-align:center;">Memeriksa database...</td></tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -89,24 +91,26 @@
             <form id="form-penjualan" onsubmit="event.preventDefault(); simpanPenjualan();">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="pilih_produk">Produk Terjual</label>
-                        <select id="pilih_produk" required></select>
+                        <label>Produk Terjual</label>
+                        <select id="pilih_produk" required>
+                            <option value="">-- Memuat Produk --</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label for="jumlah_terjual">Jumlah (Kuantitas)</label>
+                        <label>Jumlah (Kuantitas)</label>
                         <input type="number" id="jumlah_terjual" required min="1" value="1">
                     </div>
                     <div class="form-group">
-                        <label for="nama_pembeli">Nama Pelanggan / Pembeli</label>
+                        <label>Nama Pelanggan / Pembeli</label>
                         <input type="text" id="nama_pembeli" required placeholder="Nama pembeli...">
                     </div>
                     <div class="form-group">
-                        <label for="tanggal_penjualan">Tanggal Transaksi</label>
+                        <label>Tanggal Transaksi</label>
                         <input type="date" id="tanggal_penjualan" required>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="alamat_pembeli">Alamat Pengiriman / Pembeli</label>
+                    <label>Alamat Pengiriman / Pembeli</label>
                     <textarea id="alamat_pembeli" rows="2" required placeholder="Alamat lengkap pembeli..."></textarea>
                 </div>
                 <button type="submit">Catat Transaksi Penjualan</button>
@@ -120,8 +124,8 @@
     <script src="admin.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            proteksiHalamanAdmin();
-            setTimeout(() => { memuatDasborAwal(); }, 100);
+            if (typeof proteksiHalamanAdmin === 'function') { proteksiHalamanAdmin(); }
+            setTimeout(() => { if(typeof memuatDasborAwal === 'function') { memuatDasborAwal(); } }, 200);
         });
     </script>
 </body>
