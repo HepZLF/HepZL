@@ -1,41 +1,81 @@
-// auth.js
-
-// 1. FUNGSI PROSES LOGIN
+// ====================================================================
+// FUNGSI UTAMA PROSES LOGIN ADMIN
+// ====================================================================
 async function prosesLogin() {
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
+  const emailInput = document.getElementById('loginEmail').value.trim();
+  const passwordInput = document.getElementById('loginPassword').value.trim();
 
-    try {
-        const { data, error } = await supabaseClient.auth.signInWithPassword({
-            email: email,
-            password: password,
-        });
+  // Validasi awal input kosong
+  if (!emailInput || !passwordInput) {
+    alert("Mohon masukkan email dan password Anda terlebih dahulu!");
+    return;
+  }
 
-        if (error) throw error;
-
-        alert('Login Berhasil! Selamat Datang Admin.');
-        // Alihkan halaman ke dashboard internal admin
-        window.location.href = 'dashboard.html';
-    } catch (err) {
-        alert('Gagal Login: ' + err.message);
+  try {
+    // Pastikan koneksi Supabase di db.js sudah siap
+    if (typeof supabaseClient === 'undefined') {
+      throw new Error("Koneksi 'supabaseClient' tidak ditemukan di db.js. Periksa konfigurasi database Anda.");
     }
+
+    // Melakukan proses autentikasi ke Supabase Auth
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+      email: emailInput,
+      password: passwordInput,
+    });
+
+    if (error) {
+      // Jika error karena salah sandi/email atau user belum terdaftar
+      throw new Error(error.message || "Email atau password yang Anda masukkan salah!");
+    }
+
+    // --- KUNCI UTAMA AGAR TIDAK MENTAL ---
+    // Menyimpan token akses dan status sesi ke dalam localStorage browser
+    if (data && data.session) {
+      localStorage.setItem('admin_session', 'true');
+      localStorage.setItem('supabase_token', data.session.access_token);
+      
+      alert("✔️ Login Berhasil! Selamat datang di Panel Admin Nusantara Cuy.");
+      
+      // Alihkan halaman ke dashboard secara aman
+      window.location.replace('dashboard.html');
+    } else {
+      throw new Error("Gagal membuat sesi login admin. Silakan coba lagi.");
+    }
+
+  } catch (err) {
+    console.error("Login Error:", err);
+    alert("❌ Gagal Masuk: " + err.message);
+  }
 }
 
-// 2. FUNGSI CEK PROTEKSI (Mencegah user biasa masuk langsung lewat URL)
-async function proteksiHalamanAdmin() {
-    const { data: { session } } = await supabaseClient.auth.getSession();
+// ====================================================================
+// FUNGSI UNTUK MENGECEK STATUS SESI DI DASHBOARD
+// ====================================================================
+function proteksiHalamanDashboard() {
+  const session = localStorage.getItem('admin_session');
+  if (!session) {
+    // Jika tidak ada sesi aktif, paksa kembali ke index.html
+    window.location.replace('index.html');
+  }
+}
+
+// ====================================================================
+// FUNGSI LOGOUT / KELUAR APLIKASI
+// ====================================================================
+async function logoutAdmin() {
+  try {
+    if (typeof supabaseClient !== 'undefined') {
+      await supabaseClient.auth.signOut();
+    }
+  } catch (err) {
+    console.error("Error saat signout dari Supabase:", err);
+  } finally {
+    // Hapus semua jejak penyimpanan sesi dari browser
+    localStorage.removeItem('admin_session');
+    localStorage.removeItem('supabase_token');
+    localStorage.clear();
     
-    if (!session) {
-        alert('Akses Ditolak! Anda harus login terlebih dahulu.');
-        window.location.href = 'index.html';
-    }
-}
-
-// 3. FUNGSI LOGOUT
-async function prosesLogout() {
-    const { error } = await supabaseClient.auth.signOut();
-    if (!error) {
-        alert('Berhasil Logout.');
-        window.location.href = 'index.html';
-    }
+    alert("Anda telah berhasil keluar dari sistem.");
+    window.location.replace('index.html');
+  }
 }
