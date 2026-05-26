@@ -5,26 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nusantara Cuy - Minuman Tradisional Modern</title>
     <style>
-        /* Gaya Global */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #faf3e0; color: #5d4037; }
+        /* Gaya Global & Warna Estetik Nusantara (Krem, Cokelat, Orange) */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            background-color: #faf3e0; 
+            color: #5d4037; 
+            line-height: 1.6;
+        }
         
-        /* Header Responsive */
+        /* Header & Navigasi */
         header { 
             background-color: #8d6e63; 
             color: white; 
             padding: 15px 20px; 
             display: flex; 
-            flex-direction: column; /* Default bertumpuk di HP */
+            flex-direction: column; 
             gap: 15px;
             align-items: center; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
         }
-        header h1 { margin: 0; font-size: 1.6em; text-align: center; letter-spacing: 1px; }
+        header h1 { margin: 0; font-size: 1.8em; letter-spacing: 2px; }
         
-        /* Tombol Navigasi */
         .nav-buttons { display: flex; gap: 10px; width: 100%; justify-content: center; }
         .nav-buttons .btn { 
-            flex: 1; /* Tombol melebar rata di HP */
+            flex: 1; 
             max-width: 150px;
             text-align: center;
             background: #ff6e40; 
@@ -37,39 +42,71 @@
             text-decoration: none; 
             font-size: 0.9em;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: 0.3s;
         }
+        .nav-buttons .btn:hover { background: #e64a19; }
 
-        /* Banner Utama */
+        /* Banner Utama (Hero Section) */
         .hero { 
             text-align: center; 
-            padding: 40px 20px; 
+            padding: 50px 20px; 
             background: #d87e33; 
             color: white; 
             margin: 15px; 
             border-radius: 12px; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
-        .hero h2 { font-size: 1.8em; margin: 0 0 10px 0; }
-        .hero p { font-size: 1em; margin: 0; line-height: 1.4; }
+        .hero h2 { font-size: 1.8em; margin: 0 0 10px 0; text-transform: uppercase; }
+        .hero p { font-size: 1em; margin: 0; opacity: 0.95; font-style: italic; }
         
-        /* Modal Login Responsive */
+        /* Konten Utama / Container */
+        .container { padding: 20px; max-width: 1100px; margin: 0 auto; }
+        
+        /* Kartu Informasi */
+        .section-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            border-left: 5px solid #d87e33;
+        }
+        .section-card h3 { margin-top: 0; color: #d87e33; font-size: 1.4em; }
+        
+        /* Grid Keunggulan */
+        .grid-features {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .feature-item {
+            background: #fafdfc;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e0d0b0;
+        }
+        .feature-item strong { color: #8d6e63; display: block; margin-bottom: 5px; }
+
+        /* Modal Login */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; z-index: 1000; }
         .modal-content { background: white; padding: 25px; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); position: relative; }
-        .modal-content h3 { margin-top: 0; color: #d87e33; text-align: center; font-size: 1.4em; }
+        .modal-content h3 { margin-top: 0; color: #d87e33; text-align: center; }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 0.9em; }
         .form-group input { width: 100%; padding: 12px; box-sizing: border-box; border: 1px solid #e0d0b0; border-radius: 6px; font-size: 1em; }
         .btn-block { width: 100%; padding: 12px; background: #ff6e40; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1em; }
         .close-btn { position: absolute; right: 15px; top: 10px; cursor: pointer; font-size: 1.8em; color: #aaa; }
 
-        /* TAB KUSTOM UNTUK LAYAR DESTOP/KOMPUTER */
+        /* Media Queries untuk Layar Desktop / Laptop */
         @media (min-width: 768px) {
             header { flex-direction: row; justify-content: space-between; padding: 20px 40px; }
             header h1 { font-size: 2em; }
             .nav-buttons { width: auto; }
-            .hero { padding: 60px 40px; margin: 30px; }
-            .hero h2 { font-size: 2.6em; }
+            .hero { padding: 70px 40px; margin: 30px auto; max-width: 1100px; }
+            .hero h2 { font-size: 2.4em; }
             .hero p { font-size: 1.2em; }
+            .grid-features { grid-template-columns: repeat(3, 1fr); gap: 20px; }
         }
     </style>
 </head>
@@ -78,14 +115,44 @@
     <header>
         <h1>NUSANTARA CUY</h1>
         <div class="nav-buttons">
-            <a href="katalog.html" class="btn" style="background: transparent; border: 2px solid white;">Katalog</a>
+            <a href="katalog.html" class="btn" style="background: transparent; border: 2px solid white;">Lihat Katalog</a>
             <button class="btn" onclick="openModal()">Login Admin</button>
         </div>
     </header>
 
     <div class="hero">
-        <h2>Rasa Nusantara, Segarnya Juara!</h2>
-        <p>Meng-upgrade minuman tradisional Indonesia menjadi modern, higienis, dan berkelas.</p>
+        <h2>Rasa Nusantara, Sentuhan Modern Lifestyle</h2>
+        <p>"Diferensiasi Produk Minuman Tradisional melalui Eksplorasi Bahan Lokal Kekinian"</p>
+    </div>
+
+    <div class="container">
+        
+        <div class="section-card">
+            <h3>Filosofi Nusantara Cuy</h3>
+            <p>Kata <strong>"Nusantara"</strong> menggambarkan kekayaan budaya serta penggunaan bahan tradisional Indonesia yang melimpah sebagai dasar produk kami. Sementara kata <strong>"Cuy"</strong> mencerminkan nuansa modernitas, keakraban, dan ekspresi gaya hidup aktif generasi muda saat ini.</p>
+            <p>Uniknya, dalam dialek Hokkian, kata <em>"Cui"</em> juga memiliki arti air atau minuman. Sehingga secara harfiah, identitas brand kami bermakna sebagai penyedia wadah <strong>Minuman Nusantara</strong> terbaik bagi Anda.</p>
+        </div>
+
+        <div class="section-card">
+            <h3>Pilar Keunggulan Kami</h3>
+            <p>Kami hadir membawa komitmen penuh berdasarkan riset pasar mendalam demi memenuhi kebutuhan <em>hybrid beverage</em> yang sehat:</p>
+            
+            <div class="grid-features">
+                <div class="feature-item">
+                    <strong>🌿 Eksplorasi Bahan Lokal</strong>
+                    Memanfaatkan potensi rempah dan kekayaan alam asli daerah secara higienis dan berstandar mutu tinggi.
+                </div>
+                <div class="feature-item">
+                    <strong>🌱 Pelestarian Budaya Kuliner</strong>
+                    Menjaga eksistensi resep legendaris warisan leluhur agar tidak tergerus oleh tren minuman impor luar negeri.
+                </div>
+                <div class="feature-item">
+                    <strong>🎯 Relevansi Generasi Muda</strong>
+                    Mengemas produk tradisional lewat visual estetik, ramah media sosial, serta rasa yang pas di lidah Gen Z & Milenial.
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <div id="loginModal" class="modal">
