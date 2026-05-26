@@ -11,6 +11,7 @@
       --secondary: #D2691E;
       --success: #2e7d32;
       --danger: #c62828;
+      --warning: #f57c00;
       --bg: #f9f6f0;
       --white: #ffffff;
       --text: #2c1e15;
@@ -30,26 +31,41 @@
     .card-stat h4 { font-size: 13px; color: #777; text-transform: uppercase; letter-spacing: 0.5px; }
     .card-stat p { font-size: 22px; font-weight: 700; margin-top: 5px; }
 
-    /* Form Input Migrasi Data */
-    .input-section { background: var(--white); padding: 25px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 35px; }
-    .input-section h3 { margin-bottom: 15px; color: var(--primary); font-size: 18px; }
-    .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
-    .form-group { display: flex; flex-direction: column; }
+    /* Form Input Section */
+    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 25px; margin-bottom: 35px; }
+    @media (max-width: 600px) { .dashboard-grid { grid-template-columns: 1fr; } }
+
+    .input-section { background: var(--white); padding: 25px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+    .input-section h3 { margin-bottom: 15px; color: var(--primary); font-size: 18px; border-bottom: 2px solid #f2ebd9; padding-bottom: 8px; }
+    
+    .form-group { display: flex; flex-direction: column; margin-bottom: 12px; }
     .form-group label { font-size: 12px; font-weight: 600; margin-bottom: 5px; }
-    .form-group input, .form-group select { padding: 10px; border: 1px solid #d3cbb8; border-radius: 6px; font-size: 14px; }
-    .btn-submit { background: var(--success); color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: 600; margin-top: 15px; width: 100%; }
+    .form-group input, .form-group select, .form-group textarea { padding: 10px; border: 1px solid #d3cbb8; border-radius: 6px; font-size: 14px; }
+    .form-group textarea { resize: vertical; height: 80px; }
+    
+    .btn-submit { background: var(--success); color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: 600; margin-top: 10px; width: 100%; transition: opacity 0.2s; }
+    .btn-submit:hover { opacity: 0.9; }
+    .btn-cancel { background: #888; color: white; border: none; padding: 8px; border-radius: 6px; cursor: pointer; font-weight: 600; margin-top: 5px; width: 100%; display: none; }
 
     /* Pengaturan Tabel */
     .table-container { background: var(--white); padding: 25px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 35px; }
     .table-container h3 { margin-bottom: 15px; color: var(--primary); border-left: 4px solid var(--secondary); padding-left: 10px; font-size: 18px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+    
+    .table-responsive { width: 100%; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; min-width: 600px; }
     th { background: #f2ebd9; color: var(--text); font-weight: 600; text-align: left; padding: 12px; border-bottom: 2px solid #e3dec3; }
-    td { padding: 12px; border-bottom: 1px solid #f0e9dc; }
+    td { padding: 12px; border-bottom: 1px solid #f0e9dc; vertical-align: middle; }
     tr:hover { background-color: #faf8f5; }
     
     .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
     .badge.pemasukan { background: #e8f5e9; color: var(--success); }
     .badge.pengeluaran { background: #ffebee; color: var(--danger); }
+
+    .btn-action { padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; color: white; margin-right: 5px; }
+    .btn-edit { background: var(--warning); }
+    .btn-delete { background: var(--danger); }
+    
+    .img-preview { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; background: #eee; }
   </style>
 </head>
 <body>
@@ -78,30 +94,58 @@
     </div>
   </div>
 
-  <div class="input-section">
-    <h3>Input Pembukuan Keuangan Baru</h3>
-    <form id="formTransaksiKeuangan" onsubmit="event.preventDefault(); simpanTransaksiKeuangan();">
-      <div class="form-row">
+  <div class="dashboard-grid">
+    
+    <div class="input-section">
+      <h3 id="form-produk-title">Kelola Katalog Menu Produk</h3>
+      <form id="formProduk" onsubmit="event.preventDefault(); simpanDataProduk();">
+        <input type="hidden" id="prodId">
+        <div class="form-group">
+          <label>Nama Produk Menu</label>
+          <input type="text" id="prodNama" placeholder="Contoh: Telang Citrus Breeze" required>
+        </div>
+        <div class="form-group">
+          <label>Harga Jual (Rp)</label>
+          <input type="number" id="prodHarga" placeholder="Contoh: 12000" required>
+        </div>
+        <div class="form-group">
+          <label>Link Foto URL Produk</label>
+          <input type="url" id="prodFoto" placeholder="https://example.com/gambar.jpg">
+        </div>
+        <div class="form-group">
+          <label>Deskripsi Singkat</label>
+          <textarea id="prodDeskripsi" placeholder="Jelaskan keunikan rasa produk..."></textarea>
+        </div>
+        <button type="submit" id="btnSimpanProduk" class="btn-submit">Tambah Menu Baru</button>
+        <button type="button" id="btnBatalEdit" class="btn-cancel" onclick="resetFormProduk()">Batal Edit</button>
+      </form>
+    </div>
+
+    <div class="input-section">
+      <h3>Input Pembukuan Keuangan Jurnal</h3>
+      <form id="formTransaksiKeuangan" onsubmit="event.preventDefault(); simpanTransaksiKeuangan();">
         <div class="form-group">
           <label>Tanggal Transaksi</label>
           <input type="date" id="txTanggal" required>
         </div>
-        <div class="form-group">
-          <label>Jenis Arus Kas</label>
-          <select id="txJenis" required>
-            <option value="Pemasukan">Pemasukan Kas (Uang Masuk)</option>
-            <option value="Pengeluaran">Pengeluaran Kas (Uang Keluar)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Kategori Alokasi</label>
-          <select id="txKategori" required>
-            <option value="Penjualan Produk">Penjualan Produk</option>
-            <option value="Bahan Baku">Bahan Baku & Rempah</option>
-            <option value="Operasional">Operasional & Gaji</option>
-            <option value="Iklan & Marketing">Iklan & Sosmed Marketing</option>
-            <option value="Lain-lain">Kebutuhan Lain-lain</option>
-          </select>
+        <div class="form-row" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label>Jenis Arus Kas</label>
+            <select id="txJenis" required>
+              <option value="Pemasukan">Pemasukan (Uang Masuk)</option>
+              <option value="Pengeluaran">Pengeluaran (Uang Keluar)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Kategori Alokasi</label>
+            <select id="txKategori" required>
+              <option value="Penjualan Produk">Penjualan Produk</option>
+              <option value="Bahan Baku">Bahan Baku & Rempah</option>
+              <option value="Operasional">Operasional & Gaji</option>
+              <option value="Iklan & Marketing">Iklan & Marketing</option>
+              <option value="Lain-lain">Kebutuhan Lain-lain</option>
+            </select>
+          </div>
         </div>
         <div class="form-group">
           <label>Nominal Rupiah (Rp)</label>
@@ -111,96 +155,140 @@
           <label>Keterangan Tambahan</label>
           <input type="text" id="txKeterangan" placeholder="Contoh: Beli gula aren semut 2kg" required>
         </div>
-      </div>
-      <button type="submit" class="btn-submit">Simpan ke Jurnal Keuangan</button>
-    </form>
+        <button type="submit" class="btn-submit">Simpan ke Jurnal Keuangan</button>
+      </form>
+    </div>
+
   </div>
 
   <div class="table-container">
-    <h3>Laporan Saldo Posisi Kas</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Nama Rekening / Akun Tempat Penyimpanan Kas</th>
-          <th>Saldo Awal Aset</th>
-          <th>Total Dana Masuk</th>
-          <th>Total Dana Keluar</th>
-          <th>Saldo Akhir Riil Tersedia</th>
-        </tr>
-      </thead>
-      <tbody id="data-tabel-saldo">
-        <tr><td colspan="5" style="text-align: center; color: #888;">Memuat Neraca Saldo...</td></tr>
-      </tbody>
-    </table>
+    <h3>Data Master Katalog Menu Website</h3>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Gambar</th>
+            <th>Nama Menu</th>
+            <th>Harga Jual</th>
+            <th>Deskripsi Produk</th>
+            <th>Aksi Panel</th>
+          </tr>
+        </thead>
+        <tbody id="data-tabel-produk">
+          <tr><td colspan="5" style="text-align: center; color: #888;">Memuat data menu...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <h3>Laporan Saldo Posisi Kas Akun</h3>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Nama Rekening / Akun Tempat Kas</th>
+            <th>Saldo Awal</th>
+            <th>Total Dana Masuk</th>
+            <th>Total Dana Keluar</th>
+            <th>Saldo Akhir Riil Tersedia</th>
+          </tr>
+        </thead>
+        <tbody id="data-tabel-saldo">
+          <tr><td colspan="5" style="text-align: center; color: #888;">Memuat neraca posisi saldo...</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <div class="table-container">
     <h3>Daftar Detail Transaksi Penjualan Produk</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Tanggal</th>
-          <th>Nama Pelanggan / Pembeli</th>
-          <th>Jumlah Terjual</th>
-          <th>Total Penerimaan (Rp)</th>
-          <th>Metode Bayar</th>
-          <th>Catatan Informasi</th>
-        </tr>
-      </thead>
-      <tbody id="data-tabel-penjualan">
-        <tr><td colspan="6" style="text-align: center; color: #888;">Memuat log riwayat data penjualan...</td></tr>
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>Nama Pelanggan</th>
+            <th>Jumlah Jual</th>
+            <th>Total Penerimaan (Rp)</th>
+            <th>Metode Bayar</th>
+            <th>Catatan Informasi</th>
+          </tr>
+        </thead>
+        <tbody id="data-tabel-penjualan">
+          <tr><td colspan="6" style="text-align: center; color: #888;">Memuat riwayat log penjualan...</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <div class="table-container">
     <h3>Jurnal Laporan Arus Keuangan (Pemasukan & Pengeluaran)</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Tanggal</th>
-          <th>Tipe Arus Kas</th>
-          <th>Kategori Kelompok</th>
-          <th>Nominal Mutasi Dana</th>
-          <th>Deskripsi Mutasi Jurnal</th>
-        </tr>
-      </thead>
-      <tbody id="data-tabel-keuangan">
-        <tr><td colspan="5" style="text-align: center; color: #888;">Memuat ringkasan jurnal pembukuan...</td></tr>
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>Tipe Arus Kas</th>
+            <th>Kategori Kelompok</th>
+            <th>Nominal Jurnal</th>
+            <th>Deskripsi Alokasi Mutasi</th>
+          </tr>
+        </thead>
+        <tbody id="data-tabel-keuangan">
+          <tr><td colspan="5" style="text-align: center; color: #888;">Memuat pembukuan finansial kas...</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="db.js"></script>
+  <script src="auth.js"></script>
   <script>
-    // Amankan halaman, harus login admin terlebih dahulu
+    // Proteksi halaman harus sudah berhasil login admin
     document.addEventListener('DOMContentLoaded', () => {
-      const session = localStorage.getItem('admin_session');
-      if(!session) { window.location.href = 'index.html'; return; }
+      if(typeof proteksiHalamanDashboard === 'function') {
+        proteksiHalamanDashboard();
+      } else {
+        const session = localStorage.getItem('admin_session');
+        if(!session) { window.location.href = 'index.html'; return; }
+      }
       
-      // Atur default input tanggal hari ini
       document.getElementById('txTanggal').valueAsDate = new Date();
-      
-      // Ambil dan visualisasikan seluruh tabel dari database Supabase
-      MuatSemuaLaporanDashboard();
+      MuatSemuaDataDashboard();
     });
 
-    async function MuatSemuaLaporanDashboard() {
+    async function MuatSemuaDataDashboard() {
       try {
         if(typeof supabaseClient === 'undefined') return;
 
-        // 1. Ambil Data Penjualan
+        // Ambil data serentak dari database Supabase
+        const { data: produk } = await supabaseClient.from('produk').select('*').order('id', { ascending: true });
         const { data: jual } = await supabaseClient.from('penjualan').select('*').order('tanggal', { ascending: false });
-        // 2. Ambil Data Laporan Keuangan Arus Kas
         const { data: keuangan } = await supabaseClient.from('laporan_keuangan').select('*').order('tanggal', { ascending: false });
-        // 3. Ambil Data Laporan Saldo Akun
         const { data: saldo } = await supabaseClient.from('laporan_saldo').select('*').order('id', { ascending: true });
 
-        // Hitung Indikator Finansial Ringkasan
+        // 1. RENDER TABEL MASTER PRODUK KUALITAS LAMA
+        const tbProduk = document.getElementById('data-tabel-produk');
+        if(produk && produk.length > 0) {
+          tbProduk.innerHTML = '';
+          produk.forEach(p => {
+            tbProduk.innerHTML += `<tr>
+              <td><img class="img-preview" src="${p.foto_url || 'https://via.placeholder.com/50'}" alt=""></td>
+              <td><strong>${p.nama_produk}</strong></td>
+              <td>Rp ${Number(p.harga).toLocaleString('id-ID')}</td>
+              <td style="max-width:300px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.deskripsi || '-'}</td>
+              <td>
+                <button class="btn-action btn-edit" onclick="persiapanEditProduk(${p.id}, '${p.nama_produk}', ${p.harga}, '${p.foto_url || ''}', '${p.deskripsi || ''}')">Edit</button>
+                <button class="btn-action btn-delete" onclick="hapusDataProduk(${p.id})">Hapus</button>
+              </td>
+            </tr>`;
+          });
+        } else { tbProduk.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999;">Katalog produk kosong.</td></tr>`; }
+
+        // 2. RENDER TABEL LOG PENJUALAN & HITUNG OMSET
         let totalOmset = 0; let totalMasuk = 0; let totalKeluar = 0;
-        
-        // Render Tabel Penjualan
         const tbJual = document.getElementById('data-tabel-penjualan');
         if(jual && jual.length > 0) {
           tbJual.innerHTML = '';
@@ -211,13 +299,13 @@
               <td><strong>${j.nama_pembeli}</strong></td>
               <td>${j.jumlah_terjual} Pcs</td>
               <td>Rp ${Number(j.total_harga).toLocaleString('id-ID')}</td>
-              <td><span style="background:#e3f2fd; color:#0d47a1;" class="badge">${j.metode_pembayaran}</span></td>
+              <td><span style="background:#e3f2fd; color:#0d47a1;" class="badge">${j.metode_pembayaran || 'WhatsApp'}</span></td>
               <td>${j.keterangan || '-'}</td>
             </tr>`;
           });
-        } else { tbJual.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#999;">Belum ada record data penjualan.</td></tr>`; }
+        } else { tbJual.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#999;">Belum ada record penjualan.</td></tr>`; }
 
-        // Render Tabel Arus Kas Keuangan
+        // 3. RENDER JURNAL KEUANGAN MUTASI ARUS KAS
         const tbKeuangan = document.getElementById('data-tabel-keuangan');
         if(keuangan && keuangan.length > 0) {
           tbKeuangan.innerHTML = '';
@@ -233,9 +321,9 @@
               <td>${k.keterangan}</td>
             </tr>`;
           });
-        } else { tbKeuangan.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999;">Jurnal finansial masih kosong.</td></tr>`; }
+        } else { tbKeuangan.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999;">Jurnal finansial kosong.</td></tr>`; }
 
-        // Render Tabel Neraca Saldo Akun
+        // 4. RENDER NERACA SALDO POSISI KAS AKUN
         const tbSaldo = document.getElementById('data-tabel-saldo');
         if(saldo && saldo.length > 0) {
           tbSaldo.innerHTML = '';
@@ -248,39 +336,89 @@
               <td style="font-weight:700; color:var(--primary);">Rp ${Number(s.saldo_akhir).toLocaleString('id-ID')}</td>
             </tr>`;
           });
-        } else { tbSaldo.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999;">Belum ada pemetaan akun kas keuangan.</td></tr>`; }
+        } else { tbSaldo.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999;">Akun saldo keuangan belum dikonfigurasi.</td></tr>`; }
 
-        // Pasang Angka Ringkasan Atas
+        // Atur Nilai Statistik Ringkasan Atas Website
         document.getElementById('stat-omset').innerText = `Rp ${totalOmset.toLocaleString('id-ID')}`;
         document.getElementById('stat-masuk').innerText = `Rp ${totalMasuk.toLocaleString('id-ID')}`;
         document.getElementById('stat-keluar').innerText = `Rp ${totalKeluar.toLocaleString('id-ID')}`;
         document.getElementById('stat-bersih').innerText = `Rp ${(totalMasuk - totalKeluar).toLocaleString('id-ID')}`;
 
-      } catch (err) { alert("Sistem gagal memuat database: " + err.message); }
+      } catch (err) { console.error(err); }
     }
 
-    // Fungsi Aksi Menyimpan Data Baru Hasil Input Manual Anda
+    // --- FUNGSI AKSI MANAJEMEN KATALOG PRODUK (FITUR YANG DIKEMBALIKAN) ---
+    async function simpanDataProduk() {
+      const id = document.getElementById('prodId').value;
+      const nama_produk = document.getElementById('prodNama').value.trim();
+      const harga = parseInt(document.getElementById('prodHarga').value);
+      const foto_url = document.getElementById('prodFoto').value.trim();
+      const deskripsi = document.getElementById('prodDeskripsi').value.trim();
+
+      try {
+        if(id) {
+          // Mode Update/Edit Data Lama
+          const { error } = await supabaseClient.from('produk').update({ nama_produk, harga, foto_url, deskripsi }).eq('id', id);
+          if(error) throw error;
+          alert("✔️ Data produk berhasil diperbarui!");
+        } else {
+          // Mode Tambah Menu Baru
+          const { error } = await supabaseClient.from('produk').insert([{ nama_produk, harga, foto_url, deskripsi }]);
+          if(error) throw error;
+          alert("✔️ Sukses menambahkan produk menu baru ke website!");
+        }
+        resetFormProduk();
+        MuatSemuaDataDashboard();
+      } catch (err) { alert("Aksi gagal: " + err.message); }
+    }
+
+    function persiapanEditProduk(id, nama, harga, foto, deskripsi) {
+      document.getElementById('prodId').value = id;
+      document.getElementById('prodNama').value = nama;
+      document.getElementById('prodHarga').value = harga;
+      document.getElementById('prodFoto').value = foto;
+      document.getElementById('prodDeskripsi').value = deskripsi;
+      
+      document.getElementById('form-produk-title').innerText = "Edit Menu Produk Ini";
+      document.getElementById('btnSimpanProduk').innerText = "Simpan Perubahan";
+      document.getElementById('btnBatalEdit').style.display = "block";
+    }
+
+    function resetFormProduk() {
+      document.getElementById('prodId').value = '';
+      document.getElementById('formProduk').reset();
+      document.getElementById('form-produk-title').innerText = "Kelola Katalog Menu Produk";
+      document.getElementById('btnSimpanProduk').innerText = "Tambah Menu Baru";
+      document.getElementById('btnBatalEdit').style.display = "none";
+    }
+
+    async function hapusDataProduk(id) {
+      if(!confirm("Apakah Anda yakin ingin menghapus produk menu ini dari database website?")) return;
+      try {
+        const { error } = await supabaseClient.from('produk').delete().eq('id', id);
+        if(error) throw error;
+        alert("✔️ Produk berhasil dihapus!");
+        MuatSemuaDataDashboard();
+      } catch (err) { alert("Gagal menghapus: " + err.message); }
+    }
+
+    // --- FUNGSI AKSI MANAJEMEN INPUT JURNAL KEUANGAN ---
     async function simpanTransaksiKeuangan() {
       const tanggal = document.getElementById('txTanggal').value;
       const jenis_transaksi = document.getElementById('txJenis').value;
       const kategori = document.getElementById('txKategori').value;
       const nominal = parseInt(document.getElementById('txNominal').value);
-      const keterangan = document.getElementById('txKeterangan').value;
+      const keterangan = document.getElementById('txKeterangan').value.trim();
 
       try {
         const { error } = await supabaseClient.from('laporan_keuangan').insert([{ tanggal, jenis_transaksi, kategori, nominal, keterangan }]);
         if(error) throw error;
         
-        alert("✔️ Data pembukuan manual berhasil bermigrasi ke database cloud!");
+        alert("✔️ Record transaksi manual berhasil masuk ke pembukuan cloud!");
         document.getElementById('txNominal').value = '';
         document.getElementById('txKeterangan').value = '';
-        MuatSemuaLaporanDashboard(); // Refresh data otomatis
-      } catch(err) { alert("Gagal menyimpan data: " + err.message); }
-    }
-
-    function logoutAdmin() {
-      localStorage.removeItem('admin_session');
-      window.location.href = 'index.html';
+        MuatSemuaDataDashboard();
+      } catch(err) { alert("Gagal menyimpan data keuangan: " + err.message); }
     }
   </script>
 </body>
