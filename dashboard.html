@@ -5,49 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Internal - Nusantara Cuy</title>
     <style>
-        /* Desain Dasar */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f4f6f9; display: flex; flex-direction: column; }
-        
-        /* Navigasi / Sidebar (Atas di HP, Kiri di Desktop) */
+        body { font-family: Arial, sans-serif; margin: 0; background-color: #f4f6f9; display: flex; flex-direction: column; }
         .sidebar { width: 100%; background: #5d4037; color: white; padding: 15px; box-sizing: border-box; }
-        .sidebar h2 { text-align: center; font-size: 1.2em; margin: 0 0 10px 0; padding-bottom: 10px; border-bottom: 2px solid #8d6e63; }
+        .sidebar h2 { text-align: center; font-size: 1.2em; margin: 0 0 10px 0; border-bottom: 2px solid #8d6e63; padding-bottom: 10px; }
         .sidebar menu { list-style: none; padding: 0; margin: 0; display: flex; gap: 8px; justify-content: center; }
-        .sidebar menu li { padding: 10px 12px; cursor: pointer; border-radius: 6px; background: #8d6e63; text-align: center; font-weight: bold; font-size: 0.85em; flex: 1; max-width: 120px; }
-        .sidebar menu li:hover { background: #ff6e40; }
-        
-        /* Area Konten Utama */
+        .sidebar menu li { padding: 10px; cursor: pointer; border-radius: 6px; background: #8d6e63; text-align: center; font-weight: bold; font-size: 0.85em; flex: 1; }
         .main-content { padding: 20px; width: 100%; box-sizing: border-box; }
         .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); margin-bottom: 25px; }
-        .card h2 { margin-top: 0; font-size: 1.4em; color: #5d4037; border-bottom: 2px solid #f4f6f9; padding-bottom: 10px; }
-        
-        /* Form Layout (1 Kolom di HP) */
         .form-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
         .form-group { margin-bottom: 15px; display: flex; flex-direction: column; }
-        .form-group label { font-weight: bold; margin-bottom: 6px; color: #5d4037; font-size: 0.9em; }
+        .form-group label { font-weight: bold; margin-bottom: 6px; color: #5d4037; }
         .form-group input, .form-group textarea, .form-group select { padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 1em; width: 100%; box-sizing: border-box; }
-        
-        button { background: #ff6e40; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1em; width: 100%; }
-        button:hover { background: #e64a19; }
-        
-        /* Pembungkus Tabel Biar Bisa Di-scroll Horizontal di HP */
-        .table-responsive { width: 100%; overflow-x: auto; margin-top: 15px; border-radius: 8px; border: 1px solid #ddd; }
-        table { width: 100%; border-collapse: collapse; min-width: 500px; } /* Memaksa tabel punya ruang minimal */
-        th, td { padding: 12px; text-align: left; font-size: 0.9em; border-bottom: 1px solid #ddd; }
+        button { background: #ff6e40; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; }
+        .table-responsive { width: 100%; overflow-x: auto; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
         th { background-color: #8d6e63; color: white; }
-
-        /* ====================================================== */
-        /* ATURAN TAMPILAN UNTUK DESTOP/KOMPUTER (MIN-WIDTH: 768px)*/
-        /* ====================================================== */
         @media (min-width: 768px) {
             body { flex-direction: row; }
-            .sidebar { width: 250px; height: 100vh; position: fixed; top: 0; left: 0; padding: 25px 20px; }
-            .sidebar h2 { font-size: 1.4em; margin-bottom: 25px; padding-bottom: 15px; }
-            .sidebar menu { flex-direction: column; gap: 10px; }
-            .sidebar menu li { max-width: none; font-size: 1em; padding: 12px; text-align: left; }
-            
-            .main-content { margin-left: 250px; padding: 40px; width: calc(100% - 250px); }
-            .form-grid { grid-template-columns: 1fr 1fr; gap: 20px; }
-            button { width: auto; display: inline-block; padding: 12px 30px; }
+            .sidebar { width: 250px; height: 100vh; position: fixed; }
+            .sidebar menu { flex-direction: column; }
+            .main-content { margin-left: 250px; width: calc(100% - 250px); padding: 40px; }
+            .form-grid { grid-template-columns: 1fr 1fr; }
+            button { width: auto; padding: 12px 30px; }
         }
     </style>
 </head>
@@ -56,74 +36,82 @@
     <div class="sidebar">
         <h2>Dashboard Admin</h2>
         <menu>
-            <li onclick="location.href='#section-produk'">📦 Produk</li>
-            <li onclick="location.href='#section-penjualan'">💰 Penjualan</li>
+            <li onclick="location.href='#section-produk'">📦 Perbarui Harga & Foto</li>
+            <li onclick="location.href='#section-penjualan'">💰 Pencatatan Penjualan</li>
             <li onclick="prosesLogout()" style="background: #c62828;">🚪 Logout</li>
         </menu>
     </div>
 
     <div class="main-content">
-        
         <div id="section-produk" class="card">
-            <h2>Manajemen Katalog Produk</h2>
+            <h2>Manajemen Katalog Produk (Ubah Harga / Foto)</h2>
             <form id="form-produk" onsubmit="event.preventDefault(); tambahAtauUpdateProduk();">
                 <input type="hidden" id="edit-id-produk">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="nama_produk">Nama Produk</label>
-                        <input type="text" id="nama_produk" required placeholder="Es Doger Premium">
+                        <label for="nama_produk">Nama Produk (Pilih dari Tabel di Bawah)</label>
+                        <input type="text" id="nama_produk" readonly placeholder="Klik tombol Edit di tabel bawah..." style="background: #eee;">
                     </div>
                     <div class="form-group">
-                        <label for="harga">Harga (Rp)</label>
-                        <input type="number" id="harga" required placeholder="18000">
+                        <label for="harga">Harga Baru (Rp)</label>
+                        <input type="number" id="harga" required placeholder="Contoh: 18000">
+                    </div>
+                    <div class="form-group" style="grid-column: span 1;">
+                        <label for="foto_url">URL Tautan Foto Produk</label>
+                        <input type="text" id="foto_url" placeholder="Paste link foto produk disini...">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="deskripsi">Deskripsi Produk</label>
-                    <textarea id="deskripsi" rows="3" required placeholder="Deskripsi kesegaran produk..."></textarea>
+                    <label for="deskripsi">Deskripsi</label>
+                    <textarea id="deskripsi" rows="2" readonly style="background: #eee;"></textarea>
                 </div>
-                <button type="submit" id="btn-simpan-produk">Simpan Produk Baru</button>
+                <button type="submit" id="btn-simpan-produk">Simpan Perubahan Data</button>
             </form>
 
-            <h3>Daftar Produk Aktif</h3>
+            <h3>Daftar 3 Produk Fiks</h3>
             <div class="table-responsive">
                 <table>
                     <thead>
                         <tr>
                             <th>Nama Produk</th>
                             <th>Harga</th>
-                            <th>Deskripsi</th>
+                            <th>Foto URL</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
-                    <tbody id="tabel-produk">
-                        </tbody>
+                    <tbody id="tabel-produk"></tbody>
                 </table>
             </div>
         </div>
 
         <div id="section-penjualan" class="card">
-            <h2>Pencatatan Data Penjualan Harian</h2>
+            <h2>Pencatatan Data Penjualan</h2>
             <form id="form-penjualan" onsubmit="event.preventDefault(); simpanPenjualan();">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="pilih_produk">Pilih Produk Terjual</label>
-                        <select id="pilih_produk" required>
-                            </select>
+                        <label for="pilih_produk">Produk Terjual</label>
+                        <select id="pilih_produk" required></select>
                     </div>
                     <div class="form-group">
-                        <label for="jumlah_terjual">Jumlah (Cup/Porsi)</label>
+                        <label for="jumlah_terjual">Jumlah (Kuantitas)</label>
                         <input type="number" id="jumlah_terjual" required min="1" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="nama_pembeli">Nama Pelanggan / Pembeli</label>
+                        <input type="text" id="nama_pembeli" required placeholder="Nama pembeli...">
                     </div>
                     <div class="form-group">
                         <label for="tanggal_penjualan">Tanggal Transaksi</label>
                         <input type="date" id="tanggal_penjualan" required>
                     </div>
                 </div>
-                <button type="submit">Catat Penjualan</button>
+                <div class="form-group">
+                    <label for="alamat_pembeli">Alamat Pengiriman / Pembeli</label>
+                    <textarea id="alamat_pembeli" rows="2" required placeholder="Alamat lengkap pembeli..."></textarea>
+                </div>
+                <button type="submit">Catat Transaksi Penjualan</button>
             </form>
         </div>
-
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -133,9 +121,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             proteksiHalamanAdmin();
-            setTimeout(() => {
-                memuatDasborAwal();
-            }, 100);
+            setTimeout(() => { memuatDasborAwal(); }, 100);
         });
     </script>
 </body>
