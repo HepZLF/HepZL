@@ -5,26 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Internal - Nusantara Cuy</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; background-color: #f4f6f9; display: flex; }
-        .sidebar { width: 250px; height: 100vh; background: #5d4037; color: white; padding: 20px; box-sizing: border-box; position: fixed; }
-        .sidebar h2 { text-align: center; font-size: 1.4em; border-bottom: 2px solid #8d6e63; padding-bottom: 15px; }
-        .sidebar menu { list-style: none; padding: 0; margin: 30px 0; }
-        .sidebar menu li { padding: 12px; margin-bottom: 8px; cursor: pointer; border-radius: 6px; background: #8d6e63; text-align: center; font-weight: bold; }
+        /* Desain Dasar */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f4f6f9; display: flex; flex-direction: column; }
+        
+        /* Navigasi / Sidebar (Atas di HP, Kiri di Desktop) */
+        .sidebar { width: 100%; background: #5d4037; color: white; padding: 15px; box-sizing: border-box; }
+        .sidebar h2 { text-align: center; font-size: 1.2em; margin: 0 0 10px 0; padding-bottom: 10px; border-bottom: 2px solid #8d6e63; }
+        .sidebar menu { list-style: none; padding: 0; margin: 0; display: flex; gap: 8px; justify-content: center; }
+        .sidebar menu li { padding: 10px 12px; cursor: pointer; border-radius: 6px; background: #8d6e63; text-align: center; font-weight: bold; font-size: 0.85em; flex: 1; max-width: 120px; }
         .sidebar menu li:hover { background: #ff6e40; }
         
-        .main-content { margin-left: 250px; padding: 40px; width: calc(100% - 250px); box-sizing: border-box; }
-        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); margin-bottom: 30px; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        /* Area Konten Utama */
+        .main-content { padding: 20px; width: 100%; box-sizing: border-box; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        .card h2 { margin-top: 0; font-size: 1.4em; color: #5d4037; border-bottom: 2px solid #f4f6f9; padding-bottom: 10px; }
+        
+        /* Form Layout (1 Kolom di HP) */
+        .form-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
         .form-group { margin-bottom: 15px; display: flex; flex-direction: column; }
-        .form-group label { font-weight: bold; margin-bottom: 5px; color: #5d4037;}
-        .form-group input, .form-group textarea, .form-group select { padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 1em; }
-        button { background: #ff6e40; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1em; }
+        .form-group label { font-weight: bold; margin-bottom: 6px; color: #5d4037; font-size: 0.9em; }
+        .form-group input, .form-group textarea, .form-group select { padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 1em; width: 100%; box-sizing: border-box; }
+        
+        button { background: #ff6e40; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1em; width: 100%; }
         button:hover { background: #e64a19; }
         
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        table, th, td { border: 1px solid #ddd; }
-        th, td { padding: 12px; text-align: left; }
+        /* Pembungkus Tabel Biar Bisa Di-scroll Horizontal di HP */
+        .table-responsive { width: 100%; overflow-x: auto; margin-top: 15px; border-radius: 8px; border: 1px solid #ddd; }
+        table { width: 100%; border-collapse: collapse; min-width: 500px; } /* Memaksa tabel punya ruang minimal */
+        th, td { padding: 12px; text-align: left; font-size: 0.9em; border-bottom: 1px solid #ddd; }
         th { background-color: #8d6e63; color: white; }
+
+        /* ====================================================== */
+        /* ATURAN TAMPILAN UNTUK DESTOP/KOMPUTER (MIN-WIDTH: 768px)*/
+        /* ====================================================== */
+        @media (min-width: 768px) {
+            body { flex-direction: row; }
+            .sidebar { width: 250px; height: 100vh; position: fixed; top: 0; left: 0; padding: 25px 20px; }
+            .sidebar h2 { font-size: 1.4em; margin-bottom: 25px; padding-bottom: 15px; }
+            .sidebar menu { flex-direction: column; gap: 10px; }
+            .sidebar menu li { max-width: none; font-size: 1em; padding: 12px; text-align: left; }
+            
+            .main-content { margin-left: 250px; padding: 40px; width: calc(100% - 250px); }
+            .form-grid { grid-template-columns: 1fr 1fr; gap: 20px; }
+            button { width: auto; display: inline-block; padding: 12px 30px; }
+        }
     </style>
 </head>
 <body>
@@ -32,9 +56,9 @@
     <div class="sidebar">
         <h2>Dashboard Admin</h2>
         <menu>
-            <li onclick="location.href='#section-produk'">📦 Kelola Produk</li>
-            <li onclick="location.href='#section-penjualan'">💰 Input Penjualan</li>
-            <li onclick="prosesLogout()" style="background: #c62828; margin-top: 50px;">🚪 Logout</li>
+            <li onclick="location.href='#section-produk'">📦 Produk</li>
+            <li onclick="location.href='#section-penjualan'">💰 Penjualan</li>
+            <li onclick="prosesLogout()" style="background: #c62828;">🚪 Logout</li>
         </menu>
     </div>
 
@@ -61,19 +85,21 @@
                 <button type="submit" id="btn-simpan-produk">Simpan Produk Baru</button>
             </form>
 
-            <h3>Daftar Produk Aktif (Bisa Diedit)</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nama Produk</th>
-                        <th>Harga</th>
-                        <th>Deskripsi</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="tabel-produk">
-                    </tbody>
-            </table>
+            <h3>Daftar Produk Aktif</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nama Produk</th>
+                            <th>Harga</th>
+                            <th>Deskripsi</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabel-produk">
+                        </tbody>
+                </table>
+            </div>
         </div>
 
         <div id="section-penjualan" class="card">
@@ -105,7 +131,6 @@
     <script src="auth.js"></script>
     <script src="admin.js"></script>
     <script>
-        // Perbaikan Bug DOM Tanggal Null: Menunggu HTML siap sepenuhnya
         document.addEventListener('DOMContentLoaded', () => {
             proteksiHalamanAdmin();
             setTimeout(() => {
