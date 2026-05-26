@@ -3,133 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Tambah Produk Nusantara Cuy</title>
+    <title>Nusantara Cuy - Minuman Tradisional Modern</title>
     <style>
-        /* Gaya Global Nusantara Cuy */
-        body { 
-            font-family: Arial, sans-serif; \n            margin: 0; 
-            background-color: #faf3e0; /* Warna krem background */
-            color: #5d4037; /* Warna teks cokelat tua */
-        }
-
-        /* Gaya Header */
-        header {
-            background-color: #8d6e63; /* Cokelat header */
-            color: white;
-            padding: 20px 0;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        header h1 { margin: 0; font-size: 2.2em; text-transform: uppercase; letter-spacing: 2px; }
-        header p { margin: 5px 0 0; font-size: 1em; opacity: 0.9; }
-
-        /* Container & Card Admin */
-        .admin-section {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: calc(100vh - 120px);
-            padding: 20px;
-        }
-
-        .form-container { 
-            width: 100%;
-            max-width: 450px; 
-            background: white; 
-            padding: 30px; 
-            border-radius: 12px; 
-            box-shadow: 0 8px 15px rgba(0,0,0,0.1); 
-            border: 1px solid #e0d0b0; /* Border emas tipis */
-        }
-
-        .form-container h2 { 
-            text-align: center; 
-            margin-top: 0; 
-            color: #d87e33; /* Warna orange sub-header */
-            margin-bottom: 25px;
-        }
-
-        /* Form styling */
-        .form-group { margin-bottom: 18px; }
-        label { display: block; margin-bottom: 6px; font-weight: bold; color: #8d6e63; }
-        input, textarea { 
-            width: 100%; 
-            padding: 12px; 
-            box-sizing: border-box; 
-            border: 1px solid #e0d0b0; 
-            border-radius: 6px; 
-            background-color: #fafdfc;
-            font-size: 1em;
-            color: #5d4037;
-        }
-        input:focus, textarea:focus {
-            outline: 2px solid #d87e33;
-            border-color: #d87e33;
-        }
-
-        /* Buttonstyling 'Beli Sekarang' style */
-        button { 
-            background-color: #ff6e40; /* Orange-merah tombol */
-            color: white; 
-            padding: 12px 18px; 
-            border: none; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            width: 100%; 
-            font-size: 1.1em; 
-            font-weight: bold;
-            transition: background 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            text-transform: uppercase;
-        }
-        button:hover { background-color: #e64a19; }
-
-        /* Gaya untuk link katalog */
-        .nav-link {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            color: #8d6e63;
-            text-decoration: none;
-            font-size: 0.9em;
-        }
-        .nav-link:hover { text-decoration: underline; }
+        body { font-family: Arial, sans-serif; margin: 0; background-color: #faf3e0; color: #5d4037; }
+        header { background-color: #8d6e63; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        header h1 { margin: 0; font-size: 1.8em; }
+        .nav-buttons .btn { background: #ff6e40; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; text-decoration: none; }
+        .hero { text-align: center; padding: 60px 20px; background: #d87e33; color: white; margin: 20px; border-radius: 12px; }
+        .hero h2 { font-size: 2.5em; margin-bottom: 10px; }
+        
+        /* Modal Login Styling */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .modal-content h3 { margin-top: 0; color: #d87e33; text-align: center; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group input { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #e0d0b0; border-radius: 6px; }
+        .btn-block { width: 100%; padding: 12px; background: #ff6e40; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1em; }
+        .close-btn { float: right; cursor: pointer; font-size: 1.5em; color: #aaa; }
     </style>
 </head>
 <body>
 
     <header>
         <h1>NUSANTARA CUY</h1>
-        <p>Minuman Tradisional, Sentuhan Modern</p>
+        <div class="nav-buttons">
+            <a href="katalog.html" class="btn" style="background: transparent; border: 2px solid white; margin-right: 10px;">Lihat Katalog</a>
+            <button class="btn" onclick="openModal()">Login Admin</button>
+        </div>
     </header>
 
-    <div class="admin-section">
-        <div class="form-container">
-            <h2>Tambah Produk Baru</h2>
-            <form id="form-produk" onsubmit="event.preventDefault(); tambahProduk();">
+    <div class="hero">
+        <h2>Rasa Nusantara, Segarnya Juara!</h2>
+        <p>Meng-upgrade minuman tradisional Indonesia menjadi modern, higienis, dan berkelas.</p>
+    </div>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h3>Login Panel Admin</h3>
+            <form id="formLogin" onsubmit="event.preventDefault(); prosesLogin();">
                 <div class="form-group">
-                    <label for="nama_produk">Nama Produk:</label>
-                    <input type="text" id="nama_produk" required placeholder="Misal: Es Doger Sultan">
+                    <label for="loginEmail">Email Admin:</label>
+                    <input type="email" id="loginEmail" required placeholder="admin@nusantaracuy.com">
                 </div>
-                
                 <div class="form-group">
-                    <label for="harga">Harga (Rp):</label>
-                    <input type="number" id="harga" required placeholder="Misal: 15000">
+                    <label for="loginPassword">Password:</label>
+                    <input type="password" id="loginPassword" required placeholder="******">
                 </div>
-                
-                <div class="form-group">
-                    <label for="deskripsi">Deskripsi (Untuk Kartu):</label>
-                    <textarea id="deskripsi" rows="3" placeholder="Misal: Campuran es serut dengan ketan hitam, pacar cina, dan roti tawar."></textarea>
-                </div>
-                
-                <button type="submit">Simpan ke Supabase Cloud</button>
+                <button type="submit" class="btn-block">Masuk ke Dashboard</button>
             </form>
-            <a href="katalog.html" class="nav-link">← Lihat Katalog Produk</a>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="db.js"></script>
-    <script src="admin.js"></script>
+    <script src="auth.js"></script>
+    <script>
+        function openModal() { document.getElementById('loginModal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('loginModal').style.display = 'none'; }
+    </script>
 </body>
 </html>

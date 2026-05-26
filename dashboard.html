@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Internal - Nusantara Cuy</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background-color: #f4f6f9; display: flex; }
+        .sidebar { width: 250px; height: 100vh; background: #5d4037; color: white; padding: 20px; box-sizing: border-box; position: fixed; }
+        .sidebar h2 { text-align: center; font-size: 1.4em; border-bottom: 2px solid #8d6e63; padding-bottom: 15px; }
+        .sidebar menu { list-style: none; padding: 0; margin: 30px 0; }
+        .sidebar menu li { padding: 12px; margin-bottom: 8px; cursor: pointer; border-radius: 6px; background: #8d6e63; text-align: center; font-weight: bold; }
+        .sidebar menu li:hover { background: #ff6e40; }
+        
+        .main-content { margin-left: 250px; padding: 40px; width: calc(100% - 250px); box-sizing: border-box; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 15px; display: flex; flex-direction: column; }
+        .form-group label { font-weight: bold; margin-bottom: 5px; color: #5d4037;}
+        .form-group input, .form-group textarea, .form-group select { padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 1em; }
+        button { background: #ff6e40; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1em; }
+        button:hover { background: #e64a19; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        table, th, td { border: 1px solid #ddd; }
+        th, td { padding: 12px; text-align: left; }
+        th { background-color: #8d6e63; color: white; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Dashboard Admin</h2>
+        <menu>
+            <li onclick="location.href='#section-produk'">📦 Kelola Produk</li>
+            <li onclick="location.href='#section-penjualan'">💰 Input Penjualan</li>
+            <li onclick="prosesLogout()" style="background: #c62828; margin-top: 50px;">🚪 Logout</li>
+        </menu>
+    </div>
+
+    <div class="main-content">
+        
+        <div id="section-produk" class="card">
+            <h2>Manajemen Katalog Produk</h2>
+            <form id="form-produk" onsubmit="event.preventDefault(); tambahAtauUpdateProduk();">
+                <input type="hidden" id="edit-id-produk">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="nama_produk">Nama Produk</label>
+                        <input type="text" id="nama_produk" required placeholder="Es Doger Premium">
+                    </div>
+                    <div class="form-group">
+                        <label for="harga">Harga (Rp)</label>
+                        <input type="number" id="harga" required placeholder="18000">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="deskripsi">Deskripsi Produk</label>
+                    <textarea id="deskripsi" rows="3" required placeholder="Deskripsi kesegaran produk..."></textarea>
+                </div>
+                <button type="submit" id="btn-simpan-produk">Simpan Produk Baru</button>
+            </form>
+
+            <h3>Daftar Produk Aktif (Bisa Diedit)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nama Produk</th>
+                        <th>Harga</th>
+                        <th>Deskripsi</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tabel-produk">
+                    </tbody>
+            </table>
+        </div>
+
+        <div id="section-penjualan" class="card">
+            <h2>Pencatatan Data Penjualan Harian</h2>
+            <form id="form-penjualan" onsubmit="event.preventDefault(); simpanPenjualan();">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="pilih_produk">Pilih Produk Terjual</label>
+                        <select id="pilih_produk" required>
+                            </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="jumlah_terjual">Jumlah (Cup/Porsi)</label>
+                        <input type="number" id="jumlah_terjual" required min="1" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="tanggal_penjualan">Tanggal Transaksi</label>
+                        <input type="date" id="tanggal_penjualan" required>
+                    </div>
+                </div>
+                <button type="submit">Catat Penjualan</button>
+            </form>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="db.js"></script>
+    <script src="auth.js"></script>
+    <script src="admin.js"></script>
+    <script>
+        // Perbaikan Bug DOM Tanggal Null: Menunggu HTML siap sepenuhnya
+        document.addEventListener('DOMContentLoaded', () => {
+            proteksiHalamanAdmin();
+            setTimeout(() => {
+                memuatDasborAwal();
+            }, 100);
+        });
+    </script>
+</body>
+</html>
