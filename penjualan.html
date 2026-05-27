@@ -90,7 +90,7 @@
     <div class="form-row">
       <div class="form-group">
         <label>Nama Pembeli</label>
-        <input type="text" id="inNama" class="form-control" value="Hep" placeholder="Contoh: Hep">
+        <input type="text" id="inNama" class="form-control" placeholder="Contoh: Hep">
       </div>
       <div class="form-group">
         <label>Tanggal</label>
@@ -120,7 +120,6 @@
       <div class="form-group">
         <label>📝 Note Request Khusus Varian Ini</label>
         <input type="text" id="inNoteRequest" class="form-control" placeholder="Contoh: Less sugar, Tanpa es...">
-        
       </div>
       <button class="btn-add-item" onclick="tambahKeKeranjangLokal()">📥 Tambah Varian</button>
     </div>
@@ -133,8 +132,7 @@
       <div style="font-size: 1.2rem; font-weight: 700; color: var(--primary); background: #fff; padding: 10px; border-radius: 4px; border: 1px solid #ffe082; margin-bottom: 10px;">
         Total : <span id="textTotalNota" style="color:var(--success);">Rp 0</span>
       </div>
-      
-      <button class="btn-submit-all" onclick="prosesSimpanFinalNota()">🔒 Input</button>
+      <button class="btn-submit-all" onclick="prosesSimpanFinalNota()">🔒 Simpan Seluruh Pesanan Ke Cloud</button>
     </div>
   </div>
 
@@ -272,7 +270,7 @@
 
         alert(`✔️ Sukses! Nota transaksi atas nama "${nama_pembeli}" berhasil di-input dan tersimpan di cloud!`);
         
-        document.getElementById('inNama').value = 'Hep'; 
+        document.getElementById('inNama').value = ''; // Mengosongkan form nama setelah berhasil input
         keranjangSementara = [];
         akumulasiTotalHarga = 0;
         renderVisualKeranjang();
