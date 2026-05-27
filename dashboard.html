@@ -45,7 +45,7 @@
     .card { background: var(--white); border-radius: 8px; padding: 20px; border: 1px solid #e3dec3; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 25px; }
     .card h3 { color: var(--primary); margin-bottom: 15px; font-size: 1.1rem; border-bottom: 1px solid #efe9db; padding-bottom: 8px; }
     
-    /* TABLES STYLE ORIGINAL */
+    /* TABLES STYLE */
     .table-responsive { width: 100%; overflow-x: auto; }
     .custom-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
     .custom-table th { padding: 12px; background: #efe9db; color: var(--primary); font-weight: 700; border: 1px solid #e3dec3; text-transform: uppercase; font-size: 0.8rem; }
@@ -59,7 +59,7 @@
     .badge-masuk { background: #e8f5e9; color: var(--success); }
     .badge-keluar { background: #fff0f0; color: var(--danger); }
 
-    /* FORMS ORIGINAL STYLE */
+    /* FORMS */
     .form-group { margin-bottom: 15px; }
     .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #5c4a3c; }
     .form-control { width: 100%; padding: 10px; border: 1px solid #c2b9a7; border-radius: 4px; font-size: 0.9rem; color: var(--text); background: #fdfdfb; }
@@ -125,7 +125,7 @@
         </div>
         <div class="form-group">
           <label>Nama File Gambar</label>
-          <input type="text" id="prodFoto" class="form-control" placeholder="Contoh: cendols.png">
+          <input type="text" id="prodFoto" class="form-control" placeholder="Contoh: cendols.jpg">
         </div>
         <div class="form-group">
           <label>Deskripsi Pendek</label>
@@ -284,13 +284,13 @@
     }
 
     async function MuatSemuaDataDashboard() {
+      // --- AMBIL DATA PESANAN & PENJUALAN ---
       try {
         const { data: pesananData, error: e1 } = await supabaseClient
           .from('pesanan')
           .select('*, detail_pesanan(*)')
           .order('tanggal', { ascending: false });
-        if(e1) throw e1;
-
+        
         const jBody = document.getElementById('tabelPenjualanBody');
         jBody.innerHTML = '';
         
@@ -298,7 +298,7 @@
         let totalPorsiTerjual = 0;
         let totalTransaksi = 0;
 
-        if(pesananData && pesananData.length > 0) {
+        if(!e1 && pesananData && pesananData.length > 0) {
           totalTransaksi = pesananData.length;
           pesananData.forEach(p => {
             totalOmset += (p.total_harga || 0);
@@ -343,16 +343,18 @@
         document.getElementById('cardOmset').innerText = `Rp ${totalOmset.toLocaleString('id-ID')}`;
         document.getElementById('cardTerjual').innerText = `${totalPorsiTerjual} Cup`;
         document.getElementById('cardTransaksi').innerText = `${totalTransaksi} PO`;
+      } catch(err) { console.error("Error tabel penjualan:", err.message); }
 
+      // --- AMBIL DATA STOK BARANG LOGISTIK ---
+      try {
         const { data: stokData, error: e2 } = await supabaseClient
           .from('stok_barang')
           .select('*')
           .order('nama_barang', { ascending: true });
-        if(e2) throw e2;
 
         const targetStokBody = document.getElementById('tabelStokBody');
         targetStokBody.innerHTML = '';
-        if(stokData && stokData.length > 0) {
+        if(!e2 && stokData && stokData.length > 0) {
           stokData.forEach(s => {
             const row = document.createElement('tr');
             let warnaStok = (Number(s.jumlah) === 0) ? 'color: var(--danger); font-weight: 700;' : 'font-weight: 600;';
@@ -367,25 +369,33 @@
         } else {
           targetStokBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Data logistik kosong.</td></tr>`;
         }
+      } catch(err) { console.error("Error tabel stok:", err.message); }
 
+      // --- AMBIL DATA KATALOG PRODUK (YANG TADI MACET) ---
+      try {
         const { data: prodData, error: e3 } = await supabaseClient
           .from('produk')
           .select('*')
           .order('id', { ascending: true });
-        if(e3) throw e3;
+        
+        if (e3) throw e3;
         TampilkanKatalogManajemen(prodData);
-        MuatDataKeuanganTab();
+      } catch(err) { 
+        console.error("Error tabel produk:", err.message);
+        document.getElementById('tabelManajemenProdukBody').innerHTML = `<tr><td colspan="6" style="text-align:center; color:red;">Gagal memuat katalog: ${err.message}</td></tr>`;
+      }
 
-      } catch(err) { console.error("Gagal menyinkronkan data:", err.message); }
+      // Jalankan pemuatan data keuangan secara terpisah agar tidak mengganggu katalog produk jika error
+      MuatDataKeuanganTab();
     }
 
     async function MuatDataKeuanganTab() {
+      // Ambil jurnal laporan keuangan
       try {
         const { data: kasData, error: errKas } = await supabaseClient.from('laporan_keuangan').select('*').order('tanggal', { ascending: false });
-        if(errKas) throw errKas;
         const hBody = document.getElementById('tabelHistoriKeuanganBody');
         hBody.innerHTML = '';
-        if(kasData && kasData.length > 0) {
+        if(!errKas && kasData && kasData.length > 0) {
           kasData.forEach(k => {
             const row = document.createElement('tr');
             const badgeArus = k.jenis_transaksi === 'Pemasukan' ? 'badge-masuk' : 'badge-keluar';
@@ -399,14 +409,16 @@
             hBody.appendChild(row);
           });
         } else {
-          hBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999;">Belum ada mutasi keuangan.</td></tr>`;
+          hBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999;">Belum ada mutasi keuangan atau tabel belum siap.</td></tr>`;
         }
+      } catch(err) { console.log("Laporan keuangan belum aktif:", err.message); }
 
+      // Ambil posisi saldo
+      try {
         const { data: saldoData, error: errSaldo } = await supabaseClient.from('laporan_saldo').select('*').order('nama_akun', { ascending: true });
-        if(errSaldo) throw errSaldo;
         const sBody = document.getElementById('tabelLaporanSaldoBody');
         sBody.innerHTML = '';
-        if(saldoData && saldoData.length > 0) {
+        if(!errSaldo && saldoData && saldoData.length > 0) {
           saldoData.forEach(s => {
             const row = document.createElement('tr');
             row.innerHTML = `
@@ -421,7 +433,7 @@
         } else {
           sBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999;">Data ringkasan saldo kosong.</td></tr>`;
         }
-      } catch(err) { console.error(err.message); }
+      } catch(err) { console.log("Laporan saldo belum aktif:", err.message); }
     }
 
     async function simpanTransaksiKeuangan() {
