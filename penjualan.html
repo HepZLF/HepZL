@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laporan Penjualan - Nusantara Cuy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #8B4513;
+      --secondary: #D2691E;
+      --success: #2e7d32;
+      --danger: #c62828;
+      --bg: #f9f6f0;
+      --white: #ffffff;
+      --text: #2c1e15;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Poppins', sans-serif; }
+    body { background: var(--bg); color: var(--text); padding: 25px; }
+    
+    .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #e3dec3; padding-bottom: 15px; }
+    .nav-header h2 { color: var(--primary); font-weight: 700; }
+    .btn-logout { background: var(--danger); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    
+    /* MENU NAVIGASI */
+    .sub-nav-buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; background: #efe9db; padding: 10px; border-radius: 8px; }
+    .nav-link { padding: 10px 18px; background: var(--white); color: var(--text); border: 1px solid #dcd5c5; border-radius: 6px; font-weight: 600; font-size: 0.9rem; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: all 0.2s ease; }
+    .nav-link:hover { background: #faf8f5; border-color: var(--secondary); color: var(--secondary); }
+    .nav-link.active { background: var(--primary); color: var(--white); border-color: var(--primary); }
+
+    .card { background: var(--white); border-radius: 8px; padding: 20px; border: 1px solid #e3dec3; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 25px; }
+    .card h3 { color: var(--primary); margin-bottom: 15px; font-size: 1.1rem; border-bottom: 1px solid #efe9db; padding-bottom: 8px; }
+    
+    /* TABLES STYLE */
+    .table-responsive { width: 100%; overflow-x: auto; }
+    .custom-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+    .custom-table th { padding: 12px; background: #efe9db; color: var(--primary); font-weight: 700; border: 1px solid #e3dec3; text-transform: uppercase; font-size: 0.8rem; }
+    .custom-table td { padding: 12px; border: 1px solid #e3dec3; }
+    .custom-table tr:nth-child(even) { background: #faf8f5; }
+    
+    /* BADGES METHOD */
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; display: inline-block; }
+    .badge-cash { background: #e8f5e9; color: var(--success); }
+    .badge-bca { background: #e3f2fd; color: #0d47a1; }
+    .badge-qris { background: #f3e5f5; color: #4a148c; }
+  </style>
+</head>
+<body>
+
+  <header class="nav-header">
+    <h2>Nusantara Cuy - Laporan Penjualan</h2>
+    <button class="btn-logout" onclick="logoutAdmin()">🚪 Keluar</button>
+  </header>
+
+  <nav class="sub-nav-buttons">
+    <a href="dashboard.html" class="nav-link">📊 Panel Utama</a>
+    <a href="produk.html" class="nav-link">📋 Katalog Produk</a>
+    <a href="penjualan.html" class="nav-link active">🛒 Laporan Penjualan</a>
+    <a href="keuangan.html" class="nav-link">🏦 Laporan Keuangan</a>
+  </nav>
+
+  <div class="card">
+    <h3>🛒 Daftar Detail Transaksi Penjualan Produk</h3>
+    <div class="table-responsive">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>Nama Pembeli</th>
+            <th>Minuman Yang Dibeli</th>
+            <th>Jumlah Cup</th>
+            <th>Total Bayar</th>
+            <th>Metode Pembayaran</th>
+          </tr>
+        </thead>
+        <tbody id="tabelPenjualanBody">
+          <tr><td colspan="6" style="text-align:center; color:#888;">Menyelaraskan data pembukuan pesanan...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="db.js"></script>
+  <script src="auth.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      proteksiHalamanDashboard();
+      MuatRiwayatPenjualan();
+    });
+
+    async function MuatRiwayatPenjualan() {
+      try {
+        const { data: pesananData, error } = await supabaseClient
+          .from('pesanan')
+          .select('*, detail_pesanan(*)')
+          .order('tanggal', { ascending: false });
+        
+        if (error) throw error;
+
+        const jBody = document.getElementById('tabelPenjualanBody');
+        jBody.innerHTML = '';
+        
+        if(pesananData && pesananData.length > 0) {
+          pesananData.forEach(p => {
+            let teksRincianProduk = [];
+            let totalCupDiPesananIni = 0;
+
+            if(p.detail_pesanan && p.detail_pesanan.length > 0) {
+              p.detail_pesanan.forEach(d => {
+                // Filter barang non-porsi utama jika ada
+                if(d.nama_produk !== 'Extra Plastik' && d.nama_produk !== 'Extra Longan' && d.nama_produk !== 'Longan') {
+                  totalCupDiPesananIni += (d.jumlah || 0);
+                }
+                let rincianItem = `${d.jumlah} ${d.nama_produk}`;
+                if(d.catatan) rincianItem += ` (${d.catatan})`;
+                teksRincianProduk.push(rincianItem);
+              });
+            }
+
+            // Estimasi cadangan jika relasi detail kosong namun ada nominal total
+            if(totalCupDiPesananIni === 0 && p.total_harga > 0) {
+               totalCupDiPesananIni = Math.round(p.total_harga / 15000) || 1;
+            }
+
+            // Mengatur warna badge berdasarkan metode bayar
+            let badgeClass = 'badge-cash';
+            let metodeText = (p.metode_pembayaran || 'CASH').toUpperCase();
+            if(metodeText === 'BCA') badgeClass = 'badge-bca';
+            if(metodeText === 'QRIS') badgeClass = 'badge-qris';
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${p.tanggal || '-'}</td>
+              <td style="font-weight:600; color:var(--primary);">${p.nama_pembeli || '-'}</td>
+              <td style="font-weight:600;">${teksRincianProduk.join(', ') || 'Menu Kustom / Variabel Luar'}</td>
+              <td style="font-weight:600;">${totalCupDiPesananIni} Cup</td>
+              <td style="font-weight:700; color:var(--success);">Rp ${(p.total_harga || 0).toLocaleString('id-ID')}</td>
+              <td><span class="badge ${badgeClass}">${metodeText}</span></td>
+            `;
+            jBody.appendChild(row);
+          });
+        } else {
+          jBody.innerHTML = `<tr><td colspan="6" style="text-align:center;">Belum ada record data transaksi pesanan terkini.</td></tr>`;
+        }
+      } catch(err) { 
+        console.error("Error tabel penjualan:", err.message);
+        document.getElementById('tabelPenjualanBody').innerHTML = `<tr><td colspan="6" style="text-align:center; color:red;">Gagal memuat histori penjualan: ${err.message}</td></tr>`;
+      }
+    }
+  </script>
+</body>
+</html>
