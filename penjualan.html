@@ -31,9 +31,12 @@
     .card { background: var(--white); border-radius: 8px; padding: 20px; border: 1px solid #e3dec3; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 25px; }
     .card h3 { color: var(--primary); margin-bottom: 15px; font-size: 1.1rem; border-bottom: 1px solid #efe9db; padding-bottom: 8px; }
     
-    /* STYLING FORM MULTI-ITEM */
-    .form-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 15px; }
+    /* STYLING FORM PO MULTI-COLUMN */
+    .form-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 15px; }
+    .form-full-width { width: 100%; margin-bottom: 15px; display: block; }
+    
     .item-builder { display: grid; grid-template-columns: 2fr 1fr 3fr auto; gap: 15px; align-items: flex-end; background: #efe9db; padding: 15px; border-radius: 6px; border: 1px solid #c2b9a7; margin-bottom: 15px; }
+    @media (max-width: 992px) { .form-row { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 768px) { .form-row, .item-builder { grid-template-columns: 1fr; } }
     
     .form-group { margin-bottom: 5px; }
@@ -68,12 +71,15 @@
     .badge-bca { background: #e3f2fd; color: #0d47a1; }
     .badge-qris { background: #f3e5f5; color: #4a148c; }
     .badge-split { background: #fff3cd; color: #856404; border: 1px dashed #ffeeba; }
+    
+    .badge-pickup { background: #e0f2f1; color: #00695c; }
+    .badge-delivery { background: #efe0ff; color: #6a1b9a; }
   </style>
 </head>
 <body>
 
   <header class="nav-header">
-    <h2>Nusantara Cuy - Kontrol Log Penjualan</h2>
+    <h2>Nusantara Cuy - Kontrol Log Penjualan & PO</h2>
     <button class="btn-logout" onclick="logoutAdmin()">🚪 Keluar</button>
   </header>
 
@@ -85,19 +91,23 @@
   </nav>
 
   <div class="card">
-    <h3>📥 Input Catatan Transaksi Penjualan Baru (Multi-Varian)</h3>
+    <h3>📥 Input Catatan Transaksi / PO Baru (Multi-Varian)</h3>
     
     <div class="form-row">
       <div class="form-group">
         <label>Nama Pembeli</label>
-        <input type="text" id="inNama" class="form-control" placeholder="Contoh: Hep">
+        <input type="text" id="inNama" class="form-control" placeholder="Contoh: Mas Hep">
       </div>
       <div class="form-group">
-        <label>Tanggal</label>
+        <label>Nomor Telepon (WA)</label>
+        <input type="text" id="inTelepon" class="form-control" placeholder="Contoh: 081234567xx">
+      </div>
+      <div class="form-group">
+        <label>Tanggal Transaksi / PO</label>
         <input type="date" id="inTanggal" class="form-control">
       </div>
       <div class="form-group">
-        <label>Metode Bayar (Mendukung Split Payment)</label>
+        <label>Metode Bayar</label>
         <select id="inMetode" class="form-control">
           <option value="CASH">CASH (Tunai)</option>
           <option value="BCA">BCA Transfer</option>
@@ -108,7 +118,24 @@
       </div>
     </div>
 
-    <div class="item-builder">
+    <div class="form-row" style="margin-bottom: 10px;">
+      <div class="form-group" style="grid-column: span 4;">
+        <label>Tipe Pengambilan Pesanan</label>
+        <select id="inTipeAmbil" class="form-control" onchange="toggleAlamatInput()">
+          <option value="PICK UP">🥡 PICK UP (Ambil Sendiri ke Warung)</option>
+          <option value="DELIVERY">🛵 DELIVERY (Diantar Kurir ke Lokasi Alamat)</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="groupAlamat" class="form-full-width" style="display: none;">
+      <div class="form-group">
+        <label style="color: var(--secondary); font-weight: 700;">📍 Alamat Lokasi Tujuan Pengiriman Lengkap</label>
+        <input type="text" id="inAlamat" class="form-control" style="border: 2px solid var(--secondary);" placeholder="Ketik nama jalan, nomor rumah, RT/RW, nama kompleks, atau patokan kurir...">
+      </div>
+    </div>
+
+    <div class="item-builder" style="margin-top: 20px;">
       <div class="form-group">
         <label>Pilih Varian Minuman</label>
         <select id="inProdukDropdown" class="form-control"></select>
@@ -118,7 +145,7 @@
         <input type="number" id="inQty" class="form-control" value="1" min="1">
       </div>
       <div class="form-group">
-        <label>📝 Note </label>
+        <label>📝 Note Request Khusus Varian Ini</label>
         <input type="text" id="inNoteRequest" class="form-control" placeholder="Contoh: Less sugar, Tanpa es...">
       </div>
       <button class="btn-add-item" onclick="tambahKeKeranjangLokal()">📥 Tambah Varian</button>
@@ -130,29 +157,31 @@
         <li style="color:#856404; font-style:italic; list-style:none;">Belum ada item dimasukkan. Klik "Tambah Varian" di atas untuk menyusun isi nota belanja.</li>
       </ul>
       <div style="font-size: 1.2rem; font-weight: 700; color: var(--primary); background: #fff; padding: 10px; border-radius: 4px; border: 1px solid #ffe082; margin-bottom: 10px;">
-        Total : <span id="textTotalNota" style="color:var(--success);">Rp 0</span>
+        Total Otomatis Nota: <span id="textTotalNota" style="color:var(--success);">Rp 0</span>
       </div>
       <button class="btn-submit-all" onclick="prosesSimpanFinalNota()">🔒 Simpan Seluruh Pesanan Ke Cloud</button>
     </div>
   </div>
 
   <div class="card">
-    <h3>🛒 Riwayat Record Transaksi Penjualan Terdaftar</h3>
+    <h3>🛒 Riwayat Record Transaksi Penjualan & PO Terdaftar</h3>
     <div class="table-responsive">
       <table class="custom-table">
         <thead>
           <tr>
             <th>Tanggal</th>
-            <th>Nama Pembeli</th>
+            <th>Data Pelanggan</th>
+            <th>Tipe Ambil</th>
+            <th>📍 Alamat Pengiriman</th>
             <th>Minuman Yang Dibeli</th>
             <th>Note Request</th>
             <th>Jumlah Cup</th>
             <th>Total Bayar</th>
-            <th>Metode Pembayaran</th>
+            <th>Metode</th>
           </tr>
         </thead>
         <tbody id="tabelPenjualanBody">
-          <tr><td colspan="7" style="text-align:center; color:#888;">Menyelaraskan data pembukuan pesanan...</td></tr>
+          <tr><td colspan="9" style="text-align:center; color:#888;">Menyelaraskan data pembukuan pesanan...</td></tr>
         </tbody>
       </table>
     </div>
@@ -171,7 +200,21 @@
       const hariIni = new Date().toISOString().split('T')[0];
       document.getElementById('inTanggal').value = hariIni;
       InisialisasiDropdownDanTabel();
+      toggleAlamatInput(); // Jalankan fungsi pengecekan awal saat halaman dibuka
     });
+
+    // FUNGSI UTAMA MEMBUKA DAN MENUTUP KOTAK INPUT ALAMAT LOKASI
+    function toggleAlamatInput() {
+      const tipe = document.getElementById('inTipeAmbil').value;
+      const groupAlamat = document.getElementById('groupAlamat');
+      
+      if (tipe === 'DELIVERY') {
+        groupAlamat.style.display = 'block'; // Menampilkan elemen kotak alamat
+      } else {
+        groupAlamat.style.display = 'none';  // Menyembunyikan elemen kotak alamat
+        document.getElementById('inAlamat').value = ''; // Reset isian alamat
+      }
+    }
 
     async function InisialisasiDropdownDanTabel() {
       try {
@@ -231,11 +274,18 @@
 
     async function prosesSimpanFinalNota() {
       const nama_pembeli = document.getElementById('inNama').value.trim();
+      const no_telepon = document.getElementById('inTelepon').value.trim();
       const tanggal = document.getElementById('inTanggal').value;
       const metode_pembayaran = document.getElementById('inMetode').value;
+      const tipe_pengambilan = document.getElementById('inTipeAmbil').value;
+      const alamat_tujuan = document.getElementById('inAlamat').value.trim();
 
       if(!nama_pembeli) {
         alert("Nama pembeli wajib diisi!");
+        return;
+      }
+      if(tipe_pengambilan === 'DELIVERY' && !alamat_tujuan) {
+        alert("Alamat tujuan pengiriman wajib diisi untuk pilihan DELIVERY!");
         return;
       }
       if(keranjangSementara.length === 0) {
@@ -246,7 +296,15 @@
       try {
         const { data: notaInduk, error: errInduk } = await supabaseClient
           .from('pesanan')
-          .insert([{ nama_pembeli, tanggal, metode_pembayaran, total_harga: akumulasiTotalHarga }])
+          .insert([{ 
+            nama_pembeli, 
+            no_telepon: no_telepon || '-', 
+            tanggal, 
+            metode_pembayaran, 
+            total_harga: akumulasiTotalHarga,
+            tipe_pengambilan,
+            alamat_tujuan: tipe_pengambilan === 'DELIVERY' ? alamat_tujuan : '-'
+          }])
           .select();
 
         if (errInduk) throw errInduk;
@@ -268,9 +326,15 @@
           if(errAnak) throw errAnak;
         }
 
-        alert(`✔️ Sukses! Nota transaksi atas nama "${nama_pembeli}" berhasil di-input dan tersimpan di cloud!`);
+        alert(`✔️ Sukses! PO/Nota atas nama "${nama_pembeli}" (${tipe_pengambilan}) berhasil disimpan!`);
         
-        document.getElementById('inNama').value = ''; // Mengosongkan form nama setelah berhasil input
+        // Reset form
+        document.getElementById('inNama').value = '';
+        document.getElementById('inTelepon').value = '';
+        document.getElementById('inAlamat').value = '';
+        document.getElementById('inTipeAmbil').value = 'PICK UP';
+        toggleAlamatInput();
+        
         keranjangSementara = [];
         akumulasiTotalHarga = 0;
         renderVisualKeranjang();
@@ -317,10 +381,20 @@
             if(metodeText === 'QRIS') badgeClass = 'badge-qris';
             if(metodeText.includes('+')) badgeClass = 'badge-split';
 
+            let tipeAmbil = p.tipe_pengambilan || 'PICK UP';
+            let badgeAmbilClass = (tipeAmbil === 'DELIVERY') ? 'badge-delivery' : 'badge-pickup';
+
             const row = document.createElement('tr');
             row.innerHTML = `
               <td>${p.tanggal || '-'}</td>
-              <td style="font-weight:600; color:var(--primary);">${p.nama_pembeli || '-'}</td>
+              <td>
+                <strong style="color:var(--primary); font-size:0.95rem;">${p.nama_pembeli || '-'}</strong><br>
+                <span style="font-size:0.8rem; color:#666;">📞 ${p.no_telepon || '-'}</span>
+              </td>
+              <td><span class="badge ${badgeAmbilClass}">${tipeAmbil}</span></td>
+              <td style="font-size:0.85rem; max-width:200px; color:#555; line-height:1.4;">
+                ${tipeAmbil === 'DELIVERY' ? `<strong>📍 Alamat:</strong><br>${p.alamat_tujuan || '-'}` : '<span style="color:#aaa; font-style:italic;">Ambil di warung</span>'}
+              </td>
               <td>${listHtmlProduk}</td>
               <td>${listHtmlNote}</td>
               <td style="font-weight:600;">${totalCupDiPesananIni} Cup</td>
