@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kelola Katalog Produk - Nusantara Cuy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #8B4513;
+      --secondary: #D2691E;
+      --success: #2e7d32;
+      --danger: #c62828;
+      --warning: #f57c00;
+      --bg: #f9f6f0;
+      --white: #ffffff;
+      --text: #2c1e15;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Poppins', sans-serif; }
+    body { background: var(--bg); color: var(--text); padding: 25px; }
+    
+    .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #e3dec3; padding-bottom: 15px; }
+    .nav-header h2 { color: var(--primary); font-weight: 700; }
+    .btn-logout { background: var(--danger); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    
+    /* MENU NAVIGASI */
+    .sub-nav-buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; background: #efe9db; padding: 10px; border-radius: 8px; }
+    .nav-link { padding: 10px 18px; background: var(--white); color: var(--text); border: 1px solid #dcd5c5; border-radius: 6px; font-weight: 600; font-size: 0.9rem; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: all 0.2s ease; }
+    .nav-link:hover { background: #faf8f5; border-color: var(--secondary); color: var(--secondary); }
+    .nav-link.active { background: var(--primary); color: var(--white); border-color: var(--primary); }
+
+    /* LAYOUT COLLUMNS */
+    .main-grid { display: grid; grid-template-columns: 2fr 1.2fr; gap: 25px; margin-bottom: 30px; }
+    @media (max-width: 992px) { .main-grid { grid-template-columns: 1fr; } }
+    
+    .card { background: var(--white); border-radius: 8px; padding: 20px; border: 1px solid #e3dec3; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 25px; }
+    .card h3 { color: var(--primary); margin-bottom: 15px; font-size: 1.1rem; border-bottom: 1px solid #efe9db; padding-bottom: 8px; }
+    
+    /* TABLES STYLE */
+    .table-responsive { width: 100%; overflow-x: auto; }
+    .custom-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+    .custom-table th { padding: 12px; background: #efe9db; color: var(--primary); font-weight: 700; border: 1px solid #e3dec3; text-transform: uppercase; font-size: 0.8rem; }
+    .custom-table td { padding: 12px; border: 1px solid #e3dec3; }
+    .custom-table tr:nth-child(even) { background: #faf8f5; }
+    
+    /* FORMS */
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #5c4a3c; }
+    .form-control { width: 100%; padding: 10px; border: 1px solid #c2b9a7; border-radius: 4px; font-size: 0.9rem; color: var(--text); background: #fdfdfb; }
+    .form-control:focus { outline: none; border-color: var(--secondary); box-shadow: 0 0 4px rgba(210,105,30,0.2); }
+    
+    .btn-primary { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 4px; font-weight: 600; cursor: pointer; width: 100%; font-size: 0.9rem; transition: background 0.2s; }
+    .btn-primary:hover { background: #73390f; }
+    .btn-secondary { background: #e3dec3; color: var(--text); border: none; padding: 10px; border-radius: 4px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 8px; font-size: 0.9rem; }
+    .action-btn { padding: 4px 8px; border: none; border-radius: 4px; font-weight: 600; font-size: 0.75rem; cursor: pointer; color: white; margin-right: 4px; }
+  </style>
+</head>
+<body>
+
+  <header class="nav-header">
+    <h2>Nusantara Cuy - Manajemen Produk</h2>
+    <button class="btn-logout" onclick="logoutAdmin()">🚪 Keluar</button>
+  </header>
+
+  <nav class="sub-nav-buttons">
+    <a href="dashboard.html" class="nav-link">📊 Panel Utama</a>
+    <a href="produk.html" class="nav-link active">📋 Katalog Produk</a>
+    <a href="penjualan.html" class="nav-link">🛒 Laporan Penjualan</a>
+    <a href="keuangan.html" class="nav-link">🏦 Laporan Keuangan</a>
+  </nav>
+
+  <div class="main-grid">
+    <div class="card">
+      <h3>📋 Hub Kontrol Manajemen Katalog Menu Terpasang</h3>
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th style="width: 60px;">ID</th>
+              <th>Nama Varian</th>
+              <th>Harga Jual</th>
+              <th>File Gambar</th>
+              <th>Deskripsi</th>
+              <th>Aksi Kontrol</th>
+            </tr>
+          </thead>
+          <tbody id="tabelManajemenProdukBody">
+            <tr><td colspan="6" style="text-align:center; color:#888;">Memuat data katalog...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 id="formTitle">✏️ Kelola Katalog Produk</h3>
+      <input type="hidden" id="prodId">
+      <div class="form-group">
+        <label>Nama Varian Minuman</label>
+        <input type="text" id="prodNama" class="form-control" placeholder="Contoh: Cendol Sultan">
+      </div>
+      <div class="form-group">
+        <label>Harga Satuan (Rp)</label>
+        <input type="number" id="prodHarga" class="form-control" placeholder="Contoh: 15000">
+      </div>
+      <div class="form-group">
+        <label>Nama File Gambar</label>
+        <input type="text" id="prodFoto" class="form-control" placeholder="Contoh: cendols.jpg">
+      </div>
+      <div class="form-group">
+        <label>Deskripsi Pendek</label>
+        <textarea id="prodDesc" class="form-control" rows="4" placeholder="Deskripsi varian produk..."></textarea>
+      </div>
+      <button class="btn-primary" id="btnSimpanProduk" onclick="simpanAksiProduk()">Simpan Ke Cloud</button>
+      <button class="btn-secondary" id="btnBatalEdit" onclick="resetFormProduk()" style="display:none;">Batal Perubahan</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="db.js"></script>
+  <script src="auth.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      proteksiHalamanDashboard();
+      MuatKatalogProduk();
+    });
+
+    async function MuatKatalogProduk() {
+      try {
+        const { data: prodData, error } = await supabaseClient
+          .from('produk')
+          .select('*')
+          .order('id', { ascending: true });
+        
+        if (error) throw error;
+        
+        const pBody = document.getElementById('tabelManajemenProdukBody');
+        pBody.innerHTML = '';
+        
+        if(prodData && prodData.length > 0) {
+          prodData.forEach(p => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td><code>#${p.id}</code></td>
+              <td style="font-weight:600; color:var(--primary);">${p.nama_produk}</td>
+              <td style="font-weight:700;">Rp ${(p.harga || 0).toLocaleString('id-ID')}</td>
+              <td><code>${p.foto_url || '-'}</code></td>
+              <td style="font-size:0.85rem; color:#555;">${p.deskripsi || '-'}</td>
+              <td>
+                <button class="action-btn" style="background:var(--warning);" onclick="setFormModeEdit(${p.id}, '${p.nama_produk}', ${p.harga}, '${p.foto_url || ''}', '${p.deskripsi || ''}')">Edit</button>
+                <button class="action-btn" style="background:var(--danger);" onclick="hapusDataProduk(${p.id})">Hapus</button>
+              </td>
+            `;
+            pBody.appendChild(row);
+          });
+        } else {
+          pBody.innerHTML = `<tr><td colspan="6" style="text-align:center;">Database menu kosong.</td></tr>`;
+        }
+      } catch(err) { 
+        console.error("Error tabel produk:", err.message);
+        document.getElementById('tabelManajemenProdukBody').innerHTML = `<tr><td colspan="6" style="text-align:center; color:red;">Gagal memuat katalog: ${err.message}</td></tr>`;
+      }
+    }
+
+    async function simpanAksiProduk() {
+      const id = document.getElementById('prodId').value;
+      const nama_produk = document.getElementById('prodNama').value.trim();
+      const harga = parseInt(document.getElementById('prodHarga').value);
+      const foto_url = document.getElementById('prodFoto').value.trim();
+      const deskripsi = document.getElementById('prodDesc').value.trim();
+
+      if(!nama_produk || !harga) { alert("Nama produk dan nominal harga wajib terisi!"); return; }
+      try {
+        if(id) {
+          const { error } = await supabaseClient.from('produk').update({ nama_produk, harga, foto_url, deskripsi }).eq('id', id);
+          if(error) throw error;
+          alert("✔️ Data menu produk berhasil dimodifikasi!");
+        } else {
+          const { error } = await supabaseClient.from('produk').insert([{ nama_produk, harga, foto_url, deskripsi }]);
+          if(error) throw error;
+          alert("✔️ Varian produk baru berhasil ditambahkan!");
+        }
+        resetFormProduk();
+        MuatKatalogProduk();
+      } catch (err) { alert("Aksi Gagal: " + err.message); }
+    }
+
+    function setFormModeEdit(id, nama, harga, foto, desc) {
+      document.getElementById('prodId').value = id;
+      document.getElementById('prodNama').value = nama;
+      document.getElementById('prodHarga').value = harga;
+      document.getElementById('prodFoto').value = foto;
+      document.getElementById('prodDesc').value = desc;
+      document.getElementById('formTitle').innerText = "✏️ Edit Varian: " + nama;
+      document.getElementById('btnSimpanProduk').innerText = "Simpan Perubahan";
+      document.getElementById('btnBatalEdit').style.display = "block";
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetFormProduk() {
+      document.getElementById('prodId').value = '';
+      document.getElementById('prodNama').value = '';
+      document.getElementById('prodHarga').value = '';
+      document.getElementById('prodFoto').value = '';
+      document.getElementById('prodDesc').value = '';
+      document.getElementById('formTitle').innerText = "✏️ Kelola Katalog Produk";
+      document.getElementById('btnSimpanProduk').innerText = "Simpan Ke Cloud";
+      document.getElementById('btnBatalEdit').style.display = "none";
+    }
+
+    async function hapusDataProduk(id) {
+      if(!confirm("Hapus varian menu ini dari database?")) return;
+      try {
+        const { error } = await supabaseClient.from('produk').delete().eq('id', id);
+        if(error) throw error;
+        alert("✔️ Produk berhasil dihapus!");
+        MuatKatalogProduk();
+      } catch (err) { alert("Gagal menghapus: " + err.message); }
+    }
+  </script>
+</body>
+</html>
