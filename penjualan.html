@@ -34,7 +34,7 @@
     
     /* STYLING FORM PO MULTI-COLUMN */
     .form-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 15px; }
-    .form-full-width { width: 100%; margin-bottom: 15px; block: block; }
+    .form-full-width { width: 100%; margin-bottom: 15px; display: block; }
     
     .item-builder { display: grid; grid-template-columns: 2fr 1fr 3fr auto; gap: 15px; align-items: flex-end; background: #efe9db; padding: 15px; border-radius: 6px; border: 1px solid #c2b9a7; margin-bottom: 15px; }
     @media (max-width: 992px) { .form-row { grid-template-columns: 1fr 1fr; } }
@@ -367,7 +367,7 @@
           const arrayDetailPayload = keranjangSementara.map(item => ({
             id_pesanan: idPesananYangSedangDiedit, nama_produk: item.nama_produk, jumlah: item.jumlah, harga_satuan: item.harga_satuan, catatan: item.catatan
           }));
-          const { error: errInsertAnak Baru } = await supabaseClient.from('detail_pesanan').insert(arrayDetailPayload);
+          const { error: errInsertAnakBaru } = await supabaseClient.from('detail_pesanan').insert(arrayDetailPayload);
           if(errInsertAnakBaru) throw errInsertAnakBaru;
 
           alert(`✔️ Sukses memperbarui data PO ID #${idPesananYangSedangDiedit} atas nama "${nama_pembeli}"!`);
@@ -416,17 +416,13 @@
 
     // FUNGSI AKSI JIKALAU TOMBOL EDIT DI LAPORAN DIKLIK KASIR
     function pemicuEditPesanan(idPesanan) {
-      // Temukan object pesanan di database lokal array
       const targetPesanan = databaseSemuaPesanan.find(p => p.id === idPesanan);
       if(!targetPesanan) return;
 
-      // 1. Gulir layar otomatis kembali ke atas form area agar kasir tahu sedang mengedit
       document.getElementById('formAreaUtama').scrollIntoView({ behavior: 'smooth' });
 
-      // 2. Set variabel global id edit mode
       idPesananYangSedangDiedit = targetPesanan.id;
 
-      // 3. Ubah Tampilan Judul Form Komponen & Notifikasi
       document.getElementById('judulForm').innerText = "📝 Edit / Koreksi Catatan Data Pesanan";
       document.getElementById('textIdEdit').innerText = targetPesanan.id;
       document.getElementById('notifModeEdit').style.display = "block";
@@ -435,7 +431,6 @@
       btnSimpan.innerText = "💾 Simpan Hasil Perubahan (Update)";
       btnSimpan.classList.add('btn-edit-mode');
 
-      // 4. Masukkan data induk pesanan ke kotak form inputan
       document.getElementById('inNama').value = targetPesanan.nama_pembeli || '';
       document.getElementById('inTelepon').value = targetPesanan.no_telepon === '-' ? '' : (targetPesanan.no_telepon || '');
       document.getElementById('inTanggal').value = targetPesanan.tanggal || '';
@@ -445,7 +440,6 @@
 
       toggleAlamatInput();
 
-      // 5. Salin data detail produk belanjaan lama masuk kembali ke keranjang sementara
       keranjangSementara = [];
       akumulasiTotalHarga = 0;
 
