@@ -77,8 +77,9 @@
     .badge-qris { background: #f3e5f5; color: #4a148c; }
     .badge-split { background: #fff3cd; color: #856404; border: 1px dashed #ffeeba; }
     
-    .badge-pickup { background: #e0f2f1; color: #00695c; }
     .badge-delivery { background: #efe0ff; color: #6a1b9a; }
+    .badge-pabrik { background: #e0f2f1; color: #00695c; }
+    .badge-stand { background: #fff3cd; color: #b85c00; border: 1px solid #ffeeba; }
   </style>
 </head>
 <body>
@@ -127,8 +128,9 @@
       <div class="form-group" style="grid-column: span 4;">
         <label>Tipe Pengambilan Pesanan</label>
         <select id="inTipeAmbil" class="form-control" onchange="toggleAlamatInput()">
-          <option value="PICK UP">🥡 PICK UP (Ambil Sendiri ke Warung)</option>
           <option value="DELIVERY">🛵 DELIVERY (Diantar Kurir ke Lokasi Alamat)</option>
+          <option value="AMBIL DI PABRIK">🏭 AMBIL DI PABRIK (Rumah)</option>
+          <option value="STAND">🎪 STAND (Penjualan di Lapak/Stand)</option>
         </select>
       </div>
     </div>
@@ -214,7 +216,7 @@
     let listKatalogLokal = [];
     let keranjangSementara = []; 
     let akumulasiTotalHarga = 0;
-    let databaseSemuaPesanan = []; // Untuk menampung semua data asli dari Supabase
+    let databaseSemuaPesanan = []; 
 
     document.addEventListener("DOMContentLoaded", () => {
       proteksiHalamanDashboard();
@@ -224,6 +226,7 @@
       toggleAlamatInput();
     });
 
+    // MENYESUAIKAN FUNGSI HIDDEN INPUT ALAMAT KHUSUS UNTUK DELIVERY SAJA
     function toggleAlamatInput() {
       const tipe = document.getElementById('inTipeAmbil').value;
       const groupAlamat = document.getElementById('groupAlamat');
@@ -323,7 +326,7 @@
         document.getElementById('inNama').value = '';
         document.getElementById('inTelepon').value = '';
         document.getElementById('inAlamat').value = '';
-        document.getElementById('inTipeAmbil').value = 'PICK UP';
+        document.getElementById('inTipeAmbil').value = 'DELIVERY';
         toggleAlamatInput();
         keranjangSementara = []; akumulasiTotalHarga = 0;
         renderVisualKeranjang();
@@ -331,7 +334,6 @@
       } catch (err) { alert("Gagal: " + err.message); }
     }
 
-    // FUNGSI UTAMA LOAD DATA
     async function MuatRiwayatPenjualan() {
       try {
         const { data: pesananData, error } = await supabaseClient
@@ -341,13 +343,12 @@
         
         if (error) throw error;
         
-        // Simpan data asli ke variabel lokal agar bisa difilter berkali-kali tanpa tembak cloud lagi
         databaseSemuaPesanan = pesananData || []; 
         renderTabelVisual(databaseSemuaPesanan);
       } catch(err) { console.error(err.message); }
     }
 
-    // FUNGSI UNTUK MERENDER DATA KE HTML TABLE
+    // ADAPTASI MATRIKS RENDER UNTUK MENANGANI BADGE 3 OPSI BARU
     function renderTabelVisual(dataArray) {
       const jBody = document.getElementById('tabelPenjualanBody');
       jBody.innerHTML = '';
@@ -380,8 +381,21 @@
         if(metodeText === 'QRIS') badgeClass = 'badge-qris';
         if(metodeText.includes('+')) badgeClass = 'badge-split';
 
-        let tipeAmbil = p.tipe_pengambilan || 'PICK UP';
-        let badgeAmbilClass = (tipeAmbil === 'DELIVERY') ? 'badge-delivery' : 'badge-pickup';
+        // Logika Pengkondisian Pewarnaan Badge 3 Opsi Baru
+        let tipeAmbil = p.tipe_pengambilan || 'DELIVERY';
+        let badgeAmbilClass = 'badge-delivery';
+        let alamatTeksKolom = '';
+
+        if(tipeAmbil === 'AMBIL DI PABRIK' || tipeAmbil === 'PICK UP') {
+          badgeAmbilClass = 'badge-pabrik';
+          alamatTeksKolom = '<span style="color:#aaa; font-style:italic;">Ambil di Pabrik (Rumah)</span>';
+        } else if(tipeAmbil === 'STAND') {
+          badgeAmbilClass = 'badge-stand';
+          alamatTeksKolom = '<span style="color:#b85c00; font-style:italic;">📍 Terjual di Stand</span>';
+        } else {
+          badgeAmbilClass = 'badge-delivery';
+          alamatTeksKolom = `<strong>📍 Alamat:</strong><br>${p.alamat_tujuan || '-'}`;
+        }
 
         const row = document.createElement('tr');
         row.innerHTML = `
@@ -391,9 +405,7 @@
             <span style="font-size:0.8rem; color:#666;">📞 ${p.no_telepon || '-'}</span>
           </td>
           <td><span class="badge ${badgeAmbilClass}">${tipeAmbil}</span></td>
-          <td style="font-size:0.85rem; max-width:200px; color:#555; line-height:1.4;">
-            ${tipeAmbil === 'DELIVERY' ? `<strong>📍 Alamat:</strong><br>${p.alamat_tujuan || '-'}` : '<span style="color:#aaa; font-style:italic;">Ambil di warung</span>'}
-          </td>
+          <td style="font-size:0.85rem; max-width:200px; color:#555; line-height:1.4;">${alamatTeksKolom}</td>
           <td>${listHtmlProduk}</td>
           <td>${listHtmlNote}</td>
           <td style="font-weight:600;">${totalCupDiPesananIni} Cup</td>
@@ -404,20 +416,18 @@
       });
     }
 
-    // LOGIKA FILTRASI SEARCH DAN TANGGAL SECARA LIVE
     function jalankanFilterDataDataLokal() {
       const keyword = document.getElementById('searchKeyword').value.toLowerCase().trim();
       const tglPilihan = document.getElementById('filterTanggal').value;
 
       const dataHasilFilter = databaseSemuaPesanan.filter(p => {
-        // Cek filter kecocokan kata kunci (Nama, No Telp, atau Alamat)
         const cocokNama = p.nama_pembeli ? p.nama_pembeli.toLowerCase().includes(keyword) : false;
         const cocokTelepon = p.no_telepon ? p.no_telepon.toLowerCase().includes(keyword) : false;
         const cocokAlamat = p.alamat_tujuan ? p.alamat_tujuan.toLowerCase().includes(keyword) : false;
+        const cocokTipe = p.tipe_pengambilan ? p.tipe_pengambilan.toLowerCase().includes(keyword) : false;
         
-        const cocokKeyword = cocokNama || cocokTelepon || cocokAlamat;
+        const cocokKeyword = cocokNama || cocokTelepon || cocokAlamat || cocokTipe;
 
-        // Cek filter kecocokan Tanggal
         let cocokTanggal = true;
         if(tglPilihan) {
           cocokTanggal = (p.tanggal === tglPilihan);
@@ -426,11 +436,9 @@
         return cocokKeyword && cocokTanggal;
       });
 
-      // Tampilkan hasil filter ke tabel
       renderTabelVisual(dataHasilFilter);
     }
 
-    // RESET FILTER KEMBALI SEPERTI SEMULA
     function resetFilterSemua() {
       document.getElementById('searchKeyword').value = '';
       document.getElementById('filterTanggal').value = '';
