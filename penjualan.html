@@ -31,18 +31,19 @@
     .card { background: var(--white); border-radius: 8px; padding: 20px; border: 1px solid #e3dec3; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 25px; }
     .card h3 { color: var(--primary); margin-bottom: 15px; font-size: 1.1rem; border-bottom: 1px solid #efe9db; padding-bottom: 8px; }
     
-    /* STYLING FORM INPUT GRID */
-    .form-inline-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 15px; }
-    .form-full-width { display: grid; grid-template-columns: 3fr 1fr; gap: 15px; align-items: flex-end; }
-    @media (max-width: 768px) { .form-inline-grid, .form-full-width { grid-template-columns: 1fr; } }
+    /* STYLING FORM MULTI-ITEM */
+    .form-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 15px; }
+    .item-builder { display: grid; grid-template-columns: 2fr 1fr 3fr auto; gap: 15px; align-items: flex-end; background: #efe9db; padding: 15px; border-radius: 6px; border: 1px solid #c2b9a7; margin-bottom: 15px; }
+    @media (max-width: 768px) { .form-row, .item-builder { grid-template-columns: 1fr; } }
     
     .form-group { margin-bottom: 5px; }
     .form-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 6px; color: #5c4a3c; text-transform: uppercase; }
     .form-control { width: 100%; padding: 10px; border: 1px solid #c2b9a7; border-radius: 4px; font-size: 0.9rem; color: var(--text); background: #fdfdfb; height: 42px; }
-    .form-control:focus { outline: none; border-color: var(--secondary); }
     
-    .btn-submit { background: var(--success); color: white; border: none; padding: 0 25px; border-radius: 4px; font-weight: 600; cursor: pointer; height: 42px; font-size: 0.9rem; transition: background 0.2s; width: 100%; }
-    .btn-submit:hover { background: #236327; }
+    .btn-add-item { background: var(--secondary); color: white; border: none; padding: 0 20px; border-radius: 4px; font-weight: 700; cursor: pointer; height: 42px; border: 2px solid #a04e11; }
+    .btn-add-item:hover { background: #b55616; }
+    .btn-submit-all { background: var(--success); color: white; border: none; padding: 14px 25px; border-radius: 4px; font-weight: 700; cursor: pointer; font-size: 1rem; width: 100%; margin-top: 15px; box-shadow: 0 4px 10px rgba(46,125,50,0.3); }
+    .btn-submit-all:hover { background: #1e5221; }
 
     /* TABLES STYLE */
     .table-responsive { width: 100%; overflow-x: auto; }
@@ -57,11 +58,16 @@
     .request-text { color: #b85c00; font-weight: 600; font-style: italic; font-size: 0.85rem; }
     .no-request { color: #aaa; font-size: 0.85rem; font-style: italic; }
     
+    /* CART CONTAINER */
+    .cart-summary { background: #fff3cd; border: 2px solid #ffeeba; padding: 20px; border-radius: 6px; margin-bottom: 15px; }
+    .cart-summary h4 { color: #856404; font-size: 0.95rem; margin-bottom: 10px; text-transform: uppercase; border-bottom: 1px dashed #ffeeba; padding-bottom: 5px; }
+    
     /* BADGES */
-    .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; display: inline-block; }
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; display: inline-block; text-transform: uppercase; }
     .badge-cash { background: #e8f5e9; color: var(--success); }
     .badge-bca { background: #e3f2fd; color: #0d47a1; }
     .badge-qris { background: #f3e5f5; color: #4a148c; }
+    .badge-split { background: #fff3cd; color: #856404; border: 1px dashed #ffeeba; }
   </style>
 </head>
 <body>
@@ -79,47 +85,56 @@
   </nav>
 
   <div class="card">
-    <h3>📥 Input Catatan Transaksi Penjualan Baru</h3>
+    <h3>📥 Input Catatan Transaksi Penjualan Baru (Multi-Varian)</h3>
     
-    <div class="form-inline-grid">
+    <div class="form-row">
       <div class="form-group">
         <label>Nama Pembeli</label>
-        <input type="text" id="inNama" class="form-control" placeholder="Contoh: Hep">
+        <input type="text" id="inNama" class="form-control" value="Hep" placeholder="Contoh: Hep">
       </div>
       <div class="form-group">
         <label>Tanggal</label>
         <input type="date" id="inTanggal" class="form-control">
       </div>
       <div class="form-group">
-        <label>Metode Bayar</label>
+        <label>Metode Bayar (Mendukung Split Payment)</label>
         <select id="inMetode" class="form-control">
           <option value="CASH">CASH (Tunai)</option>
           <option value="BCA">BCA Transfer</option>
           <option value="QRIS">QRIS / E-Wallet</option>
+          <option value="CASH + QRIS">CASH + QRIS (Gabungan)</option>
+          <option value="CASH + BCA">CASH + BCA (Gabungan)</option>
         </select>
       </div>
     </div>
 
-    <div class="form-full-width">
-      <div style="display:grid; grid-template-columns: 1fr 2fr; gap: 15px;">
-        <div class="form-group">
-          <label>Pilih Menu Minuman</label>
-          <select id="inProdukDropdown" class="form-control" onchange="sinkronisasiEstimasiHarga()">
-            </select>
-        </div>
-        <div class="form-group">
-          <label>📝 Note Request Pembeli (Catatan Kustom)</label>
-          <input type="text" id="inNoteRequest" class="form-control" placeholder="Contoh: Less sugar, tanpa es, extra longan...">
-        </div>
+    <div class="item-builder">
+      <div class="form-group">
+        <label>Pilih Varian Minuman</label>
+        <select id="inProdukDropdown" class="form-control"></select>
       </div>
       <div class="form-group">
-        <label>Total Bayar (Rp)</label>
-        <input type="number" id="inTotal" class="form-control" placeholder="0">
+        <label>Jumlah (Cup)</label>
+        <input type="number" id="inQty" class="form-control" value="1" min="1">
       </div>
+      <div class="form-group">
+        <label>📝 Note Request Khusus Varian Ini</label>
+        <input type="text" id="inNoteRequest" class="form-control" placeholder="Contoh: Less sugar, Tanpa es...">
+        
+      </div>
+      <button class="btn-add-item" onclick="tambahKeKeranjangLokal()">📥 Tambah Varian</button>
     </div>
-    
-    <div style="margin-top: 15px;">
-      <button class="btn-submit" onclick="simpanPenjualanManual()">➕ Input</button>
+
+    <div class="cart-summary" id="boxKeranjang">
+      <h4>🛒 Daftar Item Belanjaan Nota Ini:</h4>
+      <ul id="listKeranjangTeks" style="padding-left: 20px; margin-bottom: 10px; font-weight: 600; font-size: 0.9rem; color: #5c4a3c;">
+        <li style="color:#856404; font-style:italic; list-style:none;">Belum ada item dimasukkan. Klik "Tambah Varian" di atas untuk menyusun isi nota belanja.</li>
+      </ul>
+      <div style="font-size: 1.2rem; font-weight: 700; color: var(--primary); background: #fff; padding: 10px; border-radius: 4px; border: 1px solid #ffe082; margin-bottom: 10px;">
+        Total : <span id="textTotalNota" style="color:var(--success);">Rp 0</span>
+      </div>
+      
+      <button class="btn-submit-all" onclick="prosesSimpanFinalNota()">🔒 Input</button>
     </div>
   </div>
 
@@ -150,81 +165,121 @@
   <script src="auth.js"></script>
   <script>
     let listKatalogLokal = [];
+    let keranjangSementara = []; 
+    let akumulasiTotalHarga = 0;
 
     document.addEventListener("DOMContentLoaded", () => {
       proteksiHalamanDashboard();
-      
       const hariIni = new Date().toISOString().split('T')[0];
       document.getElementById('inTanggal').value = hariIni;
-      
       InisialisasiDropdownDanTabel();
     });
 
     async function InisialisasiDropdownDanTabel() {
-      // Ambil data produk untuk mengisi dropdown pilihan kasir
       try {
         const { data: produk, error } = await supabaseClient.from('produk').select('*').order('nama_produk', {ascending:true});
         if(!error && produk) {
           listKatalogLokal = produk;
           const drop = document.getElementById('inProdukDropdown');
           drop.innerHTML = produk.map(p => `<option value="${p.nama_produk}" data-harga="${p.harga}">${p.nama_produk} (Rp ${p.harga.toLocaleString()})</option>`).join('');
-          sinkronisasiEstimasiHarga();
         }
-      } catch (e) { console.error("Gagal load dropdown:", e.message); }
-
+      } catch (e) { console.error(e.message); }
       MuatRiwayatPenjualan();
     }
 
-    function sinkronisasiEstimasiHarga() {
+    function tambahKeKeranjangLokal() {
       const drop = document.getElementById('inProdukDropdown');
-      const hargaTerpilih = drop.options[drop.selectedIndex]?.getAttribute('data-harga') || 0;
-      document.getElementById('inTotal').value = hargaTerpilih;
+      const nama_produk = drop.value;
+      const harga_satuan = parseInt(drop.options[drop.selectedIndex].getAttribute('data-harga'));
+      const jumlah = parseInt(document.getElementById('inQty').value) || 1;
+      const catatan = document.getElementById('inNoteRequest').value.trim();
+
+      if(jumlah < 1) return;
+
+      const subTotalItem = harga_satuan * jumlah;
+      keranjangSementara.push({ nama_produk, jumlah, harga_satuan, catatan, subTotalItem });
+      akumulasiTotalHarga += subTotalItem;
+
+      renderVisualKeranjang();
+
+      document.getElementById('inQty').value = "1";
+      document.getElementById('inNoteRequest').value = "";
     }
 
-    // PROSES INPUT SINKRON KE TABEL PESANAN & DETAIL_PESANAN
-    async function simpanPenjualanManual() {
+    function renderVisualKeranjang() {
+      const list = document.getElementById('listKeranjangTeks');
+      const total = document.getElementById('textTotalNota');
+
+      if(keranjangSementara.length > 0) {
+        list.innerHTML = keranjangSementara.map((item, idx) => `
+          <li style="margin-bottom: 5px;">
+            🥤 ${item.jumlah}x ${item.nama_produk} ${item.catatan ? `[Note: "${item.catatan}"]` : ''} 
+            - <span style="color:var(--success)">Rp ${item.subTotalItem.toLocaleString('id-ID')}</span>
+            <button onclick="hapusItemKeranjang(${idx})" style="background:none; border:none; color:red; cursor:pointer; font-weight:bold; margin-left:10px;">(Hapus)</button>
+          </li>
+        `).join('');
+        total.innerText = `Rp ${akumulasiTotalHarga.toLocaleString('id-ID')}`;
+      } else {
+        list.innerHTML = `<li style="color:#856404; font-style:italic; list-style:none;">Belum ada item dimasukkan. Klik "Tambah Varian" di atas untuk menyusun isi nota belanja.</li>`;
+        total.innerText = `Rp 0`;
+      }
+    }
+
+    function hapusItemKeranjang(index) {
+      akumulasiTotalHarga -= keranjangSementara[index].subTotalItem;
+      keranjangSementara.splice(index, 1);
+      renderVisualKeranjang();
+    }
+
+    async function prosesSimpanFinalNota() {
       const nama_pembeli = document.getElementById('inNama').value.trim();
       const tanggal = document.getElementById('inTanggal').value;
       const metode_pembayaran = document.getElementById('inMetode').value;
-      const total_harga = parseInt(document.getElementById('inTotal').value);
-      
-      const nama_produk = document.getElementById('inProdukDropdown').value;
-      const catatan = document.getElementById('inNoteRequest').value.trim();
 
-      if(!nama_pembeli || !tanggal || !total_harga) {
-        alert("Mohon lengkapi Nama Pembeli dan Total Harga!");
+      if(!nama_pembeli) {
+        alert("Nama pembeli wajib diisi!");
+        return;
+      }
+      if(keranjangSementara.length === 0) {
+        alert("Keranjang masih kosong! Silakan tambahkan minimal 1 varian minuman dahulu.");
         return;
       }
 
       try {
-        // 1. Masukkan ke tabel induk 'pesanan'
-        const { data: pesananBaru, error: eInduk } = await supabaseClient
+        const { data: notaInduk, error: errInduk } = await supabaseClient
           .from('pesanan')
-          .insert([{ nama_pembeli, tanggal, metode_pembayaran, total_harga }])
+          .insert([{ nama_pembeli, tanggal, metode_pembayaran, total_harga: akumulasiTotalHarga }])
           .select();
 
-        if (eInduk) throw eInduk;
+        if (errInduk) throw errInduk;
 
-        // 2. Masukkan note dan produk ke tabel anak 'detail_pesanan' menggunakan ID pesanan induk
-        if(pesananBaru && pesananBaru.length > 0) {
-          const id_pesanan = pesananBaru[0].id;
-          const { error: eAnak } = await supabaseClient
+        if(notaInduk && notaInduk.length > 0) {
+          const id_pesanan = notaInduk[0].id;
+          const arrayDetailPayload = keranjangSementara.map(item => ({
+            id_pesanan: id_pesanan,
+            nama_produk: item.nama_produk,
+            jumlah: item.jumlah,
+            harga_satuan: item.harga_satuan,
+            catatan: item.catatan
+          }));
+
+          const { error: errAnak } = await supabaseClient
             .from('detail_pesanan')
-            .insert([{ id_pesanan, nama_produk, jumlah: 1, harga_satuan: total_harga, catatan }]);
+            .insert(arrayDetailPayload);
           
-          if(eAnak) throw eAnak;
+          if(errAnak) throw errAnak;
         }
 
-        alert("✔️ Sukses! Pesanan offline beserta Note Request berhasil disimpan ke database cloud!");
+        alert(`✔️ Sukses! Nota transaksi atas nama "${nama_pembeli}" berhasil di-input dan tersimpan di cloud!`);
         
-        // Reset Form input
-        document.getElementById('inNama').value = '';
-        document.getElementById('inNoteRequest').value = '';
-        sinkronisasiEstimasiHarga();
+        document.getElementById('inNama').value = 'Hep'; 
+        keranjangSementara = [];
+        akumulasiTotalHarga = 0;
+        renderVisualKeranjang();
         
         MuatRiwayatPenjualan();
       } catch (err) {
-        alert("Gagal menyimpan transaksi: " + err.message);
+        alert("Gagal memproses nota transaksi: " + err.message);
       }
     }
 
@@ -252,28 +307,17 @@
                   totalCupDiPesananIni += (d.jumlah || 0);
                 }
                 listHtmlProduk += `<li><strong>${d.jumlah}x</strong> ${d.nama_produk}</li>`;
-                
-                if(d.catatan && d.catatan.trim() !== '') {
-                  listHtmlNote += `<li><span class="request-text">📝 "${d.catatan}"</span></li>`;
-                } else {
-                  listHtmlNote += `<li><span class="no-request">-</span></li>`;
-                }
+                listHtmlNote += `<li>${d.catatan ? `<span class="request-text">📝 "${d.catatan}"</span>` : '<span class="no-request">-</span>'}</li>`;
               });
-            } else {
-              listHtmlProduk += `<li>Menu Manual</li>`;
-              listHtmlNote += `<li><span class="no-request">-</span></li>`;
             }
             listHtmlProduk += '</ul>';
             listHtmlNote += '</ul>';
 
-            if(totalCupDiPesananIni === 0 && p.total_harga > 0) {
-               totalCupDiPesananIni = Math.round(p.total_harga / 15000) || 1;
-            }
-
-            let badgeClass = 'badge-cash';
             let metodeText = (p.metode_pembayaran || 'CASH').toUpperCase();
+            let badgeClass = 'badge-cash';
             if(metodeText === 'BCA') badgeClass = 'badge-bca';
             if(metodeText === 'QRIS') badgeClass = 'badge-qris';
+            if(metodeText.includes('+')) badgeClass = 'badge-split';
 
             const row = document.createElement('tr');
             row.innerHTML = `
@@ -287,12 +331,8 @@
             `;
             jBody.appendChild(row);
           });
-        } else {
-          jBody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Belum ada record data transaksi pesanan terkini.</td></tr>`;
         }
-      } catch(err) { 
-        console.error("Error tabel penjualan:", err.message);
-      }
+      } catch(err) { console.error(err.message); }
     }
   </script>
 </body>
