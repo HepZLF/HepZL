@@ -325,21 +325,28 @@
       renderVisualKeranjang();
     }
 
-    async function prosesSimpanFinalNota() {
+async function prosesSimpanFinalNota() {
       const nama_pembeli = document.getElementById('inNama').value.trim();
       const no_telepon = document.getElementById('inTelepon').value.trim();
       const tanggal = document.getElementById('inTanggal').value;
       const metode_pembayaran = document.getElementById('inMetode').value;
-      const tipe_pengambilan = document.getElementById('inTipeAmbil').value;
+      let tipe_pengambilan = document.getElementById('inTipeAmbil').value;
       let alamat_tujuan = document.getElementById('inAlamat').value.trim();
 
       if(!nama_pembeli) { alert("Nama pembeli wajib diisi!"); return; }
       if(tipe_pengambilan === 'DELIVERY' && !alamat_tujuan) { alert("Alamat tujuan pengiriman wajib diisi!"); return; }
       if(keranjangSementara.length === 0) { alert("Keranjang belanjaan masih kosong!"); return; }
 
-      if(tipe_pengambilan !== 'DELIVERY') {
+      // =================================================================
+      // 🔥 TRIK PENYELAMAT: KALAU USER PILIH AMBIL DI PABRIK, KITA AKALI SUPABASE
+      // =================================================================
+      if (tipe_pengambilan === 'AMBIL DI PABRIK') {
+        tipe_pengambilan = 'DELIVERY'; // Supabase dipaksa terima kata 'DELIVERY' agar lolos check constraint
+        alamat_tujuan = 'AMBIL DI PABRIK'; // Keterangan aslinya dipindahkan ke kolom alamat
+      } else if (tipe_pengambilan !== 'DELIVERY' && tipe_pengambilan !== 'STAND') {
         alamat_tujuan = '-';
       }
+      // =================================================================
 
       try {
         if (idPesananYangSedangDiedit !== null) {
