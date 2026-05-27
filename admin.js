@@ -3,13 +3,42 @@
 async function memuatDasborAwal() {
     renderTabelProduk();
     isiDropdownProdukPenjualan();
+    updateStatistikDashboard(); // Menambahkan pembaruan statistik
     const inputTanggal = document.getElementById('tanggal_penjualan');
     if (inputTanggal) {
         inputTanggal.value = new Date().toISOString().substring(0, 10);
     }
 }
 
-// Render data tabel produk fiks
+// Fungsi untuk update statistik di dashboard
+async function updateStatistikDashboard() {
+    try {
+        // 1. Ambil Penjualan (Omset)
+        const { data: dataPenjualan, error: errJual } = await supabaseClient.from('penjualan').select('total_harga');
+        if (errJual) throw errJual;
+        const totalOmset = dataPenjualan.reduce((sum, item) => sum + (Number(item.total_harga) || 0), 0);
+        document.getElementById('stat-omset').innerText = `Rp ${totalOmset.toLocaleString('id-ID')}`;
+
+        // 2. Ambil Pengeluaran
+        const { data: dataPengeluaran, error: errKeluar } = await supabaseClient.from('pengeluaran').select('kredit');
+        if (errKeluar) throw errKeluar;
+        const totalKeluar = dataPengeluaran.reduce((sum, item) => sum + (Number(item.kredit) || 0), 0);
+        document.getElementById('stat-keluar').innerText = `Rp ${totalKeluar.toLocaleString('id-ID')}`;
+        
+        // 3. Hitung Saldo Bersih
+        const saldo = totalOmset - totalKeluar;
+        document.getElementById('stat-bersih').innerText = `Rp ${saldo.toLocaleString('id-ID')}`;
+
+        // 4. Total Pemasukan Kas (Contoh: Debit dari tabel pengeluaran)
+        const { data: dataMasuk, error: errMasuk } = await supabaseClient.from('pengeluaran').select('debit');
+        if (errMasuk) throw errMasuk;
+        const totalMasuk = dataMasuk.reduce((sum, item) => sum + (Number(item.debit) || 0), 0);
+        document.getElementById('stat-masuk').innerText = `Rp ${totalMasuk.toLocaleString('id-ID')}`;
+
+    } catch (err) { console.error("Gagal memuat statistik:", err); }
+}
+
+// Render data tabel produk
 async function renderTabelProduk() {
     const tbody = document.getElementById('tabel-produk');
     if (!tbody) return;
@@ -66,7 +95,7 @@ async function tambahAtauUpdateProduk() {
     } catch (err) { alert(err.message); }
 }
 
-// Dropdown pilihan produk fiks yang tersinkron otomatis
+// Dropdown pilihan produk
 async function isiDropdownProdukPenjualan() {
     const select = document.getElementById('pilih_produk');
     if (!select) return;
@@ -80,7 +109,7 @@ async function isiDropdownProdukPenjualan() {
     } catch (err) { console.error(err); }
 }
 
-// Simpan data penjualan beserta Nama & Alamat Pembeli
+// Simpan data penjualan
 async function simpanPenjualan() {
     const produkId = document.getElementById('pilih_produk').value;
     const jumlah = parseInt(document.getElementById('jumlah_terjual').value);
