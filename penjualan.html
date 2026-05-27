@@ -43,6 +43,11 @@
     .form-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 6px; color: #5c4a3c; text-transform: uppercase; }
     .form-control { width: 100%; padding: 10px; border: 1px solid #c2b9a7; border-radius: 4px; font-size: 0.9rem; color: var(--text); background: #fdfdfb; height: 42px; }
     
+    /* STYLE UNTUK FITUR FILTER & SEARCH */
+    .filter-wrapper { display: flex; gap: 15px; background: #faf8f5; padding: 12px; border-radius: 6px; border: 1px dashed #c2b9a7; margin-bottom: 15px; align-items: center; }
+    .filter-box { flex: 1; }
+    .filter-box input { height: 38px; }
+
     .btn-add-item { background: var(--secondary); color: white; border: none; padding: 0 20px; border-radius: 4px; font-weight: 700; cursor: pointer; height: 42px; border: 2px solid #a04e11; }
     .btn-add-item:hover { background: #b55616; }
     .btn-submit-all { background: var(--success); color: white; border: none; padding: 14px 25px; border-radius: 4px; font-weight: 700; cursor: pointer; font-size: 1rem; width: 100%; margin-top: 15px; box-shadow: 0 4px 10px rgba(46,125,50,0.3); }
@@ -131,7 +136,7 @@
     <div id="groupAlamat" class="form-full-width" style="display: none;">
       <div class="form-group">
         <label style="color: var(--secondary); font-weight: 700;">📍 Alamat Lokasi Tujuan Pengiriman Lengkap</label>
-        <input type="text" id="inAlamat" class="form-control" style="border: 2px solid var(--secondary);" placeholder="Ketik nama jalan, nomor rumah, RT/RW, nama kompleks, atau patokan kurir...">
+        <input type="text" id="inAlamat" class="form-control" style="border: 2px solid var(--secondary);" placeholder="Ketik nama jalan, nomor rumah, Kompleks, atau patokan kurir...">
       </div>
     </div>
 
@@ -154,7 +159,7 @@
     <div class="cart-summary" id="boxKeranjang">
       <h4>🛒 Daftar Item Belanjaan Nota Ini:</h4>
       <ul id="listKeranjangTeks" style="padding-left: 20px; margin-bottom: 10px; font-weight: 600; font-size: 0.9rem; color: #5c4a3c;">
-        <li style="color:#856404; font-style:italic; list-style:none;">Belum ada item dimasukkan. Klik "Tambah Varian" di atas untuk menyusun isi nota belanja.</li>
+        <li style="color:#856404; font-style:italic; list-style:none;">Belum ada item dimasukkan.</li>
       </ul>
       <div style="font-size: 1.2rem; font-weight: 700; color: var(--primary); background: #fff; padding: 10px; border-radius: 4px; border: 1px solid #ffe082; margin-bottom: 10px;">
         Total Otomatis Nota: <span id="textTotalNota" style="color:var(--success);">Rp 0</span>
@@ -165,6 +170,21 @@
 
   <div class="card">
     <h3>🛒 Riwayat Record Transaksi Penjualan & PO Terdaftar</h3>
+    
+    <div class="filter-wrapper">
+      <div class="filter-box">
+        <label style="font-size: 0.75rem; font-weight:700; color:#5c4a3c;">🔍 CARI NAMA / ALAMAT / NO TELEPON</label>
+        <input type="text" id="searchKeyword" class="form-control" placeholder="Ketik nama pelanggan atau alamat kurir..." onkeyup="jalankanFilterDataDataLokal()">
+      </div>
+      <div class="filter-box">
+        <label style="font-size: 0.75rem; font-weight:700; color:#5c4a3c;">📅 FILTER BERDASARKAN TANGGAL</label>
+        <input type="date" id="filterTanggal" class="form-control" onchange="jalankanFilterDataDataLokal()">
+      </div>
+      <div style="margin-top: 18px;">
+        <button onclick="resetFilterSemua()" style="background:#5c4a3c; color:white; border:none; padding:10px 15px; border-radius:4px; font-weight:600; font-size:0.85rem; cursor:pointer; height:42px;">🔄 Reset</button>
+      </div>
+    </div>
+
     <div class="table-responsive">
       <table class="custom-table">
         <thead>
@@ -194,25 +214,24 @@
     let listKatalogLokal = [];
     let keranjangSementara = []; 
     let akumulasiTotalHarga = 0;
+    let databaseSemuaPesanan = []; // Untuk menampung semua data asli dari Supabase
 
     document.addEventListener("DOMContentLoaded", () => {
       proteksiHalamanDashboard();
       const hariIni = new Date().toISOString().split('T')[0];
       document.getElementById('inTanggal').value = hariIni;
       InisialisasiDropdownDanTabel();
-      toggleAlamatInput(); // Jalankan fungsi pengecekan awal saat halaman dibuka
+      toggleAlamatInput();
     });
 
-    // FUNGSI UTAMA MEMBUKA DAN MENUTUP KOTAK INPUT ALAMAT LOKASI
     function toggleAlamatInput() {
       const tipe = document.getElementById('inTipeAmbil').value;
       const groupAlamat = document.getElementById('groupAlamat');
-      
       if (tipe === 'DELIVERY') {
-        groupAlamat.style.display = 'block'; // Menampilkan elemen kotak alamat
+        groupAlamat.style.display = 'block';
       } else {
-        groupAlamat.style.display = 'none';  // Menyembunyikan elemen kotak alamat
-        document.getElementById('inAlamat').value = ''; // Reset isian alamat
+        groupAlamat.style.display = 'none';
+        document.getElementById('inAlamat').value = '';
       }
     }
 
@@ -236,13 +255,10 @@
       const catatan = document.getElementById('inNoteRequest').value.trim();
 
       if(jumlah < 1) return;
-
       const subTotalItem = harga_satuan * jumlah;
       keranjangSementara.push({ nama_produk, jumlah, harga_satuan, catatan, subTotalItem });
       akumulasiTotalHarga += subTotalItem;
-
       renderVisualKeranjang();
-
       document.getElementById('inQty').value = "1";
       document.getElementById('inNoteRequest').value = "";
     }
@@ -250,10 +266,9 @@
     function renderVisualKeranjang() {
       const list = document.getElementById('listKeranjangTeks');
       const total = document.getElementById('textTotalNota');
-
       if(keranjangSementara.length > 0) {
         list.innerHTML = keranjangSementara.map((item, idx) => `
-          <li style="margin-bottom: 5px;">
+          <li>
             🥤 ${item.jumlah}x ${item.nama_produk} ${item.catatan ? `[Note: "${item.catatan}"]` : ''} 
             - <span style="color:var(--success)">Rp ${item.subTotalItem.toLocaleString('id-ID')}</span>
             <button onclick="hapusItemKeranjang(${idx})" style="background:none; border:none; color:red; cursor:pointer; font-weight:bold; margin-left:10px;">(Hapus)</button>
@@ -261,7 +276,7 @@
         `).join('');
         total.innerText = `Rp ${akumulasiTotalHarga.toLocaleString('id-ID')}`;
       } else {
-        list.innerHTML = `<li style="color:#856404; font-style:italic; list-style:none;">Belum ada item dimasukkan. Klik "Tambah Varian" di atas untuk menyusun isi nota belanja.</li>`;
+        list.innerHTML = `<li style="color:#856404; font-style:italic; list-style:none;">Belum ada item dimasukkan.</li>`;
         total.innerText = `Rp 0`;
       }
     }
@@ -280,30 +295,16 @@
       const tipe_pengambilan = document.getElementById('inTipeAmbil').value;
       const alamat_tujuan = document.getElementById('inAlamat').value.trim();
 
-      if(!nama_pembeli) {
-        alert("Nama pembeli wajib diisi!");
-        return;
-      }
-      if(tipe_pengambilan === 'DELIVERY' && !alamat_tujuan) {
-        alert("Alamat tujuan pengiriman wajib diisi untuk pilihan DELIVERY!");
-        return;
-      }
-      if(keranjangSementara.length === 0) {
-        alert("Keranjang masih kosong! Silakan tambahkan minimal 1 varian minuman dahulu.");
-        return;
-      }
+      if(!nama_pembeli) { alert("Nama pembeli wajib diisi!"); return; }
+      if(tipe_pengambilan === 'DELIVERY' && !alamat_tujuan) { alert("Alamat tujuan wajib diisi!"); return; }
+      if(keranjangSementara.length === 0) { alert("Keranjang masih kosong!"); return; }
 
       try {
         const { data: notaInduk, error: errInduk } = await supabaseClient
           .from('pesanan')
           .insert([{ 
-            nama_pembeli, 
-            no_telepon: no_telepon || '-', 
-            tanggal, 
-            metode_pembayaran, 
-            total_harga: akumulasiTotalHarga,
-            tipe_pengambilan,
-            alamat_tujuan: tipe_pengambilan === 'DELIVERY' ? alamat_tujuan : '-'
+            nama_pembeli, no_telepon: no_telepon || '-', tanggal, metode_pembayaran, total_harga: akumulasiTotalHarga,
+            tipe_pengambilan, alamat_tujuan: tipe_pengambilan === 'DELIVERY' ? alamat_tujuan : '-'
           }])
           .select();
 
@@ -312,39 +313,25 @@
         if(notaInduk && notaInduk.length > 0) {
           const id_pesanan = notaInduk[0].id;
           const arrayDetailPayload = keranjangSementara.map(item => ({
-            id_pesanan: id_pesanan,
-            nama_produk: item.nama_produk,
-            jumlah: item.jumlah,
-            harga_satuan: item.harga_satuan,
-            catatan: item.catatan
+            id_pesanan: id_pesanan, nama_produk: item.nama_produk, jumlah: item.jumlah, harga_satuan: item.harga_satuan, catatan: item.catatan
           }));
-
-          const { error: errAnak } = await supabaseClient
-            .from('detail_pesanan')
-            .insert(arrayDetailPayload);
-          
+          const { error: errAnak } = await supabaseClient.from('detail_pesanan').insert(arrayDetailPayload);
           if(errAnak) throw errAnak;
         }
 
-        alert(`✔️ Sukses! PO/Nota atas nama "${nama_pembeli}" (${tipe_pengambilan}) berhasil disimpan!`);
-        
-        // Reset form
+        alert(`✔️ Sukses menyimpan PO atas nama "${nama_pembeli}"!`);
         document.getElementById('inNama').value = '';
         document.getElementById('inTelepon').value = '';
         document.getElementById('inAlamat').value = '';
         document.getElementById('inTipeAmbil').value = 'PICK UP';
         toggleAlamatInput();
-        
-        keranjangSementara = [];
-        akumulasiTotalHarga = 0;
+        keranjangSementara = []; akumulasiTotalHarga = 0;
         renderVisualKeranjang();
-        
         MuatRiwayatPenjualan();
-      } catch (err) {
-        alert("Gagal memproses nota transaksi: " + err.message);
-      }
+      } catch (err) { alert("Gagal: " + err.message); }
     }
 
+    // FUNGSI UTAMA LOAD DATA
     async function MuatRiwayatPenjualan() {
       try {
         const { data: pesananData, error } = await supabaseClient
@@ -353,58 +340,101 @@
           .order('id', { ascending: false });
         
         if (error) throw error;
-
-        const jBody = document.getElementById('tabelPenjualanBody');
-        jBody.innerHTML = '';
         
-        if(pesananData && pesananData.length > 0) {
-          pesananData.forEach(p => {
-            let listHtmlProduk = '<ul class="item-list">';
-            let listHtmlNote = '<ul class="note-list">';
-            let totalCupDiPesananIni = 0;
+        // Simpan data asli ke variabel lokal agar bisa difilter berkali-kali tanpa tembak cloud lagi
+        databaseSemuaPesanan = pesananData || []; 
+        renderTabelVisual(databaseSemuaPesanan);
+      } catch(err) { console.error(err.message); }
+    }
 
-            if(p.detail_pesanan && p.detail_pesanan.length > 0) {
-              p.detail_pesanan.forEach(d => {
-                if(d.nama_produk !== 'Extra Plastik' && d.nama_produk !== 'Extra Longan' && d.nama_produk !== 'Longan') {
-                  totalCupDiPesananIni += (d.jumlah || 0);
-                }
-                listHtmlProduk += `<li><strong>${d.jumlah}x</strong> ${d.nama_produk}</li>`;
-                listHtmlNote += `<li>${d.catatan ? `<span class="request-text">📝 "${d.catatan}"</span>` : '<span class="no-request">-</span>'}</li>`;
-              });
+    // FUNGSI UNTUK MERENDER DATA KE HTML TABLE
+    function renderTabelVisual(dataArray) {
+      const jBody = document.getElementById('tabelPenjualanBody');
+      jBody.innerHTML = '';
+      
+      if(dataArray.length === 0) {
+        jBody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:#c62828; font-weight:600;">⚠️ Data tidak ditemukan atau tidak sesuai filter pencarian.</td></tr>`;
+        return;
+      }
+
+      dataArray.forEach(p => {
+        let listHtmlProduk = '<ul class="item-list">';
+        let listHtmlNote = '<ul class="note-list">';
+        let totalCupDiPesananIni = 0;
+
+        if(p.detail_pesanan && p.detail_pesanan.length > 0) {
+          p.detail_pesanan.forEach(d => {
+            if(d.nama_produk !== 'Extra Plastik' && d.nama_produk !== 'Extra Longan' && d.nama_produk !== 'Longan') {
+              totalCupDiPesananIni += (d.jumlah || 0);
             }
-            listHtmlProduk += '</ul>';
-            listHtmlNote += '</ul>';
-
-            let metodeText = (p.metode_pembayaran || 'CASH').toUpperCase();
-            let badgeClass = 'badge-cash';
-            if(metodeText === 'BCA') badgeClass = 'badge-bca';
-            if(metodeText === 'QRIS') badgeClass = 'badge-qris';
-            if(metodeText.includes('+')) badgeClass = 'badge-split';
-
-            let tipeAmbil = p.tipe_pengambilan || 'PICK UP';
-            let badgeAmbilClass = (tipeAmbil === 'DELIVERY') ? 'badge-delivery' : 'badge-pickup';
-
-            const row = document.createElement('tr');
-            row.innerHTML = `
-              <td>${p.tanggal || '-'}</td>
-              <td>
-                <strong style="color:var(--primary); font-size:0.95rem;">${p.nama_pembeli || '-'}</strong><br>
-                <span style="font-size:0.8rem; color:#666;">📞 ${p.no_telepon || '-'}</span>
-              </td>
-              <td><span class="badge ${badgeAmbilClass}">${tipeAmbil}</span></td>
-              <td style="font-size:0.85rem; max-width:200px; color:#555; line-height:1.4;">
-                ${tipeAmbil === 'DELIVERY' ? `<strong>📍 Alamat:</strong><br>${p.alamat_tujuan || '-'}` : '<span style="color:#aaa; font-style:italic;">Ambil di warung</span>'}
-              </td>
-              <td>${listHtmlProduk}</td>
-              <td>${listHtmlNote}</td>
-              <td style="font-weight:600;">${totalCupDiPesananIni} Cup</td>
-              <td style="font-weight:700; color:var(--success);">Rp ${(p.total_harga || 0).toLocaleString('id-ID')}</td>
-              <td><span class="badge ${badgeClass}">${metodeText}</span></td>
-            `;
-            jBody.appendChild(row);
+            listHtmlProduk += `<li><strong>${d.jumlah}x</strong> ${d.nama_produk}</li>`;
+            listHtmlNote += `<li>${d.catatan ? `<span class="request-text">📝 "${d.catatan}"</span>` : '<span class="no-request">-</span>'}</li>`;
           });
         }
-      } catch(err) { console.error(err.message); }
+        listHtmlProduk += '</ul>';
+        listHtmlNote += '</ul>';
+
+        let metodeText = (p.metode_pembayaran || 'CASH').toUpperCase();
+        let badgeClass = 'badge-cash';
+        if(metodeText === 'BCA') badgeClass = 'badge-bca';
+        if(metodeText === 'QRIS') badgeClass = 'badge-qris';
+        if(metodeText.includes('+')) badgeClass = 'badge-split';
+
+        let tipeAmbil = p.tipe_pengambilan || 'PICK UP';
+        let badgeAmbilClass = (tipeAmbil === 'DELIVERY') ? 'badge-delivery' : 'badge-pickup';
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${p.tanggal || '-'}</td>
+          <td>
+            <strong style="color:var(--primary); font-size:0.95rem;">${p.nama_pembeli || '-'}</strong><br>
+            <span style="font-size:0.8rem; color:#666;">📞 ${p.no_telepon || '-'}</span>
+          </td>
+          <td><span class="badge ${badgeAmbilClass}">${tipeAmbil}</span></td>
+          <td style="font-size:0.85rem; max-width:200px; color:#555; line-height:1.4;">
+            ${tipeAmbil === 'DELIVERY' ? `<strong>📍 Alamat:</strong><br>${p.alamat_tujuan || '-'}` : '<span style="color:#aaa; font-style:italic;">Ambil di warung</span>'}
+          </td>
+          <td>${listHtmlProduk}</td>
+          <td>${listHtmlNote}</td>
+          <td style="font-weight:600;">${totalCupDiPesananIni} Cup</td>
+          <td style="font-weight:700; color:var(--success);">Rp ${(p.total_harga || 0).toLocaleString('id-ID')}</td>
+          <td><span class="badge ${badgeClass}">${metodeText}</span></td>
+        `;
+        jBody.appendChild(row);
+      });
+    }
+
+    // LOGIKA FILTRASI SEARCH DAN TANGGAL SECARA LIVE
+    function jalankanFilterDataDataLokal() {
+      const keyword = document.getElementById('searchKeyword').value.toLowerCase().trim();
+      const tglPilihan = document.getElementById('filterTanggal').value;
+
+      const dataHasilFilter = databaseSemuaPesanan.filter(p => {
+        // Cek filter kecocokan kata kunci (Nama, No Telp, atau Alamat)
+        const cocokNama = p.nama_pembeli ? p.nama_pembeli.toLowerCase().includes(keyword) : false;
+        const cocokTelepon = p.no_telepon ? p.no_telepon.toLowerCase().includes(keyword) : false;
+        const cocokAlamat = p.alamat_tujuan ? p.alamat_tujuan.toLowerCase().includes(keyword) : false;
+        
+        const cocokKeyword = cocokNama || cocokTelepon || cocokAlamat;
+
+        // Cek filter kecocokan Tanggal
+        let cocokTanggal = true;
+        if(tglPilihan) {
+          cocokTanggal = (p.tanggal === tglPilihan);
+        }
+
+        return cocokKeyword && cocokTanggal;
+      });
+
+      // Tampilkan hasil filter ke tabel
+      renderTabelVisual(dataHasilFilter);
+    }
+
+    // RESET FILTER KEMBALI SEPERTI SEMULA
+    function resetFilterSemua() {
+      document.getElementById('searchKeyword').value = '';
+      document.getElementById('filterTanggal').value = '';
+      renderTabelVisual(databaseSemuaPesanan);
     }
   </script>
 </body>
