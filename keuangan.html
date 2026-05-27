@@ -163,6 +163,21 @@
 
   <div class="card">
     <h3>📊 Jurnal Utama: Histori Aliran Kas Keseluruhan (Kompleks)</h3>
+    
+    <div style="display: flex; gap: 15px; background: #faf8f5; padding: 12px; border-radius: 6px; border: 1px dashed #c2b9a7; margin-bottom: 15px; align-items: center; flex-wrap: wrap;">
+      <div style="flex: 1; min-width: 200px;">
+        <label style="font-size: 0.75rem; font-weight:700; color:#5c4a3c; display:block; margin-bottom:5px;">🔍 CARI DESKRIPSI KETERANGAN / JENISALIRAN</label>
+        <input type="text" id="searchJurnalKompleks" style="width:100%; padding:8px; border:1px solid #c2b9a7; border-radius:4px; height: 38px; font-family: inherit;" placeholder="Ketik deskripsi kas atau nama pelanggan..." onkeyup="jalankanFilterJurnalKompleksBaru()">
+      </div>
+      <div style="flex: 1; min-width: 200px;">
+        <label style="font-size: 0.75rem; font-weight:700; color:#5c4a3c; display:block; margin-bottom:5px;">📅 FILTER TANGGAL JURNAL</label>
+        <input type="date" id="filterTanggalJurnalKompleks" style="width:100%; padding:8px; border:1px solid #c2b9a7; border-radius:4px; height: 38px; font-family: inherit;" onchange="jalankanFilterJurnalKompleksBaru()">
+      </div>
+      <div style="margin-top: 20px;">
+        <button onclick="resetFilterJurnalKompleksBaru()" style="background:#5c4a3c; color:white; border:none; padding:8px 15px; border-radius:4px; font-weight:600; cursor:pointer; height: 38px;">🔄 Reset</button>
+      </div>
+    </div>
+
     <div class="table-responsive kompleks">
       <table class="custom-table">
         <thead>
@@ -330,10 +345,59 @@
           bKompleks.innerHTML = `<tr><td colspan="5" style="text-align:center;">Jurnal kas masih kosong.</td></tr>`;
         }
 
+        // Pemicu otomatis agar filter tetap berjalan ketika data di-refresh/di-save ulang
+        jalankanFilterJurnalKompleksBaru();
+
       } catch (err) {
         console.error("Error Dashboard Keuangan:", err.message);
       }
     }
+
+    // ====================================================================
+    // FITUR TAMBAHAN BARU: LIVE FILTER SEARCH JURNAL KOMPLEKS TANPA MERUBAH KODE LAMA
+    // ====================================================================
+    function jalankanFilterJurnalKompleksBaru() {
+      const keyword = document.getElementById('searchJurnalKompleks').value.toLowerCase().trim();
+      const tglPilihan = document.getElementById('filterTanggalJurnalKompleks').value;
+
+      const tBody = document.getElementById('tabelKeuanganKompleksBody');
+      const rows = tBody.getElementsByTagName('tr');
+
+      for (let i = 0; i < rows.length; i++) {
+        const cols = rows[i].getElementsByTagName('td');
+        
+        if (cols.length < 5) continue;
+
+        const teksTanggal = cols[0].textContent || cols[0].innerText;
+        const teksJenis = cols[1].textContent || cols[1].innerText;
+        const teksKeterangan = cols[2].textContent || cols[2].innerText;
+
+        const cocokKeyword = teksJenis.toLowerCase().includes(keyword) || teksKeterangan.toLowerCase().includes(keyword);
+        let cocokTanggal = true;
+        if (tglPilihan) {
+          cocokTanggal = teksTanggal.trim() === tglPilihan;
+        }
+
+        if (cocokKeyword && cocokTanggal) {
+          rows[i].style.display = "";
+        } else {
+          rows[i].style.display = "none";
+        }
+      }
+    }
+
+    function resetFilterJurnalKompleksBaru() {
+      document.getElementById('searchJurnalKompleks').value = '';
+      document.getElementById('filterTanggalJurnalKompleks').value = '';
+      
+      const tBody = document.getElementById('tabelKeuanganKompleksBody');
+      const rows = tBody.getElementsByTagName('tr');
+      
+      for (let i = 0; i < rows.length; i++) {
+        rows[i].style.display = "";
+      }
+    }
+    // ====================================================================
   </script>
 </body>
 </html>
