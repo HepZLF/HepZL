@@ -15,21 +15,111 @@
       --bg: #f9f6f0;
       --white: #ffffff;
       --text: #2c1e15;
+      --sidebar-width: 260px;
     }
     * { margin:0; padding:0; box-sizing:border-box; font-family: 'Poppins', sans-serif; }
-    body { background: var(--bg); color: var(--text); padding: 25px; }
+    body { background: var(--bg); color: var(--text); padding: 25px; transition: all 0.3s ease; }
     
-    .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #e3dec3; padding-bottom: 15px; }
-    .nav-header h2 { color: var(--primary); font-weight: 700; }
-    .btn-logout { background: var(--danger); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    /* HEADER UTAMA DENGAN TOMBOL HAMBURGER GARIS 3 */
+    .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #e3dec3; padding-bottom: 15px; gap: 15px; }
+    .header-left { display: flex; align-items: center; gap: 15px; }
+    .nav-header h2 { color: var(--primary); font-weight: 700; font-size: 1.4rem; }
+    .btn-logout { background: var(--danger); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; }
     
-    /* MENU NAVIGASI */
-    .sub-nav-buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; background: #efe9db; padding: 10px; border-radius: 8px; }
-    .nav-link { padding: 10px 18px; background: var(--white); color: var(--text); border: 1px solid #dcd5c5; border-radius: 6px; font-weight: 600; font-size: 0.9rem; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: all 0.2s ease; }
-    .nav-link:hover { background: #faf8f5; border-color: var(--secondary); color: var(--secondary); }
+    /* TOMBOL HAMBURGER INTERAKTIF (GARIS 3) */
+    .hamburger-menu {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 26px;
+      height: 18px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      z-index: 1001;
+    }
+    .hamburger-menu span {
+      width: 100%;
+      height: 3px;
+      background-color: var(--primary);
+      border-radius: 2px;
+      transition: all 0.3s linear;
+    }
+
+    /* SIDEBAR / PANEL MENU SLIDE OVERLAY KIRI */
+    .sidebar-panel {
+      position: fixed;
+      top: 0;
+      left: -260px; /* Sembunyi di luar layar kiri awal */
+      width: var(--sidebar-width);
+      height: 100%;
+      background: #efe9db;
+      border-right: 3px solid #e3dec3;
+      box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      padding: 25px 20px;
+      transition: left 0.3s ease-in-out;
+    }
+    .sidebar-panel.active {
+      left: 0; /* Geser keluar saat aktif */
+    }
+    .sidebar-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 25px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #dcd5c5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .btn-close-sidebar {
+      background: transparent;
+      border: none;
+      font-size: 1.2rem;
+      color: var(--danger);
+      cursor: pointer;
+      font-weight: bold;
+    }
+    
+    /* STYLE LINK MENU DI DALAM SIDEBAR */
+    .sidebar-links { display: flex; flex-direction: column; gap: 12px; list-style: none; }
+    .nav-link { 
+      padding: 12px 18px; 
+      background: var(--white); 
+      color: var(--text); 
+      border: 1px solid #dcd5c5; 
+      border-radius: 6px; 
+      font-weight: 600; 
+      font-size: 0.95rem; 
+      text-decoration: none; 
+      display: flex; 
+      align-items: center; 
+      gap: 10px; 
+      transition: all 0.2s ease; 
+    }
+    .nav-link:hover { background: #faf8f5; border-color: var(--secondary); color: var(--secondary); padding-left: 22px; }
     .nav-link.active { background: var(--primary); color: var(--white); border-color: var(--primary); }
 
-    /* CARDS STATS */
+    /* LAYER BACKGROUND REDUP SEMENTARA */
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 999;
+      display: none;
+    }
+    .sidebar-overlay.active {
+      display: block;
+    }
+
+    /* KONTEN STATISTIK UTAMA */
     .section-title { font-size: 1.1rem; color: var(--primary); margin: 25px 0 10px 0; font-weight: 700; border-left: 4px solid var(--secondary); padding-left: 10px; }
     .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 10px; }
     @media (max-width: 768px) { .stats-grid { grid-template-columns: 1fr; } }
@@ -37,25 +127,21 @@
     .stat-card p { font-size: 0.85rem; font-weight: 600; color: #726357; text-transform: uppercase; margin-bottom: 5px; }
     .stat-card h3 { font-size: 1.6rem; color: var(--primary); font-weight: 700; }
     
-    /* VARIANT WARNA CARD KEUANGAN */
     .card-masuk h3 { color: var(--success); }
     .card-keluar h3 { color: var(--danger); }
     .card-saldo h3 { color: #0d47a1; }
     
-    /* ALERT PANEL */
     .alert-card { background: #fff3cd; border: 1px solid #ffeeba; border-radius: 8px; padding: 20px; color: #856404; margin-bottom: 25px; margin-top: 20px; }
     .alert-card h4 { font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
     .alert-list { padding-left: 20px; font-size: 0.95rem; }
     .alert-list li { margin-bottom: 5px; font-weight: 600; }
 
-    /* SECTIONS LAYOUT BARU (DUAL COLUMN) */
     .dashboard-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 25px; }
     @media (max-width: 992px) { .dashboard-layout { grid-template-columns: 1fr; } }
     
     .panel-box { background: var(--white); border: 1px solid #e3dec3; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.01); }
     .panel-box h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 15px; font-weight: 700; border-bottom: 2px solid #efe9db; padding-bottom: 8px; display: flex; align-items: center; gap: 8px; }
     
-    /* STYLE MINI LIST KEGIATAN */
     .mini-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
     .mini-list li { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #faf9f5; border: 1px solid #efe9db; border-radius: 6px; font-size: 0.88rem; }
     .mini-list .info-left { display: flex; flex-direction: column; gap: 2px; }
@@ -65,7 +151,6 @@
     .mini-list .expense-tag { font-weight: 700; color: var(--danger); font-size: 0.95rem; }
     .mini-list .cat-badge { font-size: 0.75rem; background: #e3dec3; color: var(--text); padding: 2px 6px; border-radius: 4px; font-weight: 600; margin-top: 3px; align-self: flex-start; }
 
-    /* TOMBOL PINTASAN GRID STYLE */
     .shortcuts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
     .shortcut-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 15px; background: var(--white); border: 2px solid #e3dec3; border-radius: 8px; font-weight: 700; font-size: 0.9rem; color: var(--primary); text-decoration: none; text-align: center; gap: 8px; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.01); }
     .shortcut-btn:hover { border-color: var(--secondary); background: #faf6f0; transform: translateY(-2px); color: var(--secondary); }
@@ -74,17 +159,32 @@
 </head>
 <body>
 
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebarMenu()"></div>
+
+  <div class="sidebar-panel" id="sidebarMenuPanel">
+    <div class="sidebar-title">
+      <span>Nusantara Cuy Menu</span>
+      <button class="btn-close-sidebar" onclick="toggleSidebarMenu()">✕</button>
+    </div>
+    <ul class="sidebar-links">
+      <li><a href="dashboard.html" class="nav-link active">📊 Panel Utama</a></li>
+      <li><a href="produk.html" class="nav-link">📋 Katalog Produk</a></li>
+      <li><a href="penjualan.html" class="nav-link">🛒 Laporan Penjualan</a></li>
+      <li><a href="keuangan.html" class="nav-link">🏦 Laporan Keuangan</a></li>
+    </ul>
+  </div>
+
   <header class="nav-header">
-    <h2>Nusantara Cuy Executive Dashboard</h2>
+    <div class="header-left">
+      <button class="hamburger-menu" onclick="toggleSidebarMenu()" title="Buka Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <h2>Nusantara Cuy Executive Dashboard</h2>
+    </div>
     <button class="btn-logout" onclick="logoutAdmin()">🚪 Keluar</button>
   </header>
-
-  <nav class="sub-nav-buttons">
-    <a href="dashboard.html" class="nav-link active">📊 Panel Utama</a>
-    <a href="produk.html" class="nav-link">📋 Katalog Produk</a>
-    <a href="penjualan.html" class="nav-link">🛒 Laporan Penjualan</a>
-    <a href="keuangan.html" class="nav-link">🏦 Laporan Keuangan</a>
-  </nav>
 
   <div class="section-title">🛒 Performa Operasional & Penjualan</div>
   <div class="stats-grid">
@@ -153,13 +253,20 @@
   <script src="db.js"></script>
   <script src="auth.js"></script>
   <script>
+    // FUNGSI BARU UNTUK CONTROL ANIMASI PANEL SIDEBAR GARIS 3
+    function toggleSidebarMenu() {
+      const panel = document.getElementById('sidebarMenuPanel');
+      const overlay = document.getElementById('sidebarOverlay');
+      panel.classList.toggle('active');
+      overlay.classList.toggle('active');
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
       proteksiHalamanDashboard();
       MuatInformasiPenting();
     });
 
     async function MuatInformasiPenting() {
-      // 1. Tarik Data Statistik Utama Bisnis (Omset, Terjual, PO)
       try {
         const { data: pesananData, error: e1 } = await supabaseClient
           .from('pesanan')
@@ -182,7 +289,6 @@
             }
           });
 
-          // RENDER 4 TRANSAKSI PO TERBARU KE LIST AKTIVITAS
           const listPOEl = document.getElementById('listAktivitasPO');
           const sortedPO = [...pesananData].sort((a,b) => b.id - a.id).slice(0, 4);
           
@@ -205,7 +311,6 @@
         document.getElementById('cardTransaksi').innerText = `${totalTransaksi} PO`;
       } catch(err) { console.error("Gagal load ringkasan:", err.message); }
 
-      // 2. Tarik Data Arus Kas Finansial (Total Masuk, Keluar, Sisa Saldo) + Mini Laporan Keuangan
       try {
         const { data: kasData, error: errKas } = await supabaseClient
           .from('laporan_keuangan')
@@ -224,7 +329,6 @@
             }
           });
 
-          // RENDER 4 TRANSAKSI KEUANGAN TERBARU KE MINI ARUS KEUANGAN
           const listKasEl = document.getElementById('listMiniArusKeuangan');
           const miniKas = kasData.slice(0, 4);
 
@@ -255,11 +359,8 @@
         document.getElementById('cardDuitKeluar').innerText = `Rp ${totalKeluar.toLocaleString('id-ID')}`;
         document.getElementById('cardSisaSaldo').innerText = `Rp ${sisaSaldo.toLocaleString('id-ID')}`;
 
-      } catch(err) { 
-        console.error("Gagal menghitung statistik keuangan:", err.message); 
-      }
+      } catch(err) { console.error("Gagal menghitung statistik keuangan:", err.message); }
 
-      // 3. Tarik Data Cek Stok Kritis
       try {
         const { data: stokData, error: e2 } = await supabaseClient.from('stok_barang').select('*');
         if(!e2 && stokData) {
