@@ -145,6 +145,7 @@
 
     .po-badge { background: #e3f2fd; color: #0d47a1; font-weight: 700; padding: 3px 6px; border-radius: 4px; font-size: 0.75rem; }
     .telp-text { font-size: 0.8rem; color: #666; font-style: italic; display: block; margin-top: 2px; }
+    .address-text { font-size: 0.8rem; color: #0f766e; font-weight: 600; display: block; margin-top: 3px; background: #f0fdfa; padding: 3px 6px; border-radius: 4px; border: 1px solid #ccfbf1; }
     .note-text { font-size: 0.8rem; color: #b45309; font-weight: 600; display: block; margin-top: 3px; background: #fffbeb; padding: 3px 6px; border-radius: 4px; border: 1px solid #fef3c7; }
     .payment-badge { font-size: 0.75rem; font-weight: 700; padding: 3px 6px; border-radius: 4px; display: inline-block; }
     .badge-qris { background: #e0f7fa; color: #006064; }
@@ -211,12 +212,18 @@
           </div>
           <div class="form-group">
             <label>Tipe Pengambilan</label>
-            <select id="inputPengambilan" class="form-control" required>
+            <select id="inputPengambilan" class="form-control" onchange="handleTipePengambilanChange()" required>
               <option value="PICKUP">Ambil Sendiri (Pick Up)</option>
               <option value="GOSEND">Kirim via GoSend / Grab</option>
               <option value="ANTAR">Diantar Tim Toko</option>
             </select>
           </div>
+          
+          <div class="form-group" id="wrapperAlamat" style="display: none;">
+            <label style="color: #0f766e; font-weight: 700;">📍 Alamat Lengkap Pengiriman</label>
+            <textarea id="inputAlamat" class="form-control" style="height: 70px; border-color: #0f766e; background: #fbfdfc;" placeholder="Masukkan alamat lengkap tujuan pengiriman..."></textarea>
+          </div>
+
           <div class="form-group">
             <label>Catatan Tambahan (Notes PO)</label>
             <input type="text" id="inputKeteranganNote" class="form-control" placeholder="Contoh: Gula dipisah / Antar jam 12 siang">
@@ -240,7 +247,7 @@
             <thead>
               <tr>
                 <th>Tanggal</th>
-                <th>Nama Pembeli / No Telp</th>
+                <th>Nama Pembeli / Info Kirim</th>
                 <th>Detail Cup Terjual</th>
                 <th>Total Bayar</th>
                 <th>Via</th>
@@ -262,6 +269,22 @@
   <script src="auth.js"></script>
   <script>
     let listOpsiProdukGlobal = [];
+
+    // Fungsi dinamis untuk memantau perubahan Opsi Pengambilan
+    function handleTipePengambilanChange() {
+      const tipe = document.getElementById('inputPengambilan').value;
+      const wrapperAlamat = document.getElementById('wrapperAlamat');
+      const inputAlamat = document.getElementById('inputAlamat');
+      
+      if(tipe === 'GOSEND' || tipe === 'ANTAR') {
+        wrapperAlamat.style.display = 'block';
+        inputAlamat.setAttribute('required', 'true');
+      } else {
+        wrapperAlamat.style.display = 'none';
+        inputAlamat.removeAttribute('required');
+        inputAlamat.value = ''; // Reset nilai alamat jika diganti ke PICKUP
+      }
+    }
 
     function toggleSidebarMenu() {
       const panel = document.getElementById('sidebarMenuPanel');
@@ -330,7 +353,12 @@
           
           let telpDisplay = p.nomor_telepon ? `📞 ${p.nomor_telepon}` : '📞 -';
           
-          // Tampilkan Note / Catatan Tambahan jika diisi di database
+          // Tampilkan Alamat Pengiriman jika tipe pengambilan delivery dan data alamat ada
+          let addressDisplay = '';
+          if((p.tipe_pengambilan === 'GOSEND' || p.tipe_pengambilan === 'ANTAR') && p.alamat_pengiriman) {
+            addressDisplay = `<span class="address-text">📍 Kirim: ${p.alamat_pengiriman}</span>`;
+          }
+          
           let noteDisplay = p.keterangan ? `<span class="note-text">📝 Note: ${p.keterangan}</span>` : '';
 
           return `
@@ -340,6 +368,7 @@
                 <span class="po-badge">ID: ${p.id}</span> <br> 
                 <b>${p.nama_pembeli}</b>
                 <span class="telp-text">${telpDisplay}</span>
+                ${addressDisplay}
                 ${noteDisplay}
               </td>
               <td style="font-size:0.8rem; color:#4a3f35;">${detailString}</td>
@@ -359,7 +388,8 @@
       const telp = document.getElementById('inputTelepon').value;
       const via = document.getElementById('inputMetode').value;
       const ambil = document.getElementById('inputPengambilan').value;
-      const note = document.getElementById('inputKeteranganNote').value; // Mengambil data note
+      const alamat = document.getElementById('inputAlamat').value; // Mengambil isi alamat
+      const note = document.getElementById('inputKeteranganNote').value;
 
       const rows = document.querySelectorAll('.item-row');
       let totalHitungHarga = 0;
@@ -380,7 +410,7 @@
       }
 
       try {
-        // Menyimpan catatan di kolom keterangan tabel pesanan
+        // Menyimpan data pesanan lengkap dengan field alamat_pengiriman
         const { data: mainPesanan, error: errMain } = await supabaseClient
           .from('pesanan')
           .insert([{ 
@@ -390,6 +420,7 @@
             total_harga: totalHitungHarga, 
             metode_pembayaran: via, 
             tipe_pengambilan: ambil,
+            alamat_pengiriman: alamat, // Masuk ke kolom database alamat_pengiriman
             keterangan: note 
           }])
           .select();
@@ -414,6 +445,7 @@
         document.getElementById('formPesanan').reset();
         document.getElementById('inputTanggal').valueAsDate = new Date();
         document.getElementById('containerItemPesanan').innerHTML = '';
+        document.getElementById('wrapperAlamat').style.display = 'none'; // Sembunyikan kembali input alamat
         tambahBarisItemKosong();
         muatRiwayatPenjualan();
       } catch(err) { alert("Error simpan: " + err.message); }
