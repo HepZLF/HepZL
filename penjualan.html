@@ -20,13 +20,11 @@
     * { margin:0; padding:0; box-sizing:border-box; font-family: 'Poppins', sans-serif; }
     body { background: var(--bg); color: var(--text); padding: 25px; transition: all 0.3s ease; }
     
-    /* HEADER UTAMA DENGAN TOMBOL HAMBURGER GARIS 3 */
     .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #e3dec3; padding-bottom: 15px; gap: 15px; }
     .header-left { display: flex; align-items: center; gap: 15px; }
     .nav-header h2 { color: var(--primary); font-weight: 700; font-size: 1.4rem; }
     .btn-logout { background: var(--danger); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; }
     
-    /* TOMBOL HAMBURGER INTERAKTIF (GARIS 3) */
     .hamburger-menu {
       display: flex;
       flex-direction: column;
@@ -46,7 +44,6 @@
       transition: all 0.3s linear;
     }
 
-    /* SIDEBAR / PANEL MENU SLIDE OVERLAY KIRI */
     .sidebar-panel {
       position: fixed;
       top: 0;
@@ -74,16 +71,8 @@
       align-items: center;
       justify-content: space-between;
     }
-    .btn-close-sidebar {
-      background: transparent;
-      border: none;
-      font-size: 1.2rem;
-      color: var(--danger);
-      cursor: pointer;
-      font-weight: bold;
-    }
+    .btn-close-sidebar { background: transparent; border: none; font-size: 1.2rem; color: var(--danger); cursor: pointer; font-weight: bold; }
     
-    /* STYLE LINK MENU DI DALAM SIDEBAR */
     .sidebar-links { display: flex; flex-direction: column; gap: 12px; list-style: none; }
     .nav-link { 
       padding: 12px 18px; 
@@ -102,33 +91,20 @@
     .nav-link:hover { background: #faf8f5; border-color: var(--secondary); color: var(--secondary); padding-left: 22px; }
     .nav-link.active { background: var(--primary); color: var(--white); border-color: var(--primary); }
 
-    /* LAYER BACKGROUND REDUP SEMENTARA */
-    .sidebar-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.4);
-      z-index: 999;
-      display: none;
-    }
+    .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); z-index: 999; display: none; }
     .sidebar-overlay.active { display: block; }
 
-    /* LAYOUT KONTEN */
     .section-title { font-size: 1.1rem; color: var(--primary); margin: 25px 0 15px 0; font-weight: 700; border-left: 4px solid var(--secondary); padding-left: 10px; }
     .grid-layout { display: grid; grid-template-columns: 1fr 2fr; gap: 25px; }
     @media (max-width: 992px) { .grid-layout { grid-template-columns: 1fr; } }
 
     .panel-box { background: var(--white); border: 1px solid #e3dec3; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.01); }
     
-    /* FORM STYLING */
     .form-group { margin-bottom: 15px; }
     .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: #5c4d41; margin-bottom: 5px; }
     .form-control { width: 100%; padding: 10px; border: 1px solid #dcd5c5; border-radius: 6px; font-size: 0.9rem; background: #faf9f5; }
     .form-control:focus { outline: none; border-color: var(--secondary); background: var(--white); }
     
-    /* VARIANT SELECTION CONTAINER */
     .item-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; background: #faf8f3; padding: 10px; border: 1px dashed #dcd5c5; border-radius: 6px; }
     .btn-remove-item { background: var(--danger); color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-weight: 700; }
     .btn-add-item { background: #efe9db; color: var(--primary); border: 1px solid #dcd5c5; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; margin-top: 5px; display: inline-block; }
@@ -136,7 +112,6 @@
     .btn-submit { width: 100%; padding: 12px; background: var(--success); color: white; border: none; border-radius: 6px; font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 15px; }
     .btn-submit:hover { background: #236327; }
 
-    /* TABLE RESPONSIVE */
     .table-responsive { width: 100%; overflow-x: auto; border: 1px solid #e3dec3; border-radius: 8px; background: var(--white); }
     table { width: 100%; border-collapse: collapse; font-size: 0.88rem; text-align: left; }
     th { background: #efe9db; color: var(--primary); font-weight: 700; padding: 12px; border-bottom: 2px solid #e3dec3; }
@@ -200,7 +175,7 @@
           </div>
           <div class="form-group">
             <label>Nomor Telepon Pembeli</label>
-            <input type="tel" id="inputTelepon" class="form-control" placeholder="Contoh: 081234567890 (Boleh kosong)">
+            <input type="tel" id="inputTelepon" class="form-control" placeholder="Contoh: 081234567890">
           </div>
           <div class="form-group">
             <label>Metode Pembayaran</label>
@@ -230,8 +205,7 @@
           </div>
 
           <div style="margin-top:20px; font-weight:700; font-size:0.85rem; color:var(--primary);">📦 Detail Item / Cup Minuman:</div>
-          <div id="containerItemPesanan">
-            </div>
+          <div id="containerItemPesanan"></div>
           <button type="button" class="btn-add-item" onclick="tambahBarisItemKosong()">➕ Tambah Varian Cup</button>
 
           <button type="submit" class="btn-submit">🚀 Simpan & Rekam Transaksi</button>
@@ -310,7 +284,6 @@
     function tambahBarisItemKosong() {
       const container = document.getElementById('containerItemPesanan');
       const rowId = 'row_' + Date.now() + '_' + Math.floor(Math.random()*100);
-      
       const optionsHTML = listOpsiProdukGlobal.map(p => `<option value="${p.nama_produk}" data-price="${p.harga}">${p.nama_produk} (Rp ${p.harga.toLocaleString()})</option>`).join('');
       
       const div = document.createElement('div');
@@ -335,7 +308,6 @@
 
     async function muatRiwayatPenjualan() {
       try {
-        // Disinkronkan untuk menarik detail_pesanan menggunakan nama relasi yang benar
         const { data: pesanan, error } = await supabaseClient.from('pesanan').select('*, detail_pesanan(*)').order('id', {ascending:false});
         const tbody = document.getElementById('tabelLogPenjualan');
         if(error) throw error;
@@ -352,12 +324,10 @@
           if(p.metode_pembayaran === 'BCA') badgePay = 'badge-bca';
           
           let telpDisplay = p.nomor_telepon ? `📞 ${p.nomor_telepon}` : '📞 -';
-          
           let addressDisplay = '';
           if((p.tipe_pengambilan === 'GOSEND' || p.tipe_pengambilan === 'ANTAR') && p.alamat_pengiriman) {
             addressDisplay = `<span class="address-text">📍 Kirim: ${p.alamat_pengiriman}</span>`;
           }
-          
           let noteDisplay = p.keterangan ? `<span class="note-text">📝 Note: ${p.keterangan}</span>` : '';
 
           return `
@@ -425,27 +395,31 @@
           .single();
 
         if (errMain) throw errMain;
-        
-        if (!mainPesanan || !mainPesanan.id) {
-          throw new Error("Gagal mengambil ID dari pesanan utama yang baru dibuat.");
-        }
-        
         const newPesananId = mainPesanan.id;
 
-        // PERBAIKAN UTAMA: Mengubah huruf properti menjadi pesanan_ID (ID Kapital) agar tepat sesuai kolom database Supabase Anda
-        arrayDetailInsert = arrayDetailInsert.map(d => ({ ...d, pesanan_ID: newPesananId }));
-        
-        const { error: errDetail } = await supabaseClient.from('detail_pesanan').insert(arrayDetailInsert);
+        // JALUR SINKRONISASI PINTAR (Mendukung pesanan_id maupun pesanan_ID secara otomatis)
+        let detailData = arrayDetailInsert.map(d => {
+          let item = { nama_produk: d.nama_produk, jumlah: d.jumlah, harga_satuan: d.harga_satuan };
+          item['pesanan_ID'] = newPesananId;
+          item['pesanan_id'] = newPesananId;
+          return item;
+        });
+
+        const { error: errDetail } = await supabaseClient.from('detail_pesanan').insert(detailData);
         if(errDetail) throw errDetail;
 
-        await supabaseClient.from('laporan_keuangan').insert([{
+        // JALUR SINKRONISASI PINTAR LAPORAN KEUANGAN
+        let jurnalKeuangan = {
           tanggal: tgl,
           jenis_transaksi: 'Pemasukan',
           kategori: 'PENJUALAN',
           nominal: totalHitungHarga,
-          pesanan_id: newPesananId,
           keterangan: `Omset PO #${newPesananId} - ${nama}`
-        }]);
+        };
+        jurnalKeuangan['pesanan_id'] = newPesananId;
+        jurnalKeuangan['pesanan_ID'] = newPesananId;
+
+        await supabaseClient.from('laporan_keuangan').insert([jurnalKeuangan]);
 
         alert("Transaksi penjualan sukses disimpan!");
         document.getElementById('formPesanan').reset();
@@ -463,9 +437,10 @@
     async function hapusPesananLengkap(id) {
       if(!confirm("Hapus pesanan ini? Detail item dan jurnal keuangan terkait juga akan terhapus otomatis.")) return;
       try {
-        await supabaseClient.from('laporan_keuangan').delete().eq('pesanan_id', id);
-        // Perbaikan penghapusan detail menggunakan kolom berhuruf kapital pesanan_ID
-        await supabaseClient.from('detail_pesanan').delete().eq('pesanan_ID', id);
+        try { await supabaseClient.from('laporan_keuangan').delete().eq('pesanan_id', id); } catch(e){}
+        try { await supabaseClient.from('laporan_keuangan').delete().eq('pesanan_ID', id); } catch(e){}
+        try { await supabaseClient.from('detail_pesanan').delete().eq('pesanan_id', id); } catch(e){}
+        try { await supabaseClient.from('detail_pesanan').delete().eq('pesanan_ID', id); } catch(e){}
         await supabaseClient.from('pesanan').delete().eq('id', id);
         alert("Transaksi berhasil dihapus.");
         muatRiwayatPenjualan();
