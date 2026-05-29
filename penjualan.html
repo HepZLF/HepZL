@@ -60,34 +60,11 @@
       transition: left 0.3s ease-in-out;
     }
     .sidebar-panel.active { left: 0; }
-    .sidebar-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--primary);
-      margin-bottom: 25px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid #dcd5c5;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+    .sidebar-title { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 25px; padding-bottom: 10px; border-bottom: 2px solid #dcd5c5; display: flex; align-items: center; justify-content: space-between; }
     .btn-close-sidebar { background: transparent; border: none; font-size: 1.2rem; color: var(--danger); cursor: pointer; font-weight: bold; }
     
     .sidebar-links { display: flex; flex-direction: column; gap: 12px; list-style: none; }
-    .nav-link { 
-      padding: 12px 18px; 
-      background: var(--white); 
-      color: var(--text); 
-      border: 1px solid #dcd5c5; 
-      border-radius: 6px; 
-      font-weight: 600; 
-      font-size: 0.95rem; 
-      text-decoration: none; 
-      display: flex; 
-      align-items: center; 
-      gap: 10px; 
-      transition: all 0.2s ease; 
-    }
+    .nav-link { padding: 12px 18px; background: var(--white); color: var(--text); border: 1px solid #dcd5c5; border-radius: 6px; font-weight: 600; font-size: 0.95rem; text-decoration: none; display: flex; align-items: center; gap: 10px; transition: all 0.2s ease; }
     .nav-link:hover { background: #faf8f5; border-color: var(--secondary); color: var(--secondary); padding-left: 22px; }
     .nav-link.active { background: var(--primary); color: var(--white); border-color: var(--primary); }
 
@@ -111,6 +88,7 @@
     
     .btn-submit { width: 100%; padding: 12px; background: var(--success); color: white; border: none; border-radius: 6px; font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 15px; }
     .btn-submit:hover { background: #236327; }
+    .btn-cancel-edit { width: 100%; padding: 8px; background: #e0e0e0; color: #333; border: none; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; margin-top: 8px; display: none; text-align: center; }
 
     .table-responsive { width: 100%; overflow-x: auto; border: 1px solid #e3dec3; border-radius: 8px; background: var(--white); }
     table { width: 100%; border-collapse: collapse; font-size: 0.88rem; text-align: left; }
@@ -127,7 +105,9 @@
     .badge-bca { background: #e8eaf6; color: #1a237e; }
     .badge-tunai { background: #e8f5e9; color: #1b5e20; }
     
-    .btn-delete { background: #ffebee; color: var(--danger); border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; font-weight: 600; }
+    .action-group { display: flex; gap: 5px; }
+    .btn-edit-row { background: #fff3e0; color: #e65100; border: none; padding: 5px 8px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; font-weight: 600; }
+    .btn-delete { background: #ffebee; color: var(--danger); border: none; padding: 5px 8px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -162,9 +142,11 @@
   <div class="grid-layout">
     
     <div>
-      <div class="section-title">📥 Catat Transaksi Pesanan Baru</div>
+      <div class="section-title" id="judulFormPesanan">📥 Catat Transaksi Pesanan Baru</div>
       <div class="panel-box">
         <form id="formPesanan" onsubmit="prosesSimpanPesanan(event)">
+          <input type="hidden" id="editPesananId" value="">
+
           <div class="form-group">
             <label>Tanggal Order</label>
             <input type="date" id="inputTanggal" class="form-control" required>
@@ -208,7 +190,8 @@
           <div id="containerItemPesanan"></div>
           <button type="button" class="btn-add-item" onclick="tambahBarisItemKosong()">➕ Tambah Varian Cup</button>
 
-          <button type="submit" class="btn-submit">🚀 Simpan & Rekam Transaksi</button>
+          <button type="submit" id="btnSubmitForm" class="btn-submit">🚀 Simpan & Rekam Transaksi</button>
+          <button type="button" id="btnBatalEdit" class="btn-cancel-edit" onclick="resetFormKeModeTambah()">❌ Batal Ubah Data</button>
         </form>
       </div>
     </div>
@@ -243,6 +226,8 @@
   <script src="auth.js"></script>
   <script>
     let listOpsiProdukGlobal = [];
+    let listPesananGlobal = [];
+    let listDetailGlobal = [];
 
     function handleTipePengambilanChange() {
       const tipe = document.getElementById('inputPengambilan').value;
@@ -272,6 +257,7 @@
       await fetchDaftarOpsiKatalog();
       tambahBarisItemKosong();
       await muatRiwayatPenjualan();
+      cekParameterEditUrl();
     });
 
     async function fetchDaftarOpsiKatalog() {
@@ -281,20 +267,24 @@
       } catch(e){ console.error(e); }
     }
 
-    function tambahBarisItemKosong() {
+    function tambahBarisItemKosong(namaTerpilih = '', qtyTerpilih = 1) {
       const container = document.getElementById('containerItemPesanan');
       const rowId = 'row_' + Date.now() + '_' + Math.floor(Math.random()*100);
-      const optionsHTML = listOpsiProdukGlobal.map(p => `<option value="${p.nama_produk}" data-price="${p.harga}">${p.nama_produk} (Rp ${p.harga.toLocaleString()})</option>`).join('');
+      
+      const optionsHTML = listOpsiProdukGlobal.map(p => {
+        const selected = p.nama_produk === namaTerpilih ? 'selected' : '';
+        return `<option value="${p.nama_produk}" data-price="${p.harga}" ${selected}>${p.nama_produk} (Rp ${p.harga.toLocaleString()})</option>`;
+      }).join('');
       
       const div = document.createElement('div');
       div.className = 'item-row';
       div.id = rowId;
       div.innerHTML = `
         <select class="form-control select-produk-nama" style="flex:2;" required>
-          <option value="" disabled selected>-- Pilih Minuman --</option>
+          <option value="" disabled ${namaTerpilih === '' ? 'selected' : ''}>-- Pilih Minuman --</option>
           ${optionsHTML}
         </select>
-        <input type="number" class="form-control input-produk-qty" style="flex:1;" placeholder="Qty" min="1" value="1" required>
+        <input type="number" class="form-control input-produk-qty" style="flex:1;" placeholder="Qty" min="1" value="${qtyTerpilih}" required>
         <button type="button" class="btn-remove-item" onclick="hapusBarisItem('${rowId}')">✕</button>
       `;
       container.appendChild(div);
@@ -308,23 +298,23 @@
 
     async function muatRiwayatPenjualan() {
       try {
-        // PERBAIKAN UTAMA: Ambil data pesanan dan detail_pesanan secara terpisah (Independen)
         const { data: pesanan, error: errP } = await supabaseClient.from('pesanan').select('*').order('id', {ascending:false});
         if(errP) throw errP;
+        listPesananGlobal = pesanan || [];
 
         const { data: semuaDetail, error: errD } = await supabaseClient.from('detail_pesanan').select('*');
         if(errD) throw errD;
+        listDetailGlobal = semuaDetail || [];
 
         const tbody = document.getElementById('tabelLogPenjualan');
 
-        if(!pesanan || pesanan.length === 0) {
+        if(!listPesananGlobal || listPesananGlobal.length === 0) {
           tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#888;">Belum ada pesanan terekam.</td></tr>`;
           return;
         }
 
-        tbody.innerHTML = pesanan.map(p => {
-          // Filter detail item secara manual lewat javascript berdasarkan pesanan_id
-          let itemTerkait = semuaDetail ? semuaDetail.filter(d => d.pesanan_id === p.id) : [];
+        tbody.innerHTML = listPesananGlobal.map(p => {
+          let itemTerkait = listDetailGlobal.filter(d => d.pesanan_id === p.id);
           let detailString = itemTerkait.length > 0 
             ? itemTerkait.map(d => `• ${d.nama_produk} (<b>${d.jumlah}</b>)`).join('<br>') 
             : '-';
@@ -334,10 +324,7 @@
           if(p.metode_pembayaran === 'BCA') badgePay = 'badge-bca';
           
           let telpDisplay = p.nomor_telepon ? `📞 ${p.nomor_telepon}` : '📞 -';
-          let addressDisplay = '';
-          if((p.tipe_pengambilan === 'GOSEND' || p.tipe_pengambilan === 'ANTAR') && p.alamat_pengiriman) {
-            addressDisplay = `<span class="address-text">📍 Kirim: ${p.alamat_pengiriman}</span>`;
-          }
+          let addressDisplay = p.alamat_pengiriman ? `<span class="address-text">📍 Kirim: ${p.alamat_pengiriman}</span>` : '';
           let noteDisplay = p.keterangan ? `<span class="note-text">📝 Note: ${p.keterangan}</span>` : '';
 
           return `
@@ -353,15 +340,87 @@
               <td style="font-size:0.8rem; color:#4a3f35;">${detailString}</td>
               <td style="font-weight:700; color:var(--success);">Rp ${(p.total_harga || 0).toLocaleString('id-ID')}</td>
               <td><span class="payment-badge ${badgePay}">${p.metode_pembayaran}</span></td>
-              <td><button class="btn-delete" onclick="hapusPesananLengkap(${p.id})">Hapus</button></td>
+              <td>
+                <div class="action-group">
+                  <button class="btn-edit-row" onclick="aktifkanModeEditLokal(${p.id})">Edit</button>
+                  <button class="btn-delete" onclick="hapusPesananLengkap(${p.id})">Hapus</button>
+                </div>
+              </td>
             </tr>
           `;
         }).join('');
       } catch(err) { console.error(err.message); }
     }
 
+    // FUNGSI UTAMA: Ambil data untuk dimasukkan ke form Edit
+    function aktifkanModeEditLokal(id) {
+      const p = listPesananGlobal.find(item => item.id === id);
+      if(!p) return;
+
+      document.getElementById('editPesananId').value = p.id;
+      document.getElementById('inputTanggal').value = p.tanggal;
+      document.getElementById('inputPembeli').value = p.nama_pembeli;
+      document.getElementById('inputTelepon').value = p.nomor_telepon || '';
+      document.getElementById('inputMetode').value = p.metode_pembayaran;
+      document.getElementById('inputPengambilan').value = p.tipe_pengambilan;
+      document.getElementById('inputKeteranganNote').value = p.keterangan || '';
+
+      handleTipePengambilanChange();
+      if(p.alamat_pengiriman) {
+        document.getElementById('inputAlamat').value = p.alamat_pengiriman;
+      }
+
+      // Isi Detail Items
+      const container = document.getElementById('containerItemPesanan');
+      container.innerHTML = '';
+      const itemTerkait = listDetailGlobal.filter(d => d.pesanan_id === id);
+      
+      if(itemTerkait.length > 0) {
+        itemTerkait.forEach(item => {
+          tambahBarisItemKosong(item.nama_produk, item.jumlah);
+        });
+      } else {
+        tambahBarisItemKosong();
+      }
+
+      // Ubah Teks Tampilan Tombol & Form
+      document.getElementById('judulFormPesanan').innerText = `✏️ Edit Transaksi Jurnal PO (ID: #${p.id})`;
+      document.getElementById('btnSubmitForm').innerText = '💾 Perbarui & Simpan Perubahan';
+      document.getElementById('btnSubmitForm').style.background = 'var(--warning)';
+      document.getElementById('btnBatalEdit').style.display = 'block';
+
+      // Scroll form ke atas otomatis biar tidak bingung
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetFormKeModeTambah() {
+      document.getElementById('editPesananId').value = '';
+      document.getElementById('formPesanan').reset();
+      document.getElementById('inputTanggal').valueAsDate = new Date();
+      document.getElementById('containerItemPesanan').innerHTML = '';
+      document.getElementById('wrapperAlamat').style.display = 'none';
+      
+      document.getElementById('judulFormPesanan').innerText = '📥 Catat Transaksi Pesanan Baru';
+      document.getElementById('btnSubmitForm').innerText = '🚀 Simpan & Rekam Transaksi';
+      document.getElementById('btnSubmitForm').style.background = 'var(--success)';
+      document.getElementById('btnBatalEdit').style.display = 'none';
+      tambahBarisItemKosong();
+    }
+
+    function cekParameterEditUrl() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const editId = urlParams.get('edit_id');
+      if(editId) {
+        // Beri jeda sedikit agar data global selesai termuat dari database
+        setTimeout(() => {
+          aktifkanModeEditLokal(Number(editId));
+        }, 800);
+      }
+    }
+
     async function prosesSimpanPesanan(e) {
       e.preventDefault();
+      const editId = document.getElementById('editPesananId').value;
       const tgl = document.getElementById('inputTanggal').value;
       const nama = document.getElementById('inputPembeli').value;
       const telp = document.getElementById('inputTelepon').value;
@@ -389,53 +448,58 @@
       }
 
       try {
-        const { data: mainPesanan, error: errMain } = await supabaseClient
-          .from('pesanan')
-          .insert([{ 
-            tanggal: tgl, 
-            nama_pembeli: nama, 
-            nomor_telepon: telp,
-            total_harga: totalHitungHarga, 
-            metode_pembayaran: via, 
-            tipe_pengambilan: ambil,
-            alamat_pengiriman: alamat,
-            keterangan: note 
-          }])
-          .select('*')
-          .single();
+        if(editId) {
+          // PROSES EDIT / UPDATE DATA LAMA
+          const targetId = Number(editId);
 
-        if (errMain) throw errMain;
-        const newPesananId = mainPesanan.id;
+          // 1. Update tabel pesanan utama
+          const { error: errUpdateP } = await supabaseClient.from('pesanan').update({
+            tanggal: tgl, nama_pembeli: nama, nomor_telepon: telp,
+            total_harga: totalHitungHarga, metode_pembayaran: via,
+            tipe_pengambilan: ambil, alamat_pengiriman: alamat, keterangan: note
+          }).eq('id', targetId);
+          if(errUpdateP) throw errUpdateP;
 
-        let detailData = arrayDetailInsert.map(d => ({
-          pesanan_id: newPesananId,
-          nama_produk: d.nama_produk,
-          jumlah: d.jumlah,
-          harga_satuan: d.harga_satuan
-        }));
+          // 2. Hapus detail lama dan ganti dengan detail baru
+          await supabaseClient.from('detail_pesanan').delete().eq('pesanan_id', targetId);
+          let detailData = arrayDetailInsert.map(d => ({
+            pesanan_id: targetId, nama_produk: d.nama_produk, jumlah: d.jumlah, harga_satuan: d.harga_satuan
+          }));
+          await supabaseClient.from('detail_pesanan').insert(detailData);
 
-        const { error: errDetail } = await supabaseClient.from('detail_pesanan').insert(detailData);
-        if(errDetail) throw errDetail;
+          // 3. Update nominal laporan keuangan
+          await supabaseClient.from('laporan_keuangan').update({
+            tanggal: tgl, nominal: totalHitungHarga, keterangan: `Omset PO #${targetId} - ${nama} (Updated)`
+          }).eq('pesanan_id', targetId);
 
-        await supabaseClient.from('laporan_keuangan').insert([{
-          tanggal: tgl,
-          jenis_transaksi: 'Pemasukan',
-          kategori: 'PENJUALAN',
-          nominal: totalHitungHarga,
-          pesanan_id: newPesananId,
-          keterangan: `Omset PO #${newPesananId} - ${nama}`
-        }]);
+          alert("Transaksi penjualan berhasil diperbarui!");
+        } else {
+          // PROSES INSERT TRANSAKSI BARU (Sama seperti kemarin)
+          const { data: mainPesanan, error: errMain } = await supabaseClient.from('pesanan').insert([{ 
+            tanggal: tgl, nama_pembeli: nama, nomor_telepon: telp, total_harga: totalHitungHarga, 
+            metode_pembayaran: via, tipe_pengambilan: ambil, alamat_pengiriman: alamat, keterangan: note 
+          }]).select('*').single();
 
-        alert("Transaksi penjualan sukses disimpan!");
-        document.getElementById('formPesanan').reset();
-        document.getElementById('inputTanggal').valueAsDate = new Date();
-        document.getElementById('containerItemPesanan').innerHTML = '';
-        document.getElementById('wrapperAlamat').style.display = 'none';
-        tambahBarisItemKosong();
+          if (errMain) throw errMain;
+          const newPesananId = mainPesanan.id;
+
+          let detailData = arrayDetailInsert.map(d => ({
+            pesanan_id: newPesananId, nama_produk: d.nama_produk, jumlah: d.jumlah, harga_satuan: d.harga_satuan
+          }));
+          await supabaseClient.from('detail_pesanan').insert(detailData);
+
+          await supabaseClient.from('laporan_keuangan').insert([{
+            tanggal: tgl, jenis_transaksi: 'Pemasukan', kategori: 'PENJUALAN', nominal: totalHitungHarga,
+            pesanan_id: newPesananId, keterangan: `Omset PO #${newPesananId} - ${nama}`
+          }]);
+
+          alert("Transaksi penjualan sukses disimpan!");
+        }
+
+        resetFormKeModeTambah();
         await muatRiwayatPenjualan();
       } catch(err) { 
-        alert("Error simpan: " + err.message); 
-        console.error("Detail error:", err);
+        alert("Error proses: " + err.message); 
       }
     }
 
@@ -447,6 +511,7 @@
         await supabaseClient.from('pesanan').delete().eq('id', id);
         alert("Transaksi berhasil dihapus.");
         await muatRiwayatPenjualan();
+        if(document.getElementById('editPesananId').value == id) { resetFormKeModeTambah(); }
       } catch(e) { alert(e.message); }
     }
   </script>

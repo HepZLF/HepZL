@@ -36,13 +36,7 @@
       cursor: pointer;
       z-index: 1001;
     }
-    .hamburger-menu span {
-      width: 100%;
-      height: 3px;
-      background-color: var(--primary);
-      border-radius: 2px;
-      transition: all 0.3s linear;
-    }
+    .hamburger-menu span { width: 100%; height: 3px; background-color: var(--primary); border-radius: 2px; transition: all 0.3s linear; }
 
     .sidebar-panel {
       position: fixed;
@@ -60,34 +54,11 @@
       transition: left 0.3s ease-in-out;
     }
     .sidebar-panel.active { left: 0; }
-    .sidebar-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--primary);
-      margin-bottom: 25px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid #dcd5c5;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+    .sidebar-title { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 25px; padding-bottom: 10px; border-bottom: 2px solid #dcd5c5; display: flex; align-items: center; justify-content: space-between; }
     .btn-close-sidebar { background: transparent; border: none; font-size: 1.2rem; color: var(--danger); cursor: pointer; font-weight: bold; }
     
     .sidebar-links { display: flex; flex-direction: column; gap: 12px; list-style: none; }
-    .nav-link { 
-      padding: 12px 18px; 
-      background: var(--white); 
-      color: var(--text); 
-      border: 1px solid #dcd5c5; 
-      border-radius: 6px; 
-      font-weight: 600; 
-      font-size: 0.95rem; 
-      text-decoration: none; 
-      display: flex; 
-      align-items: center; 
-      gap: 10px; 
-      transition: all 0.2s ease; 
-    }
+    .nav-link { padding: 12px 18px; background: var(--white); color: var(--text); border: 1px solid #dcd5c5; border-radius: 6px; font-weight: 600; font-size: 0.95rem; text-decoration: none; display: flex; align-items: center; gap: 10px; transition: all 0.2s ease; }
     .nav-link:hover { background: #faf8f5; border-color: var(--secondary); color: var(--secondary); padding-left: 22px; }
     .nav-link.active { background: var(--primary); color: var(--white); border-color: var(--primary); }
 
@@ -100,7 +71,6 @@
 
     .panel-box { background: var(--white); border: 1px solid #e3dec3; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.01); }
     
-    /* SUMMARY CARDS */
     .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
     @media (max-width: 768px) { .summary-grid { grid-template-columns: 1fr; } }
     .card-stat { padding: 15px; border-radius: 8px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
@@ -110,7 +80,6 @@
     .card-stat h3 { font-size: 0.85rem; font-weight: 300; text-transform: uppercase; opacity: 0.9; }
     .card-stat p { font-size: 1.4rem; font-weight: 700; margin-top: 5px; }
 
-    /* FORM STYLING */
     .form-group { margin-bottom: 15px; }
     .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: #5c4d41; margin-bottom: 5px; }
     .form-control { width: 100%; padding: 10px; border: 1px solid #dcd5c5; border-radius: 6px; font-size: 0.9rem; background: #faf9f5; }
@@ -119,7 +88,6 @@
     .btn-submit { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 10px; }
     .btn-submit:hover { background: #6e360e; }
 
-    /* TABLE STYLING */
     .table-responsive { width: 100%; overflow-x: auto; border: 1px solid #e3dec3; border-radius: 8px; background: var(--white); }
     table { width: 100%; border-collapse: collapse; font-size: 0.88rem; text-align: left; }
     th { background: #efe9db; color: var(--primary); font-weight: 700; padding: 12px; border-bottom: 2px solid #e3dec3; }
@@ -131,6 +99,8 @@
     .badge-keluar { background: #ffebee; color: #c62828; }
     .badge-kategori { background: #f3f4f6; color: #374151; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
     
+    .action-group { display: flex; gap: 4px; }
+    .btn-edit-kas { background: #fff3e0; color: #e65100; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; font-weight: 600; }
     .btn-delete { background: #ffebee; color: var(--danger); border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; font-weight: 600; }
   </style>
 </head>
@@ -181,9 +151,11 @@
   <div class="grid-layout">
     
     <div>
-      <div class="section-title">✍️ Catat Pengeluaran / Jurnal Manual</div>
+      <div class="section-title" id="judulFormKeuangan">✍️ Catat Pengeluaran / Jurnal Manual</div>
       <div class="panel-box">
         <form id="formKeuangan" onsubmit="prosesSimpanJurnal(event)">
+          <input type="hidden" id="editKasId" value="">
+
           <div class="form-group">
             <label>Tanggal Transaksi</label>
             <input type="date" id="inputTanggal" class="form-control" required>
@@ -213,7 +185,8 @@
             <input type="text" id="inputKeterangan" class="form-control" placeholder="Contoh: Beli es batu 5 bal & susu murni" required>
           </div>
 
-          <button type="submit" class="btn-submit">💾 Rekam ke Buku Jurnal</button>
+          <button type="submit" id="btnSubmitKas" class="btn-submit">💾 Rekam ke Buku Jurnal</button>
+          <button type="button" id="btnBatalKas" class="btn-submit" style="background:#e0e0e0; color:#333; display:none; margin-top:5px;" onclick="resetFormKasModeTambah()">✕ Batal Edit</button>
         </form>
       </div>
     </div>
@@ -247,6 +220,8 @@
   <script src="db.js"></script>
   <script src="auth.js"></script>
   <script>
+    let listJurnalGlobal = [];
+
     function toggleSidebarMenu() {
       const panel = document.getElementById('sidebarMenuPanel');
       const overlay = document.getElementById('sidebarOverlay');
@@ -262,34 +237,44 @@
 
     async function muatDataBukuJurnal() {
       try {
-        // MENYELARASKAN QUERY AGAR MEMBACA HURUF KECIL 'pesanan_id'
         const { data: jurnal, error } = await supabaseClient.from('laporan_keuangan').select('*').order('id', {ascending:false});
         if(error) throw error;
+        listJurnalGlobal = jurnal || [];
 
         const tbody = document.getElementById('tabelJurnalKeuangan');
-        
         let totalMasuk = 0;
         let totalKeluar = 0;
 
-        if(!jurnal || jurnal.length === 0) {
+        if(!listJurnalGlobal || listJurnalGlobal.length === 0) {
           tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#888;">Belum ada riwayat transaksi keuangan.</td></tr>`;
           updateSummaryCards(0, 0);
           return;
         }
 
-        tbody.innerHTML = jurnal.map(j => {
+        tbody.innerHTML = listJurnalGlobal.map(j => {
           const nominal = j.nominal || 0;
-          if (j.jenis_transaksi === 'Pemasukan') {
-            totalMasuk += nominal;
-          } else {
-            totalKeluar += nominal;
-          }
+          if (j.jenis_transaksi === 'Pemasukan') { totalMasuk += nominal; } else { totalKeluar += nominal; }
 
           const badgeClass = j.jenis_transaksi === 'Pemasukan' ? 'badge-masuk' : 'badge-keluar';
-          // Tombol hapus jurnal khusus non-otomatis PO (agar sinkron)
-          const tombolAksi = j.pesanan_id 
-            ? `<span style="font-size:0.75rem; color:#888; font-style:italic;">Dari PO #${j.pesanan_id}</span>`
-            : `<button class="btn-delete" onclick="hapusJurnalManual(${j.id})">Hapus</button>`;
+          
+          let tombolAksi = '';
+          if(j.pesanan_id) {
+            // Jika transaksi otomatis dari PO Penjualan, tombol edit akan langsung melempar ke halaman penjualan
+            tombolAksi = `
+              <div class="action-group">
+                <button class="btn-edit-kas" onclick="lompatKeEditPenjualan(${j.pesanan_id})">✏️ Edit PO</button>
+                <button class="btn-delete" onclick="hapusJurnalOtomatisPO(${j.pesanan_id})">✕</button>
+              </div>
+            `;
+          } else {
+            // Jika transaksi input jurnal manual biasa
+            tombolAksi = `
+              <div class="action-group">
+                <button class="btn-edit-kas" onclick="aktifkanEditKasManual(${j.id})">Edit</button>
+                <button class="btn-delete" onclick="hapusJurnalManual(${j.id})">Hapus</button>
+              </div>
+            `;
+          }
 
           return `
             <tr>
@@ -306,29 +291,52 @@
         }).join('');
 
         updateSummaryCards(totalMasuk, totalKeluar);
-
-      } catch(err) {
-        console.error("Gagal memuat jurnal:", err.message);
-      }
+      } catch(err) { console.error(err.message); }
     }
 
     function updateSummaryCards(masuk, keluar) {
       document.getElementById('statPemasukan').innerText = 'Rp ' + masuk.toLocaleString('id-ID');
       document.getElementById('statPengeluaran').innerText = 'Rp ' + keluar.toLocaleString('id-ID');
-      
       const saldo = masuk - keluar;
-      const statSaldoElement = document.getElementById('statSaldo');
-      statSaldoElement.innerText = 'Rp ' + saldo.toLocaleString('id-ID');
-      
-      if(saldo < 0) {
-        statSaldoElement.style.color = '#f87171';
-      } else {
-        statSaldoElement.style.color = '#ffffff';
-      }
+      document.getElementById('statSaldo').innerText = 'Rp ' + saldo.toLocaleString('id-ID');
+    }
+
+    function lompatKeEditPenjualan(pesananId) {
+      // Melempar admin ke halaman penjualan.html sambil membawa ID pesanan di link URL
+      window.location.href = `penjualan.html?edit_id=${pesananId}`;
+    }
+
+    function aktifkanEditKasManual(id) {
+      const j = listJurnalGlobal.find(item => item.id === id);
+      if(!j) return;
+
+      document.getElementById('editKasId').value = j.id;
+      document.getElementById('inputTanggal').value = j.tanggal;
+      document.getElementById('inputJenis').value = j.jenis_transaksi;
+      document.getElementById('inputKategori').value = j.kategori;
+      document.getElementById('inputNominal').value = j.nominal;
+      document.getElementById('inputKeterangan').value = j.keterangan;
+
+      document.getElementById('judulFormKeuangan').innerText = "✏️ Edit Jurnal Kas Manual";
+      document.getElementById('btnSubmitKas').innerText = "💾 Perbarui Jurnal";
+      document.getElementById('btnSubmitKas').style.background = "var(--warning)";
+      document.getElementById('btnBatalKas').style.display = "block";
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetFormKasModeTambah() {
+      document.getElementById('editKasId').value = '';
+      document.getElementById('formKeuangan').reset();
+      document.getElementById('inputTanggal').valueAsDate = new Date();
+      document.getElementById('judulFormKeuangan').innerText = "✍️ Catat Pengeluaran / Jurnal Manual";
+      document.getElementById('btnSubmitKas').innerText = "💾 Rekam ke Buku Jurnal";
+      document.getElementById('btnSubmitKas').style.background = "var(--primary)";
+      document.getElementById('btnBatalKas').style.display = "none";
     }
 
     async function prosesSimpanJurnal(e) {
       e.preventDefault();
+      const editId = document.getElementById('editKasId').value;
       const tgl = document.getElementById('inputTanggal').value;
       const jenis = document.getElementById('inputJenis').value;
       const kat = document.getElementById('inputKategori').value;
@@ -336,23 +344,22 @@
       const ket = document.getElementById('inputKeterangan').value;
 
       try {
-        const { error } = await supabaseClient.from('laporan_keuangan').insert([{
-          tanggal: tgl,
-          jenis_transaksi: jenis,
-          kategori: kat,
-          nominal: nom,
-          keterangan: ket
-        }]);
-
-        if(error) throw error;
-
-        alert("Catatan keuangan berhasil ditambahkan!");
-        document.getElementById('formKeuangan').reset();
-        document.getElementById('inputTanggal').valueAsDate = new Date();
+        if(editId) {
+          const { error } = await supabaseClient.from('laporan_keuangan').update({
+            tanggal: tgl, jenis_transaksi: jenis, kategori: kat, nominal: nom, keterangan: ket
+          }).eq('id', Number(editId));
+          if(error) throw error;
+          alert("Catatan kas berhasil diperbarui!");
+        } else {
+          const { error } = await supabaseClient.from('laporan_keuangan').insert([{
+            tanggal: tgl, jenis_transaksi: jenis, kategori: kat, nominal: nom, keterangan: ket
+          }]);
+          if(error) throw error;
+          alert("Catatan keuangan berhasil ditambahkan!");
+        }
+        resetFormKasModeTambah();
         await muatDataBukuJurnal();
-      } catch(err) {
-        alert("Gagal simpan jurnal: " + err.message);
-      }
+      } catch(err) { alert("Gagal proses jurnal: " + err.message); }
     }
 
     async function hapusJurnalManual(id) {
@@ -361,6 +368,18 @@
         const { error } = await supabaseClient.from('laporan_keuangan').delete().eq('id', id);
         if(error) throw error;
         alert("Catatan berhasil dihapus.");
+        await muatDataBukuJurnal();
+        if(document.getElementById('editKasId').value == id) resetFormKasModeTambah();
+      } catch(e) { alert(e.message); }
+    }
+
+    async function hapusJurnalOtomatisPO(pesananId) {
+      if(!confirm("Data ini terikat dengan Order PO Penjualan. Menghapus ini akan menghapus seluruh data pesanan & detail cup terkait di halaman penjualan. Lanjutkan?")) return;
+      try {
+        await supabaseClient.from('laporan_keuangan').delete().eq('pesanan_id', pesananId);
+        await supabaseClient.from('detail_pesanan').delete().eq('pesanan_id', pesananId);
+        await supabaseClient.from('pesanan').delete().eq('id', pesananId);
+        alert("Seluruh data penjualan terkait berhasil dibersihkan.");
         await muatDataBukuJurnal();
       } catch(e) { alert(e.message); }
     }
