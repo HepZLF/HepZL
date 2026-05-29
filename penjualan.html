@@ -308,9 +308,14 @@
 
     async function muatRiwayatPenjualan() {
       try {
-        const { data: pesanan, error } = await supabaseClient.from('pesanan').select('*, detail_pesanan(*)').order('id', {ascending:false});
+        // PERBAIKAN UTAMA: Ambil data pesanan dan detail_pesanan secara terpisah (Independen)
+        const { data: pesanan, error: errP } = await supabaseClient.from('pesanan').select('*').order('id', {ascending:false});
+        if(errP) throw errP;
+
+        const { data: semuaDetail, error: errD } = await supabaseClient.from('detail_pesanan').select('*');
+        if(errD) throw errD;
+
         const tbody = document.getElementById('tabelLogPenjualan');
-        if(error) throw error;
 
         if(!pesanan || pesanan.length === 0) {
           tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#888;">Belum ada pesanan terekam.</td></tr>`;
@@ -318,7 +323,12 @@
         }
 
         tbody.innerHTML = pesanan.map(p => {
-          let detailString = p.detail_pesanan ? p.detail_pesanan.map(d => `• ${d.nama_produk} (<b>${d.jumlah}</b>)`).join('<br>') : '-';
+          // Filter detail item secara manual lewat javascript berdasarkan pesanan_id
+          let itemTerkait = semuaDetail ? semuaDetail.filter(d => d.pesanan_id === p.id) : [];
+          let detailString = itemTerkait.length > 0 
+            ? itemTerkait.map(d => `• ${d.nama_produk} (<b>${d.jumlah}</b>)`).join('<br>') 
+            : '-';
+            
           let badgePay = 'badge-tunai';
           if(p.metode_pembayaran === 'Qris') badgePay = 'badge-qris';
           if(p.metode_pembayaran === 'BCA') badgePay = 'badge-bca';
@@ -397,7 +407,6 @@
         if (errMain) throw errMain;
         const newPesananId = mainPesanan.id;
 
-        // DIKEMBALIKAN KE standar huruf kecil pesanan_id
         let detailData = arrayDetailInsert.map(d => ({
           pesanan_id: newPesananId,
           nama_produk: d.nama_produk,
@@ -408,7 +417,6 @@
         const { error: errDetail } = await supabaseClient.from('detail_pesanan').insert(detailData);
         if(errDetail) throw errDetail;
 
-        // DIKEMBALIKAN KE standar huruf kecil pesanan_id
         await supabaseClient.from('laporan_keuangan').insert([{
           tanggal: tgl,
           jenis_transaksi: 'Pemasukan',
@@ -424,7 +432,7 @@
         document.getElementById('containerItemPesanan').innerHTML = '';
         document.getElementById('wrapperAlamat').style.display = 'none';
         tambahBarisItemKosong();
-        muatRiwayatPenjualan();
+        await muatRiwayatPenjualan();
       } catch(err) { 
         alert("Error simpan: " + err.message); 
         console.error("Detail error:", err);
@@ -438,7 +446,7 @@
         await supabaseClient.from('detail_pesanan').delete().eq('pesanan_id', id);
         await supabaseClient.from('pesanan').delete().eq('id', id);
         alert("Transaksi berhasil dihapus.");
-        muatRiwayatPenjualan();
+        await muatRiwayatPenjualan();
       } catch(e) { alert(e.message); }
     }
   </script>
