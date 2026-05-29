@@ -397,29 +397,26 @@
         if (errMain) throw errMain;
         const newPesananId = mainPesanan.id;
 
-        // JALUR SINKRONISASI PINTAR (Mendukung pesanan_id maupun pesanan_ID secara otomatis)
-        let detailData = arrayDetailInsert.map(d => {
-          let item = { nama_produk: d.nama_produk, jumlah: d.jumlah, harga_satuan: d.harga_satuan };
-          item['pesanan_ID'] = newPesananId;
-          item['pesanan_id'] = newPesananId;
-          return item;
-        });
+        // DIKEMBALIKAN KE standar huruf kecil pesanan_id
+        let detailData = arrayDetailInsert.map(d => ({
+          pesanan_id: newPesananId,
+          nama_produk: d.nama_produk,
+          jumlah: d.jumlah,
+          harga_satuan: d.harga_satuan
+        }));
 
         const { error: errDetail } = await supabaseClient.from('detail_pesanan').insert(detailData);
         if(errDetail) throw errDetail;
 
-        // JALUR SINKRONISASI PINTAR LAPORAN KEUANGAN
-        let jurnalKeuangan = {
+        // DIKEMBALIKAN KE standar huruf kecil pesanan_id
+        await supabaseClient.from('laporan_keuangan').insert([{
           tanggal: tgl,
           jenis_transaksi: 'Pemasukan',
           kategori: 'PENJUALAN',
           nominal: totalHitungHarga,
+          pesanan_id: newPesananId,
           keterangan: `Omset PO #${newPesananId} - ${nama}`
-        };
-        jurnalKeuangan['pesanan_id'] = newPesananId;
-        jurnalKeuangan['pesanan_ID'] = newPesananId;
-
-        await supabaseClient.from('laporan_keuangan').insert([jurnalKeuangan]);
+        }]);
 
         alert("Transaksi penjualan sukses disimpan!");
         document.getElementById('formPesanan').reset();
@@ -437,10 +434,8 @@
     async function hapusPesananLengkap(id) {
       if(!confirm("Hapus pesanan ini? Detail item dan jurnal keuangan terkait juga akan terhapus otomatis.")) return;
       try {
-        try { await supabaseClient.from('laporan_keuangan').delete().eq('pesanan_id', id); } catch(e){}
-        try { await supabaseClient.from('laporan_keuangan').delete().eq('pesanan_ID', id); } catch(e){}
-        try { await supabaseClient.from('detail_pesanan').delete().eq('pesanan_id', id); } catch(e){}
-        try { await supabaseClient.from('detail_pesanan').delete().eq('pesanan_ID', id); } catch(e){}
+        await supabaseClient.from('laporan_keuangan').delete().eq('pesanan_id', id);
+        await supabaseClient.from('detail_pesanan').delete().eq('pesanan_id', id);
         await supabaseClient.from('pesanan').delete().eq('id', id);
         alert("Transaksi berhasil dihapus.");
         muatRiwayatPenjualan();
