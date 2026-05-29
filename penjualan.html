@@ -335,6 +335,7 @@
 
     async function muatRiwayatPenjualan() {
       try {
+        // Disinkronkan untuk menarik detail_pesanan menggunakan nama relasi yang benar
         const { data: pesanan, error } = await supabaseClient.from('pesanan').select('*, detail_pesanan(*)').order('id', {ascending:false});
         const tbody = document.getElementById('tabelLogPenjualan');
         if(error) throw error;
@@ -352,7 +353,6 @@
           
           let telpDisplay = p.nomor_telepon ? `📞 ${p.nomor_telepon}` : '📞 -';
           
-          // DIKEMBALIKAN SEMULA: Membaca properti tipe_pengambilan agar sesuai database asli
           let addressDisplay = '';
           if((p.tipe_pengambilan === 'GOSEND' || p.tipe_pengambilan === 'ANTAR') && p.alamat_pengiriman) {
             addressDisplay = `<span class="address-text">📍 Kirim: ${p.alamat_pengiriman}</span>`;
@@ -409,7 +409,6 @@
       }
 
       try {
-        // DIKEMBALIKAN SEMULA: Properti ditargetkan kembali ke kolom tipe_pengambilan
         const { data: mainPesanan, error: errMain } = await supabaseClient
           .from('pesanan')
           .insert([{ 
@@ -418,7 +417,7 @@
             nomor_telepon: telp,
             total_harga: totalHitungHarga, 
             metode_pembayaran: via, 
-            tipe_pengambilan: ambil, // <-- Kembali menggunakan tipe_pengambilan sesuai database asli Mas Hep
+            tipe_pengambilan: ambil,
             alamat_pengiriman: alamat,
             keterangan: note 
           }])
@@ -433,7 +432,9 @@
         
         const newPesananId = mainPesanan.id;
 
-        arrayDetailInsert = arrayDetailInsert.map(d => ({ ...d, pesanan_id: newPesananId }));
+        // PERBAIKAN UTAMA: Mengubah huruf properti menjadi pesanan_ID (ID Kapital) agar tepat sesuai kolom database Supabase Anda
+        arrayDetailInsert = arrayDetailInsert.map(d => ({ ...d, pesanan_ID: newPesananId }));
+        
         const { error: errDetail } = await supabaseClient.from('detail_pesanan').insert(arrayDetailInsert);
         if(errDetail) throw errDetail;
 
@@ -463,7 +464,8 @@
       if(!confirm("Hapus pesanan ini? Detail item dan jurnal keuangan terkait juga akan terhapus otomatis.")) return;
       try {
         await supabaseClient.from('laporan_keuangan').delete().eq('pesanan_id', id);
-        await supabaseClient.from('detail_pesanan').delete().eq('pesanan_id', id);
+        // Perbaikan penghapusan detail menggunakan kolom berhuruf kapital pesanan_ID
+        await supabaseClient.from('detail_pesanan').delete().eq('pesanan_ID', id);
         await supabaseClient.from('pesanan').delete().eq('id', id);
         alert("Transaksi berhasil dihapus.");
         muatRiwayatPenjualan();
