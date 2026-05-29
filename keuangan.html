@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Laporan Keuangan & Buku Kas - Nusantara Cuy</title>
+  <title>Laporan Keuangan - Nusantara Cuy</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -20,13 +20,11 @@
     * { margin:0; padding:0; box-sizing:border-box; font-family: 'Poppins', sans-serif; }
     body { background: var(--bg); color: var(--text); padding: 25px; transition: all 0.3s ease; }
     
-    /* HEADER UTAMA DENGAN TOMBOL HAMBURGER GARIS 3 */
     .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #e3dec3; padding-bottom: 15px; gap: 15px; }
     .header-left { display: flex; align-items: center; gap: 15px; }
     .nav-header h2 { color: var(--primary); font-weight: 700; font-size: 1.4rem; }
     .btn-logout { background: var(--danger); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; }
     
-    /* TOMBOL HAMBURGER INTERAKTIF (GARIS 3) */
     .hamburger-menu {
       display: flex;
       flex-direction: column;
@@ -46,7 +44,6 @@
       transition: all 0.3s linear;
     }
 
-    /* SIDEBAR / PANEL MENU SLIDE OVERLAY KIRI */
     .sidebar-panel {
       position: fixed;
       top: 0;
@@ -74,16 +71,8 @@
       align-items: center;
       justify-content: space-between;
     }
-    .btn-close-sidebar {
-      background: transparent;
-      border: none;
-      font-size: 1.2rem;
-      color: var(--danger);
-      cursor: pointer;
-      font-weight: bold;
-    }
+    .btn-close-sidebar { background: transparent; border: none; font-size: 1.2rem; color: var(--danger); cursor: pointer; font-weight: bold; }
     
-    /* STYLE LINK MENU DI DALAM SIDEBAR */
     .sidebar-links { display: flex; flex-direction: column; gap: 12px; list-style: none; }
     .nav-link { 
       padding: 12px 18px; 
@@ -102,53 +91,47 @@
     .nav-link:hover { background: #faf8f5; border-color: var(--secondary); color: var(--secondary); padding-left: 22px; }
     .nav-link.active { background: var(--primary); color: var(--white); border-color: var(--primary); }
 
-    /* LAYER BACKGROUND REDUP SEMENTARA */
-    .sidebar-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.4);
-      z-index: 999;
-      display: none;
-    }
+    .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); z-index: 999; display: none; }
     .sidebar-overlay.active { display: block; }
 
-    /* GRID LAYOUT UTAMA KEUANGAN */
     .section-title { font-size: 1.1rem; color: var(--primary); margin: 25px 0 15px 0; font-weight: 700; border-left: 4px solid var(--secondary); padding-left: 10px; }
-    .stats-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 25px; }
-    @media (max-width: 768px) { .stats-summary { grid-template-columns: 1fr; } }
-
-    .cash-card { background: var(--white); padding: 18px; border: 1px solid #e3dec3; border-radius: 8px; }
-    .cash-card p { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 5px; color: #726357; }
-    .cash-card h3 { font-size: 1.4rem; font-weight: 700; }
-
-    .grid-container { display: grid; grid-template-columns: 1fr 2fr; gap: 25px; }
-    @media (max-width: 992px) { .grid-container { grid-template-columns: 1fr; } }
+    .grid-layout { display: grid; grid-template-columns: 1fr 2fr; gap: 25px; }
+    @media (max-width: 992px) { .grid-layout { grid-template-columns: 1fr; } }
 
     .panel-box { background: var(--white); border: 1px solid #e3dec3; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.01); }
     
-    /* INPUT COMPONENT */
+    /* SUMMARY CARDS */
+    .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+    @media (max-width: 768px) { .summary-grid { grid-template-columns: 1fr; } }
+    .card-stat { padding: 15px; border-radius: 8px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    .card-pemasukan { background: var(--success); }
+    .card-pengeluaran { background: var(--danger); }
+    .card-saldo { background: #1e3a8a; }
+    .card-stat h3 { font-size: 0.85rem; font-weight: 300; text-transform: uppercase; opacity: 0.9; }
+    .card-stat p { font-size: 1.4rem; font-weight: 700; margin-top: 5px; }
+
+    /* FORM STYLING */
     .form-group { margin-bottom: 15px; }
     .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: #5c4d41; margin-bottom: 5px; }
     .form-control { width: 100%; padding: 10px; border: 1px solid #dcd5c5; border-radius: 6px; font-size: 0.9rem; background: #faf9f5; }
     .form-control:focus { outline: none; border-color: var(--secondary); background: var(--white); }
     
-    .btn-submit { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: 700; font-size: 0.95rem; cursor: pointer; }
-    .btn-submit:hover { background: #6f340d; }
+    .btn-submit { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 10px; }
+    .btn-submit:hover { background: #6e360e; }
 
-    /* TABLE LAYOUT */
+    /* TABLE STYLING */
     .table-responsive { width: 100%; overflow-x: auto; border: 1px solid #e3dec3; border-radius: 8px; background: var(--white); }
-    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left; }
-    th { background: #efe9db; color: var(--primary); font-weight: 700; padding: 12px 15px; border-bottom: 2px solid #e3dec3; }
-    td { padding: 12px 15px; border-bottom: 1px solid #efe9db; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; text-align: left; }
+    th { background: #efe9db; color: var(--primary); font-weight: 700; padding: 12px; border-bottom: 2px solid #e3dec3; }
+    td { padding: 12px; border-bottom: 1px solid #efe9db; }
     tr:hover { background: #faf9f5; }
 
-    .txt-masuk { color: var(--success); font-weight: 700; }
-    .txt-keluar { color: var(--danger); font-weight: 700; }
-    .badge-cat { font-size: 0.75rem; background: #e3dec3; color: var(--text); padding: 2px 6px; border-radius: 4px; font-weight: 600; }
-    .btn-delete { background: #ffebee; color: var(--danger); border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; }
+    .badge-jenis { font-size: 0.75rem; font-weight: 700; padding: 3px 6px; border-radius: 4px; display: inline-block; }
+    .badge-masuk { background: #e8f5e9; color: #1b5e20; }
+    .badge-keluar { background: #ffebee; color: #c62828; }
+    .badge-kategori { background: #f3f4f6; color: #374151; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+    
+    .btn-delete { background: #ffebee; color: var(--danger); border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -175,24 +158,32 @@
         <span></span>
         <span></span>
       </button>
-      <h2>Buku Jurnal Kas Finansial Toko</h2>
+      <h2>Pembukuan & Laporan Keuangan</h2>
     </div>
     <button class="btn-logout" onclick="logoutAdmin()">🚪 Keluar</button>
   </header>
 
-  <div class="section-title">📊 Konsolidasi Saldo Arus Kas</div>
-  <div class="stats-summary">
-    <div class="cash-card"><p>Total Pemasukan (+)</p><h3 id="txtTotalMasuk" style="color:var(--success);">Rp 0</h3></div>
-    <div class="cash-card"><p>Total Pengeluaran (-)</p><h3 id="txtTotalKeluar" style="color:var(--danger);">Rp 0</h3></div>
-    <div class="cash-card"><p>Sisa Kas Neto Bersih</p><h3 id="txtKasNeto" style="color:#0d47a1;">Rp 0</h3></div>
+  <div class="summary-grid">
+    <div class="card-stat card-pemasukan">
+      <h3>Total Pemasukan</h3>
+      <p id="statPemasukan">Rp 0</p>
+    </div>
+    <div class="card-stat card-pengeluaran">
+      <h3>Total Pengeluaran</h3>
+      <p id="statPengeluaran">Rp 0</p>
+    </div>
+    <div class="card-stat card-saldo">
+      <h3>Saldo Bersih</h3>
+      <p id="statSaldo">Rp 0</p>
+    </div>
   </div>
 
-  <div class="grid-container">
+  <div class="grid-layout">
     
     <div>
-      <div class="section-title">💸 Catat Arus Keuangan Baru</div>
+      <div class="section-title">✍️ Catat Pengeluaran / Jurnal Manual</div>
       <div class="panel-box">
-        <form id="formKeuangan" onsubmit="simpanMutasiKas(event)">
+        <form id="formKeuangan" onsubmit="prosesSimpanJurnal(event)">
           <div class="form-group">
             <label>Tanggal Transaksi</label>
             <input type="date" id="inputTanggal" class="form-control" required>
@@ -200,49 +191,50 @@
           <div class="form-group">
             <label>Jenis Transaksi</label>
             <select id="inputJenis" class="form-control" required>
-              <option value="Pengeluaran">Pengeluaran Toko (-)</option>
-              <option value="Pemasukan">Pemasukan / Lain-lain (+)</option>
+              <option value="Pengeluaran">🔴 Pengeluaran (Beli Bahan/Operasional)</option>
+              <option value="Pemasukan">🟢 Pemasukan (Lain-lain / Luar PO)</option>
             </select>
           </div>
           <div class="form-group">
             <label>Kategori</label>
             <select id="inputKategori" class="form-control" required>
-              <option value="LOGISTIK">Belanja Bahan Baku (Logistik)</option>
-              <option value="OPERASIONAL">Biaya Operasional Toko</option>
-              <option value="MARKETING">Iklan / Marketing</option>
-              <option value="PENJUALAN">Hasil Jual Cup</option>
-              <option value="LAINNYA">Lain-lain / Pengeluaran Umum</option>
+              <option value="BAHAN_BAKU">Belanja Bahan Baku (Es/Susu/Kopi/Cup)</option>
+              <option value="OPERASIONAL">Operasional / Gaji / Listrik</option>
+              <option value="MARKETING">Iklan / Promosi / Brosur</option>
+              <option value="LAIN_LAIN">Lain-lain</option>
             </select>
           </div>
           <div class="form-group">
-            <label>Nominal Finansial (Rp)</label>
-            <input type="number" id="inputNominal" class="form-control" placeholder="Contoh: 75000" required>
+            <label>Nominal Uang (Rp)</label>
+            <input type="number" id="inputNominal" class="form-control" placeholder="Contoh: 150000" min="1" required>
           </div>
           <div class="form-group">
-            <label>Keterangan Transaksi</label>
-            <textarea id="inputKeterangan" class="form-control" style="height:80px;" placeholder="Contoh: Belanja Gula Pasir 10kg & Es Batu" required></textarea>
+            <label>Keterangan Detail</label>
+            <input type="text" id="inputKeterangan" class="form-control" placeholder="Contoh: Beli es batu 5 bal & susu murni" required>
           </div>
-          <button type="submit" class="btn-submit">💾 Rekam Arus Kas</button>
+
+          <button type="submit" class="btn-submit">💾 Rekam ke Buku Jurnal</button>
         </form>
       </div>
     </div>
 
     <div>
-      <div class="section-title">📜 Jurnal Arus Mutasi Uang Toko</div>
+      <div class="section-title">📖 Aliran Kas Buku Jurnal (Pemasukan & Pengeluaran)</div>
       <div class="panel-box">
         <div class="table-responsive">
           <table>
             <thead>
               <tr>
                 <th>Tanggal</th>
-                <th>Keterangan / Detil</th>
-                <th>Kat</th>
+                <th>Jenis</th>
+                <th>Kategori</th>
+                <th>Keterangan</th>
                 <th>Nominal</th>
                 <th>Aksi</th>
               </tr>
             </thead>
-            <tbody id="tabelJurnalKas">
-              <tr><td colspan="5" style="text-align:center; color:#888;">Memuat data pembukuan kas...</td></tr>
+            <tbody id="tabelJurnalKeuangan">
+              <tr><td colspan="6" style="text-align:center; color:#888;">Memuat buku kas...</td></tr>
             </tbody>
           </table>
         </div>
@@ -262,88 +254,115 @@
       overlay.classList.toggle('active');
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", async () => {
       proteksiHalamanDashboard();
       document.getElementById('inputTanggal').valueAsDate = new Date();
-      muatDataJurnalKeuangan();
+      await muatDataBukuJurnal();
     });
 
-    async function muatDataJurnalKeuangan() {
+    async function muatDataBukuJurnal() {
       try {
-        const { data, error } = await supabaseClient.from('laporan_keuangan').select('*').order('id', {ascending:false});
-        const tbody = document.getElementById('tabelJurnalKas');
+        // MENYELARASKAN QUERY AGAR MEMBACA HURUF KECIL 'pesanan_id'
+        const { data: jurnal, error } = await supabaseClient.from('laporan_keuangan').select('*').order('id', {ascending:false});
         if(error) throw error;
 
-        if(!data || data.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#888;">Belum ada riwayat mutasi kas finansial.</td></tr>`;
-          return;
-        }
-
+        const tbody = document.getElementById('tabelJurnalKeuangan');
+        
         let totalMasuk = 0;
         let totalKeluar = 0;
 
-        tbody.innerHTML = data.map(k => {
-          const isMasuk = k.jenis_transaksi === 'Pemasukan' || k.jenis_transaksi === 'Pemasukan (+)' || k.jenis_transaksi === 'MASUK';
-          let styleNominal = '';
-          let textSign = '';
+        if(!jurnal || jurnal.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#888;">Belum ada riwayat transaksi keuangan.</td></tr>`;
+          updateSummaryCards(0, 0);
+          return;
+        }
 
-          if(isMasuk) {
-            totalMasuk += (k.nominal || 0);
-            styleNominal = 'txt-masuk';
-            textSign = '+ ';
+        tbody.innerHTML = jurnal.map(j => {
+          const nominal = j.nominal || 0;
+          if (j.jenis_transaksi === 'Pemasukan') {
+            totalMasuk += nominal;
           } else {
-            totalKeluar += (k.nominal || 0);
-            styleNominal = 'txt-keluar';
-            textSign = '- ';
+            totalKeluar += nominal;
           }
+
+          const badgeClass = j.jenis_transaksi === 'Pemasukan' ? 'badge-masuk' : 'badge-keluar';
+          // Tombol hapus jurnal khusus non-otomatis PO (agar sinkron)
+          const tombolAksi = j.pesanan_id 
+            ? `<span style="font-size:0.75rem; color:#888; font-style:italic;">Dari PO #${j.pesanan_id}</span>`
+            : `<button class="btn-delete" onclick="hapusJurnalManual(${j.id})">Hapus</button>`;
 
           return `
             <tr>
-              <td style="white-space:nowrap;">${k.tanggal || '-'}</td>
-              <td><b>${k.keterangan || 'Transaksi Finansial'}</b></td>
-              <td><span class="badge-cat">${k.kategori || 'UMUM'}</span></td>
-              <td class="${styleNominal}">${textSign}Rp ${(k.nominal || 0).toLocaleString('id-ID')}</td>
-              <td><button class="btn-delete" onclick="hapusMutasiKas(${k.id})">Hapus</button></td>
+              <td style="white-space:nowrap;">${j.tanggal || '-'}</td>
+              <td><span class="badge-jenis ${badgeClass}">${j.jenis_transaksi}</span></td>
+              <td><span class="badge-kategori">${j.kategori || 'LAIN_LAIN'}</span></td>
+              <td style="color:#4a3f35; font-weight:500;">${j.keterangan || '-'}</td>
+              <td style="font-weight:700; color:${j.jenis_transaksi === 'Pemasukan' ? 'var(--success)' : 'var(--danger)'};">
+                Rp ${nominal.toLocaleString('id-ID')}
+              </td>
+              <td>${tombolAksi}</td>
             </tr>
           `;
         }).join('');
 
-        let kasNeto = totalMasuk - totalKeluar;
-        document.getElementById('txtTotalMasuk').innerText = `Rp ${totalMasuk.toLocaleString('id-ID')}`;
-        document.getElementById('txtTotalKeluar').innerText = `Rp ${totalKeluar.toLocaleString('id-ID')}`;
-        document.getElementById('txtKasNeto').innerText = `Rp ${kasNeto.toLocaleString('id-ID')}`;
+        updateSummaryCards(totalMasuk, totalKeluar);
 
-      } catch(err) { console.error("Gagal load keuangan:", err.message); }
+      } catch(err) {
+        console.error("Gagal memuat jurnal:", err.message);
+      }
     }
 
-    async function simpanMutasiKas(e) {
+    function updateSummaryCards(masuk, keluar) {
+      document.getElementById('statPemasukan').innerText = 'Rp ' + masuk.toLocaleString('id-ID');
+      document.getElementById('statPengeluaran').innerText = 'Rp ' + keluar.toLocaleString('id-ID');
+      
+      const saldo = masuk - keluar;
+      const statSaldoElement = document.getElementById('statSaldo');
+      statSaldoElement.innerText = 'Rp ' + saldo.toLocaleString('id-ID');
+      
+      if(saldo < 0) {
+        statSaldoElement.style.color = '#f87171';
+      } else {
+        statSaldoElement.style.color = '#ffffff';
+      }
+    }
+
+    async function prosesSimpanJurnal(e) {
       e.preventDefault();
       const tgl = document.getElementById('inputTanggal').value;
       const jenis = document.getElementById('inputJenis').value;
       const kat = document.getElementById('inputKategori').value;
-      const nominal = document.getElementById('inputNominal').value;
+      const nom = Number(document.getElementById('inputNominal').value || 0);
       const ket = document.getElementById('inputKeterangan').value;
 
       try {
         const { error } = await supabaseClient.from('laporan_keuangan').insert([{
-          tanggal: tgl, jenis_transaksi: jenis, kategori: kat, nominal: Number(nominal), keterangan: ket
+          tanggal: tgl,
+          jenis_transaksi: jenis,
+          kategori: kat,
+          nominal: nom,
+          keterangan: ket
         }]);
+
         if(error) throw error;
 
-        alert("Arus kas finansial berhasil dicatat!");
+        alert("Catatan keuangan berhasil ditambahkan!");
         document.getElementById('formKeuangan').reset();
         document.getElementById('inputTanggal').valueAsDate = new Date();
-        muatDataJurnalKeuangan();
-      } catch(err) { alert("Gagal merekam data kas: " + err.message); }
+        await muatDataBukuJurnal();
+      } catch(err) {
+        alert("Gagal simpan jurnal: " + err.message);
+      }
     }
 
-    async function hapusMutasiKas(id) {
-      if(!confirm("Apakah Anda yakin ingin menghapus catatan mutasi kas ini?")) return;
+    async function hapusJurnalManual(id) {
+      if(!confirm("Hapus catatan pengeluaran/pemasukan manual ini?")) return;
       try {
         const { error } = await supabaseClient.from('laporan_keuangan').delete().eq('id', id);
         if(error) throw error;
-        muatDataJurnalKeuangan();
-      } catch(err) { alert("Gagal menghapus: " + err.message); }
+        alert("Catatan berhasil dihapus.");
+        await muatDataBukuJurnal();
+      } catch(e) { alert(e.message); }
     }
   </script>
 </body>
