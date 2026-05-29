@@ -270,7 +270,6 @@
   <script>
     let listOpsiProdukGlobal = [];
 
-    // Fungsi dinamis untuk memantau perubahan Opsi Pengambilan
     function handleTipePengambilanChange() {
       const tipe = document.getElementById('inputPengambilan').value;
       const wrapperAlamat = document.getElementById('wrapperAlamat');
@@ -282,7 +281,7 @@
       } else {
         wrapperAlamat.style.display = 'none';
         inputAlamat.removeAttribute('required');
-        inputAlamat.value = ''; // Reset nilai alamat jika diganti ke PICKUP
+        inputAlamat.value = '';
       }
     }
 
@@ -353,7 +352,6 @@
           
           let telpDisplay = p.nomor_telepon ? `📞 ${p.nomor_telepon}` : '📞 -';
           
-          // Tampilkan Alamat Pengiriman jika tipe pengambilan delivery dan data alamat ada
           let addressDisplay = '';
           if((p.tipe_pengambilan === 'GOSEND' || p.tipe_pengambilan === 'ANTAR') && p.alamat_pengiriman) {
             addressDisplay = `<span class="address-text">📍 Kirim: ${p.alamat_pengiriman}</span>`;
@@ -388,7 +386,7 @@
       const telp = document.getElementById('inputTelepon').value;
       const via = document.getElementById('inputMetode').value;
       const ambil = document.getElementById('inputPengambilan').value;
-      const alamat = document.getElementById('inputAlamat').value; // Mengambil isi alamat
+      const alamat = document.getElementById('inputAlamat').value;
       const note = document.getElementById('inputKeteranganNote').value;
 
       const rows = document.querySelectorAll('.item-row');
@@ -410,7 +408,6 @@
       }
 
       try {
-        // Menyimpan data pesanan lengkap dengan field alamat_pengiriman
         const { data: mainPesanan, error: errMain } = await supabaseClient
           .from('pesanan')
           .insert([{ 
@@ -420,7 +417,7 @@
             total_harga: totalHitungHarga, 
             metode_pembayaran: via, 
             tipe_pengambilan: ambil,
-            alamat_pengiriman: alamat, // Masuk ke kolom database alamat_pengiriman
+            alamat_pengiriman: alamat,
             keterangan: note 
           }])
           .select();
@@ -432,12 +429,13 @@
         const { error: errDetail } = await supabaseClient.from('detail_pesanan').insert(arrayDetailInsert);
         if(errDetail) throw errDetail;
 
-        // Otomatis catat ke jurnal kas keuangan sebagai pemasukan
+        // DI SINI PERBAIKANNYA: Menyisipkan pesanan_id agar lolos aturan kunci relasi (Foreign Key)
         await supabaseClient.from('laporan_keuangan').insert([{
           tanggal: tgl,
           jenis_transaksi: 'Pemasukan',
           kategori: 'PENJUALAN',
           nominal: totalHitungHarga,
+          pesanan_id: newPesananId, // <-- Menyertakan ID Pesanan
           keterangan: `Omset PO #${newPesananId} - ${nama}`
         }]);
 
@@ -445,15 +443,17 @@
         document.getElementById('formPesanan').reset();
         document.getElementById('inputTanggal').valueAsDate = new Date();
         document.getElementById('containerItemPesanan').innerHTML = '';
-        document.getElementById('wrapperAlamat').style.display = 'none'; // Sembunyikan kembali input alamat
+        document.getElementById('wrapperAlamat').style.display = 'none';
         tambahBarisItemKosong();
         muatRiwayatPenjualan();
       } catch(err) { alert("Error simpan: " + err.message); }
     }
 
     async function hapusPesananLengkap(id) {
-      if(!confirm("Hapus pesanan ini? Detail item terkait juga akan terhapus otomatis.")) return;
+      if(!confirm("Hapus pesanan ini? Detail item dan jurnal keuangan terkait juga akan terhapus otomatis.")) return;
       try {
+        // Hapus log keuangan terkait terlebih dahulu agar tidak error constraint
+        await supabaseClient.from('laporan_keuangan').delete().eq('pesanan_id', id);
         await supabaseClient.from('detail_pesanan').delete().eq('pesanan_id', id);
         await supabaseClient.from('pesanan').delete().eq('id', id);
         alert("Transaksi berhasil dihapus.");
