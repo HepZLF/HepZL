@@ -408,6 +408,7 @@
       }
 
       try {
+        // PERBAIKAN: Menggunakan .select('*').single() untuk memastikan objek data langsung didapat secara utuh
         const { data: mainPesanan, error: errMain } = await supabaseClient
           .from('pesanan')
           .insert([{ 
@@ -420,22 +421,28 @@
             alamat_pengiriman: alamat,
             keterangan: note 
           }])
-          .select();
+          .select('*')
+          .single();
 
-        if(errMain) throw errMain;
-        const newPesananId = mainPesanan[0].id;
+        if (errMain) throw errMain;
+        
+        // Pengecekan ekstra untuk mengamankan ID Pesanan
+        if (!mainPesanan || !mainPesanan.id) {
+          throw new Error("Gagal mengambil ID dari pesanan utama yang baru dibuat.");
+        }
+        
+        const newPesananId = mainPesanan.id;
 
         arrayDetailInsert = arrayDetailInsert.map(d => ({ ...d, pesanan_id: newPesananId }));
         const { error: errDetail } = await supabaseClient.from('detail_pesanan').insert(arrayDetailInsert);
         if(errDetail) throw errDetail;
 
-        // DI SINI PERBAIKANNYA: Menyisipkan pesanan_id agar lolos aturan kunci relasi (Foreign Key)
         await supabaseClient.from('laporan_keuangan').insert([{
           tanggal: tgl,
           jenis_transaksi: 'Pemasukan',
           kategori: 'PENJUALAN',
           nominal: totalHitungHarga,
-          pesanan_id: newPesananId, // <-- Menyertakan ID Pesanan
+          pesanan_id: newPesananId,
           keterangan: `Omset PO #${newPesananId} - ${nama}`
         }]);
 
@@ -446,13 +453,15 @@
         document.getElementById('wrapperAlamat').style.display = 'none';
         tambahBarisItemKosong();
         muatRiwayatPenjualan();
-      } catch(err) { alert("Error simpan: " + err.message); }
+      } catch(err) { 
+        alert("Error simpan: " + err.message); 
+        console.error("Detail error:", err);
+      }
     }
 
     async function hapusPesananLengkap(id) {
       if(!confirm("Hapus pesanan ini? Detail item dan jurnal keuangan terkait juga akan terhapus otomatis.")) return;
       try {
-        // Hapus log keuangan terkait terlebih dahulu agar tidak error constraint
         await supabaseClient.from('laporan_keuangan').delete().eq('pesanan_id', id);
         await supabaseClient.from('detail_pesanan').delete().eq('pesanan_id', id);
         await supabaseClient.from('pesanan').delete().eq('id', id);
