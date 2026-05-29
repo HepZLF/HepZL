@@ -352,6 +352,7 @@
           
           let telpDisplay = p.nomor_telepon ? `📞 ${p.nomor_telepon}` : '📞 -';
           
+          // DIKEMBALIKAN SEMULA: Membaca properti tipe_pengambilan agar sesuai database asli
           let addressDisplay = '';
           if((p.tipe_pengambilan === 'GOSEND' || p.tipe_pengambilan === 'ANTAR') && p.alamat_pengiriman) {
             addressDisplay = `<span class="address-text">📍 Kirim: ${p.alamat_pengiriman}</span>`;
@@ -408,7 +409,7 @@
       }
 
       try {
-        // PERBAIKAN: Menggunakan .select('*').single() untuk memastikan objek data langsung didapat secara utuh
+        // DIKEMBALIKAN SEMULA: Properti ditargetkan kembali ke kolom tipe_pengambilan
         const { data: mainPesanan, error: errMain } = await supabaseClient
           .from('pesanan')
           .insert([{ 
@@ -417,7 +418,7 @@
             nomor_telepon: telp,
             total_harga: totalHitungHarga, 
             metode_pembayaran: via, 
-            tipe_pengambilan: ambil,
+            tipe_pengambilan: ambil, // <-- Kembali menggunakan tipe_pengambilan sesuai database asli Mas Hep
             alamat_pengiriman: alamat,
             keterangan: note 
           }])
@@ -426,7 +427,6 @@
 
         if (errMain) throw errMain;
         
-        // Pengecekan ekstra untuk mengamankan ID Pesanan
         if (!mainPesanan || !mainPesanan.id) {
           throw new Error("Gagal mengambil ID dari pesanan utama yang baru dibuat.");
         }
