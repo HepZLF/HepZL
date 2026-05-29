@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kelola Katalog Produk - Nusantara Cuy</title>
+  <title>Katalog Produk & Stok - Nusantara Cuy</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -15,206 +15,413 @@
       --bg: #f9f6f0;
       --white: #ffffff;
       --text: #2c1e15;
+      --sidebar-width: 260px;
     }
     * { margin:0; padding:0; box-sizing:border-box; font-family: 'Poppins', sans-serif; }
-    body { background: var(--bg); color: var(--text); padding: 25px; }
+    body { background: var(--bg); color: var(--text); padding: 25px; transition: all 0.3s ease; }
     
-    .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #e3dec3; padding-bottom: 15px; }
-    .nav-header h2 { color: var(--primary); font-weight: 700; }
-    .btn-logout { background: var(--danger); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    /* HEADER UTAMA DENGAN TOMBOL HAMBURGER GARIS 3 */
+    .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #e3dec3; padding-bottom: 15px; gap: 15px; }
+    .header-left { display: flex; align-items: center; gap: 15px; }
+    .nav-header h2 { color: var(--primary); font-weight: 700; font-size: 1.4rem; }
+    .btn-logout { background: var(--danger); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; }
     
-    /* MENU NAVIGASI */
-    .sub-nav-buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; background: #efe9db; padding: 10px; border-radius: 8px; }
-    .nav-link { padding: 10px 18px; background: var(--white); color: var(--text); border: 1px solid #dcd5c5; border-radius: 6px; font-weight: 600; font-size: 0.9rem; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: all 0.2s ease; }
-    .nav-link:hover { background: #faf8f5; border-color: var(--secondary); color: var(--secondary); }
+    /* TOMBOL HAMBURGER INTERAKTIF (GARIS 3) */
+    .hamburger-menu {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 26px;
+      height: 18px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      z-index: 1001;
+    }
+    .hamburger-menu span {
+      width: 100%;
+      height: 3px;
+      background-color: var(--primary);
+      border-radius: 2px;
+      transition: all 0.3s linear;
+    }
+
+    /* SIDEBAR / PANEL MENU SLIDE OVERLAY KIRI */
+    .sidebar-panel {
+      position: fixed;
+      top: 0;
+      left: -260px; /* Sembunyi di luar layar kiri awal */
+      width: var(--sidebar-width);
+      height: 100%;
+      background: #efe9db;
+      border-right: 3px solid #e3dec3;
+      box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      padding: 25px 20px;
+      transition: left 0.3s ease-in-out;
+    }
+    .sidebar-panel.active {
+      left: 0; /* Geser keluar saat aktif */
+    }
+    .sidebar-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 25px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #dcd5c5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .btn-close-sidebar {
+      background: transparent;
+      border: none;
+      font-size: 1.2rem;
+      color: var(--danger);
+      cursor: pointer;
+      font-weight: bold;
+    }
+    
+    /* STYLE LINK MENU DI DALAM SIDEBAR */
+    .sidebar-links { display: flex; flex-direction: column; gap: 12px; list-style: none; }
+    .nav-link { 
+      padding: 12px 18px; 
+      background: var(--white); 
+      color: var(--text); 
+      border: 1px solid #dcd5c5; 
+      border-radius: 6px; 
+      font-weight: 600; 
+      font-size: 0.95rem; 
+      text-decoration: none; 
+      display: flex; 
+      align-items: center; 
+      gap: 10px; 
+      transition: all 0.2s ease; 
+    }
+    .nav-link:hover { background: #faf8f5; border-color: var(--secondary); color: var(--secondary); padding-left: 22px; }
     .nav-link.active { background: var(--primary); color: var(--white); border-color: var(--primary); }
 
-    /* LAYOUT COLLUMNS */
-    .main-grid { display: grid; grid-template-columns: 2fr 1.2fr; gap: 25px; margin-bottom: 30px; }
-    @media (max-width: 992px) { .main-grid { grid-template-columns: 1fr; } }
+    /* LAYER BACKGROUND REDUP SEMENTARA */
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 999;
+      display: none;
+    }
+    .sidebar-overlay.active {
+      display: block;
+    }
+
+    /* STYLE ELEMEN HALAMAN KATALOG PRODUK */
+    .section-title { font-size: 1.1rem; color: var(--primary); margin: 25px 0 15px 0; font-weight: 700; border-left: 4px solid var(--secondary); padding-left: 10px; }
+    .grid-container { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; }
+    @media (max-width: 992px) { .grid-container { grid-template-columns: 1fr; } }
     
-    .card { background: var(--white); border-radius: 8px; padding: 20px; border: 1px solid #e3dec3; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 25px; }
-    .card h3 { color: var(--primary); margin-bottom: 15px; font-size: 1.1rem; border-bottom: 1px solid #efe9db; padding-bottom: 8px; }
+    .panel-box { background: var(--white); border: 1px solid #e3dec3; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.01); margin-bottom: 25px; }
+    .panel-box h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 15px; font-weight: 700; border-bottom: 2px solid #efe9db; padding-bottom: 8px; }
     
-    /* TABLES STYLE */
-    .table-responsive { width: 100%; overflow-x: auto; }
-    .custom-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
-    .custom-table th { padding: 12px; background: #efe9db; color: var(--primary); font-weight: 700; border: 1px solid #e3dec3; text-transform: uppercase; font-size: 0.8rem; }
-    .custom-table td { padding: 12px; border: 1px solid #e3dec3; }
-    .custom-table tr:nth-child(even) { background: #faf8f5; }
-    
-    /* FORMS */
+    /* FORM INPUT STYLE */
     .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #5c4a3c; }
-    .form-control { width: 100%; padding: 10px; border: 1px solid #c2b9a7; border-radius: 4px; font-size: 0.9rem; color: var(--text); background: #fdfdfb; }
-    .form-control:focus { outline: none; border-color: var(--secondary); box-shadow: 0 0 4px rgba(210,105,30,0.2); }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: #5c4d41; margin-bottom: 5px; }
+    .form-control { width: 100%; padding: 10px; border: 1px solid #dcd5c5; border-radius: 6px; font-size: 0.9rem; background: #faf9f5; }
+    .form-control:focus { outline: none; border-color: var(--secondary); background: var(--white); }
     
-    .btn-primary { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 4px; font-weight: 600; cursor: pointer; width: 100%; font-size: 0.9rem; transition: background 0.2s; }
-    .btn-primary:hover { background: #73390f; }
-    .btn-secondary { background: #e3dec3; color: var(--text); border: none; padding: 10px; border-radius: 4px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 8px; font-size: 0.9rem; }
-    .action-btn { padding: 4px 8px; border: none; border-radius: 4px; font-weight: 600; font-size: 0.75rem; cursor: pointer; color: white; margin-right: 4px; }
+    .btn-block { display: block; width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: 700; font-size: 0.95rem; cursor: pointer; text-align: center; }
+    .btn-primary { background: var(--primary); color: var(--white); }
+    .btn-primary:hover { background: #6f340d; }
+    
+    /* TABLE STYLING */
+    .table-responsive { width: 100%; overflow-x: auto; border: 1px solid #e3dec3; border-radius: 8px; background: var(--white); }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+    th { background: #efe9db; color: var(--primary); font-weight: 700; padding: 12px 15px; border-bottom: 2px solid #e3dec3; }
+    td { padding: 12px 15px; border-bottom: 1px solid #efe9db; color: var(--text); }
+    tr:hover { background: #faf9f5; }
+    
+    /* BADGE STATUS STOK */
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; }
+    .badge-success { background: #e8f5e9; color: var(--success); }
+    .badge-danger { background: #ffebee; color: var(--danger); }
+    .badge-warning { background: #fff3e0; color: var(--warning); }
+    
+    .btn-action { padding: 4px 8px; border: none; border-radius: 4px; font-size: 0.8rem; cursor: pointer; font-weight: 600; margin-right: 5px; }
+    .btn-edit { background: #e3f2fd; color: #0d47a1; }
+    .btn-delete { background: #ffebee; color: var(--danger); }
   </style>
 </head>
 <body>
 
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebarMenu()"></div>
+
+  <div class="sidebar-panel" id="sidebarMenuPanel">
+    <div class="sidebar-title">
+      <span>Nusantara Cuy Menu</span>
+      <button class="btn-close-sidebar" onclick="toggleSidebarMenu()">✕</button>
+    </div>
+    <ul class="sidebar-links">
+      <li><a href="dashboard.html" class="nav-link">📊 Panel Utama</a></li>
+      <li><a href="produk.html" class="nav-link active">📋 Katalog Produk</a></li>
+      <li><a href="penjualan.html" class="nav-link">🛒 Laporan Penjualan</a></li>
+      <li><a href="keuangan.html" class="nav-link">🏦 Laporan Keuangan</a></li>
+    </ul>
+  </div>
+
   <header class="nav-header">
-    <h2>Nusantara Cuy - Manajemen Produk</h2>
+    <div class="header-left">
+      <button class="hamburger-menu" onclick="toggleSidebarMenu()" title="Buka Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <h2>Katalog Produk & Stok - Nusantara Cuy</h2>
+    </div>
     <button class="btn-logout" onclick="logoutAdmin()">🚪 Keluar</button>
   </header>
 
-  <nav class="sub-nav-buttons">
-    <a href="dashboard.html" class="nav-link">📊 Panel Utama</a>
-    <a href="produk.html" class="nav-link active">📋 Katalog Produk</a>
-    <a href="penjualan.html" class="nav-link">🛒 Laporan Penjualan</a>
-    <a href="keuangan.html" class="nav-link">🏦 Laporan Keuangan</a>
-  </nav>
+  <div class="grid-container">
+    
+    <div>
+      <div class="section-title">🍹 Menu Minuman & Varian Terdaftar</div>
+      <div class="panel-box">
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Nama Produk</th>
+                <th>Kategori</th>
+                <th>Harga Jual</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tabelProduk">
+              <tr><td colspan="4" style="text-align:center; color:#888;">Memuat data produk...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-  <div class="main-grid">
-    <div class="card">
-      <h3>📋 Hub Kontrol Manajemen Katalog Menu Terpasang</h3>
-      <div class="table-responsive">
-        <table class="custom-table">
-          <thead>
-            <tr>
-              <th style="width: 60px;">ID</th>
-              <th>Nama Varian</th>
-              <th>Harga Jual</th>
-              <th>File Gambar</th>
-              <th>Deskripsi</th>
-              <th>Aksi Kontrol</th>
-            </tr>
-          </thead>
-          <tbody id="tabelManajemenProdukBody">
-            <tr><td colspan="6" style="text-align:center; color:#888;">Memuat data katalog...</td></tr>
-          </tbody>
-        </table>
+      <div class="section-title">📦 Inventaris & Manajemen Stok Bahan</div>
+      <div class="panel-box">
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Nama Bahan Baku</th>
+                <th>Jumlah Stok</th>
+                <th>Satuan</th>
+                <th>Status</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tabelStok">
+              <tr><td colspan="5" style="text-align:center; color:#888;">Memuat data logistik stok...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-    <div class="card">
-      <h3 id="formTitle">✏️ Kelola Katalog Produk</h3>
-      <input type="hidden" id="prodId">
-      <div class="form-group">
-        <label>Nama Varian Minuman</label>
-        <input type="text" id="prodNama" class="form-control" placeholder="Contoh: Cendol Sultan">
+    <div>
+      <div class="section-title">➕ Tambah Menu Produk Baru</div>
+      <div class="panel-box">
+        <form id="formTambahProduk" onsubmit="simpanProdukBaru(event)">
+          <div class="form-group">
+            <label>Nama Produk / Minuman</label>
+            <input type="text" id="inputNamaProduk" class="form-control" placeholder="Contoh: Cendol Sultan Kopi" required>
+          </div>
+          <div class="form-group">
+            <label>Kategori</label>
+            <select id="inputKategoriProduk" class="form-control" required>
+              <option value="Cendol Series">Cendol Series</option>
+              <option value="Telang Series">Telang Series</option>
+              <option value="Nusantara Soda">Nusantara Soda</option>
+              <option value="Tambahan">Tambahan / Topping</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Harga Jual (Rp)</label>
+            <input type="number" id="inputHargaProduk" class="form-control" placeholder="Contoh: 15000" required>
+          </div>
+          <button type="submit" class="btn-block btn-primary">💾 Simpan Produk</button>
+        </form>
       </div>
-      <div class="form-group">
-        <label>Harga Satuan (Rp)</label>
-        <input type="number" id="prodHarga" class="form-control" placeholder="Contoh: 15000">
+
+      <div class="section-title">📥 Update / Tambah Bahan Baku</div>
+      <div class="panel-box">
+        <form id="formTambahStok" onsubmit="simpanStokBaru(event)">
+          <div class="form-group">
+            <label>Nama Bahan Baku</label>
+            <input type="text" id="inputNamaBahan" class="form-control" placeholder="Contoh: Cup 22oz, Susu, Gula" required>
+          </div>
+          <div class="form-group">
+            <label>Jumlah Stok Awal</label>
+            <input type="number" id="inputJumlahBahan" class="form-control" placeholder="Contoh: 100" required>
+          </div>
+          <div class="form-group">
+            <label>Satuan Barang</label>
+            <input type="text" id="inputSatuanBahan" class="form-control" placeholder="Contoh: Pcs, Kg, Liter" required>
+          </div>
+          <button type="submit" class="btn-block btn-primary">📦 Simpan Stok Bahan</button>
+        </form>
       </div>
-      <div class="form-group">
-        <label>Nama File Gambar</label>
-        <input type="text" id="prodFoto" class="form-control" placeholder="Contoh: cendols.jpg">
-      </div>
-      <div class="form-group">
-        <label>Deskripsi Pendek</label>
-        <textarea id="prodDesc" class="form-control" rows="4" placeholder="Deskripsi varian produk..."></textarea>
-      </div>
-      <button class="btn-primary" id="btnSimpanProduk" onclick="simpanAksiProduk()">Simpan Ke Cloud</button>
-      <button class="btn-secondary" id="btnBatalEdit" onclick="resetFormProduk()" style="display:none;">Batal Perubahan</button>
     </div>
+
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="db.js"></script>
   <script src="auth.js"></script>
   <script>
+    // CONTROL ANIMASI PANEL SIDEBAR GARIS 3
+    function toggleSidebarMenu() {
+      const panel = document.getElementById('sidebarMenuPanel');
+      const overlay = document.getElementById('sidebarOverlay');
+      panel.classList.toggle('active');
+      overlay.classList.toggle('active');
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
-      proteksiHalamanDashboard();
-      MuatKatalogProduk();
+      proteksiHalamanDashboard(); // Pastikan sudah login admin
+      muatSemuaDataKatalog();
     });
 
-    async function MuatKatalogProduk() {
+    async function muatSemuaDataKatalog() {
+      await muatTabelProduk();
+      await muatTabelStok();
+    }
+
+    // LOAD DATA PRODUK DARI SUPABASE
+    async function muatTabelProduk() {
       try {
-        const { data: prodData, error } = await supabaseClient
-          .from('produk')
-          .select('*')
-          .order('id', { ascending: true });
-        
+        const { data, error } = await supabaseClient.from('produk').select('*').order('nama_produk', { ascending: true });
+        const tbody = document.getElementById('tabelProduk');
         if (error) throw error;
         
-        const pBody = document.getElementById('tabelManajemenProdukBody');
-        pBody.innerHTML = '';
-        
-        if(prodData && prodData.length > 0) {
-          prodData.forEach(p => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-              <td><code>#${p.id}</code></td>
-              <td style="font-weight:600; color:var(--primary);">${p.nama_produk}</td>
-              <td style="font-weight:700;">Rp ${(p.harga || 0).toLocaleString('id-ID')}</td>
-              <td><code>${p.foto_url || '-'}</code></td>
-              <td style="font-size:0.85rem; color:#555;">${p.deskripsi || '-'}</td>
-              <td>
-                <button class="action-btn" style="background:var(--warning);" onclick="setFormModeEdit(${p.id}, '${p.nama_produk}', ${p.harga}, '${p.foto_url || ''}', '${p.deskripsi || ''}')">Edit</button>
-                <button class="action-btn" style="background:var(--danger);" onclick="hapusDataProduk(${p.id})">Hapus</button>
-              </td>
-            `;
-            pBody.appendChild(row);
-          });
-        } else {
-          pBody.innerHTML = `<tr><td colspan="6" style="text-align:center;">Database menu kosong.</td></tr>`;
+        if (!data || data.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#888;">Belum ada menu produk terdaftar.</td></tr>`;
+          return;
         }
-      } catch(err) { 
-        console.error("Error tabel produk:", err.message);
-        document.getElementById('tabelManajemenProdukBody').innerHTML = `<tr><td colspan="6" style="text-align:center; color:red;">Gagal memuat katalog: ${err.message}</td></tr>`;
-      }
+
+        tbody.innerHTML = data.map(p => `
+          <tr>
+            <td style="font-weight:600;">${p.nama_produk}</td>
+            <td><span class="badge" style="background:#f0ebd8; color:var(--primary);">${p.kategori || 'Minuman'}</span></td>
+            <td style="font-weight:600; color:var(--secondary)">Rp ${(p.harga || 0).toLocaleString('id-ID')}</td>
+            <td>
+              <button class="btn-action btn-delete" onclick="hapusProduk(${p.id})">Hapus</button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) { console.error("Gagal load produk:", err.message); }
     }
 
-    async function simpanAksiProduk() {
-      const id = document.getElementById('prodId').value;
-      const nama_produk = document.getElementById('prodNama').value.trim();
-      const harga = parseInt(document.getElementById('prodHarga').value);
-      const foto_url = document.getElementById('prodFoto').value.trim();
-      const deskripsi = document.getElementById('prodDesc').value.trim();
-
-      if(!nama_produk || !harga) { alert("Nama produk dan nominal harga wajib terisi!"); return; }
+    // LOAD DATA STOK BARANG DARI SUPABASE
+    async function muatTabelStok() {
       try {
-        if(id) {
-          const { error } = await supabaseClient.from('produk').update({ nama_produk, harga, foto_url, deskripsi }).eq('id', id);
-          if(error) throw error;
-          alert("✔️ Data menu produk berhasil dimodifikasi!");
-        } else {
-          const { error } = await supabaseClient.from('produk').insert([{ nama_produk, harga, foto_url, deskripsi }]);
-          if(error) throw error;
-          alert("✔️ Varian produk baru berhasil ditambahkan!");
+        const { data, error } = await supabaseClient.from('stok_barang').select('*').order('nama_barang', { ascending: true });
+        const tbody = document.getElementById('tabelStok');
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#888;">Belum ada stok barang terdaftar.</td></tr>`;
+          return;
         }
-        resetFormProduk();
-        MuatKatalogProduk();
-      } catch (err) { alert("Aksi Gagal: " + err.message); }
+
+        tbody.innerHTML = data.map(s => {
+          let jml = Number(s.jumlah || 0);
+          let badgeStatus = `<span class="badge badge-success">Aman</span>`;
+          if (jml <= 0) {
+            badgeStatus = `<span class="badge badge-danger">Habis</span>`;
+          } else if (jml <= 15) {
+            badgeStatus = `<span class="badge badge-warning">Kritis</span>`;
+          }
+
+          return `
+            <tr>
+              <td style="font-weight:600;">${s.nama_barang}</td>
+              <td style="font-weight:700;">${jml}</td>
+              <td>${s.satuan || 'Pcs'}</td>
+              <td>${badgeStatus}</td>
+              <td>
+                <button class="btn-action btn-edit" onclick="sesuaikanStokBarang(${s.id}, ${jml})">Edit Angka</button>
+                <button class="btn-action btn-delete" onclick="hapusStokBahan(${s.id})">Hapus</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) { console.error("Gagal load stok:", err.message); }
     }
 
-    function setFormModeEdit(id, nama, harga, foto, desc) {
-      document.getElementById('prodId').value = id;
-      document.getElementById('prodNama').value = nama;
-      document.getElementById('prodHarga').value = harga;
-      document.getElementById('prodFoto').value = foto;
-      document.getElementById('prodDesc').value = desc;
-      document.getElementById('formTitle').innerText = "✏️ Edit Varian: " + nama;
-      document.getElementById('btnSimpanProduk').innerText = "Simpan Perubahan";
-      document.getElementById('btnBatalEdit').style.display = "block";
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    // TAMBAH DATA PRODUK KE SUPABASE
+    async function simpanProdukBaru(e) {
+      e.preventDefault();
+      const nama = document.getElementById('inputNamaProduk').value;
+      const kategori = document.getElementById('inputKategoriProduk').value;
+      const harga = document.getElementById('inputHargaProduk').value;
+
+      try {
+        const { error } = await supabaseClient.from('produk').insert([{ nama_produk: nama, kategori: kategori, harga: Number(harga) }]);
+        if (error) throw error;
+        
+        document.getElementById('formTambahProduk').reset();
+        alert('Produk baru berhasil ditambahkan!');
+        muatTabelProduk();
+      } catch (err) { alert('Gagal menyimpan produk: ' + err.message); }
     }
 
-    function resetFormProduk() {
-      document.getElementById('prodId').value = '';
-      document.getElementById('prodNama').value = '';
-      document.getElementById('prodHarga').value = '';
-      document.getElementById('prodFoto').value = '';
-      document.getElementById('prodDesc').value = '';
-      document.getElementById('formTitle').innerText = "✏️ Kelola Katalog Produk";
-      document.getElementById('btnSimpanProduk').innerText = "Simpan Ke Cloud";
-      document.getElementById('btnBatalEdit').style.display = "none";
+    // TAMBAH DATA STOK BARU KE SUPABASE
+    async function simpanStokBaru(e) {
+      e.preventDefault();
+      const nama = document.getElementById('inputNamaBahan').value;
+      const jumlah = document.getElementById('inputJumlahBahan').value;
+      const satuan = document.getElementById('inputSatuanBahan').value;
+
+      try {
+        const { error } = await supabaseClient.from('stok_barang').insert([{ nama_barang: nama, jumlah: Number(jumlah), satuan: satuan }]);
+        if (error) throw error;
+
+        document.getElementById('formTambahStok').reset();
+        alert('Data stok bahan baku berhasil disimpan!');
+        muatTabelStok();
+      } catch (err) { alert('Gagal menyimpan bahan baku: ' + err.message); }
     }
 
-    async function hapusDataProduk(id) {
-      if(!confirm("Hapus varian menu ini dari database?")) return;
+    // UPDATE ANGKA STOK CEPAT VIA PROMPT
+    async function sesuaikanStokBarang(id, stokLama) {
+      const angkaBaru = prompt("Masukkan jumlah stok fisik terbaru di toko saat ini:", stokLama);
+      if (angkaBaru === null || angkaBaru.trim() === "") return;
+
+      try {
+        const { error } = await supabaseClient.from('stok_barang').update({ jumlah: Number(angkaBaru) }).eq('id', id);
+        if (error) throw error;
+        muatTabelStok();
+      } catch (err) { alert('Gagal memperbarui stok: ' + err.message); }
+    }
+
+    // HAPUS PRODUK
+    async function hapusProduk(id) {
+      if (!confirm("Apakah Anda yakin ingin menghapus produk ini dari katalog?")) return;
       try {
         const { error } = await supabaseClient.from('produk').delete().eq('id', id);
-        if(error) throw error;
-        alert("✔️ Produk berhasil dihapus!");
-        MuatKatalogProduk();
-      } catch (err) { alert("Gagal menghapus: " + err.message); }
+        if (error) throw error;
+        muatTabelProduk();
+      } catch (err) { alert('Gagal menghapus produk: ' + err.message); }
+    }
+
+    // HAPUS BAHAN BAKU
+    async function hapusStokBahan(id) {
+      if (!confirm("Apakah Anda yakin ingin menghapus bahan baku ini dari inventaris logistik?")) return;
+      try {
+        const { error } = await supabaseClient.from('stok_barang').delete().eq('id', id);
+        if (error) throw error;
+        muatTabelStok();
+      } catch (err) { alert('Gagal menghapus bahan baku: ' + err.message); }
     }
   </script>
 </body>
