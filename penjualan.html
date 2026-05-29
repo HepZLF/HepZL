@@ -144,6 +144,7 @@
     tr:hover { background: #faf9f5; }
 
     .po-badge { background: #e3f2fd; color: #0d47a1; font-weight: 700; padding: 3px 6px; border-radius: 4px; font-size: 0.75rem; }
+    .telp-text { font-size: 0.8rem; color: #666; font-style: italic; display: block; margin-top: 2px; }
     .payment-badge { font-size: 0.75rem; font-weight: 700; padding: 3px 6px; border-radius: 4px; display: inline-block; }
     .badge-qris { background: #e0f7fa; color: #006064; }
     .badge-bca { background: #e8eaf6; color: #1a237e; }
@@ -196,6 +197,10 @@
             <input type="text" id="inputPembeli" class="form-control" placeholder="Contoh: Kantor Primamusa (Ko Aben)" required>
           </div>
           <div class="form-group">
+            <label>Nomor Telepon Pembeli</label>
+            <input type="tel" id="inputTelepon" class="form-control" placeholder="Contoh: 081234567890 (Boleh kosong)">
+          </div>
+          <div class="form-group">
             <label>Metode Pembayaran</label>
             <select id="inputMetode" class="form-control" required>
               <option value="BCA">Transfer BCA</option>
@@ -230,7 +235,7 @@
             <thead>
               <tr>
                 <th>Tanggal</th>
-                <th>Nama Pembeli</th>
+                <th>Nama Pembeli / No Telp</th>
                 <th>Detail Cup Terjual</th>
                 <th>Total Bayar</th>
                 <th>Via</th>
@@ -317,11 +322,18 @@
           let badgePay = 'badge-tunai';
           if(p.metode_pembayaran === 'Qris') badgePay = 'badge-qris';
           if(p.metode_pembayaran === 'BCA') badgePay = 'badge-bca';
+          
+          // Tampilkan nomor telepon jika ada di database, jika kosong tampilkan tanda hubung (-)
+          let telpDisplay = p.nomor_telepon ? `📞 ${p.nomor_telepon}` : '📞 -';
 
           return `
             <tr>
               <td style="white-space:nowrap;">${p.tanggal || '-'}</td>
-              <td><span class="po-badge">ID: ${p.id}</span> <br> <b>${p.nama_pembeli}</b></td>
+              <td>
+                <span class="po-badge">ID: ${p.id}</span> <br> 
+                <b>${p.nama_pembeli}</b>
+                <span class="telp-text">${telpDisplay}</span>
+              </td>
               <td style="font-size:0.8rem; color:#4a3f35;">${detailString}</td>
               <td style="font-weight:700; color:var(--success);">Rp ${(p.total_harga || 0).toLocaleString('id-ID')}</td>
               <td><span class="payment-badge ${badgePay}">${p.metode_pembayaran}</span></td>
@@ -336,6 +348,7 @@
       e.preventDefault();
       const tgl = document.getElementById('inputTanggal').value;
       const nama = document.getElementById('inputPembeli').value;
+      const telp = document.getElementById('inputTelepon').value;
       const via = document.getElementById('inputMetode').value;
       const ambil = document.getElementById('inputPengambilan').value;
 
@@ -358,9 +371,17 @@
       }
 
       try {
+        // Menyimpan data pesanan lengkap dengan field nomor_telepon
         const { data: mainPesanan, error: errMain } = await supabaseClient
           .from('pesanan')
-          .insert([{ tanggal: tgl, nama_pembeli: nama, total_harga: totalHitungHarga, metode_pembayaran: via, tipe_pengambilan: ambil }])
+          .insert([{ 
+            tanggal: tgl, 
+            nama_pembeli: nama, 
+            nomor_telepon: telp,
+            total_harga: totalHitungHarga, 
+            metode_pembayaran: via, 
+            tipe_pengambilan: ambil 
+          }])
           .select();
 
         if(errMain) throw errMain;
@@ -381,6 +402,7 @@
 
         alert("Transaksi penjualan sukses disimpan!");
         document.getElementById('formPesanan').reset();
+        document.getElementById('inputTanggal').valueAsDate = new Date();
         document.getElementById('containerItemPesanan').innerHTML = '';
         tambahBarisItemKosong();
         muatRiwayatPenjualan();
