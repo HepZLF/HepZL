@@ -147,7 +147,7 @@
     .product-image {
       height: 280px; background: #fdf1e1; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;
     }
-    .product-image img.product-main { height: 85%; width: auto; object-fit: contain; z-index: 2; transition: transform 0.5s ease; }
+    .product-image img.product-main { height: 85%; width: auto; max-width: 90%; object-fit: contain; z-index: 2; transition: transform 0.5s ease; }
     .product-card:hover .product-main { transform: scale(1.08) rotate(2deg); }
 
     .product-info { padding: 25px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; }
@@ -336,21 +336,25 @@
           throw new Error("Koneksi 'supabaseClient' tidak ditemukan. Periksa konfigurasi berkas db.js Anda!");
         }
 
-        const { data: produk, error } = await supabaseClient.from('produk').select('*').order('id', { ascending: true });
+        const { data: produk, error } = await supabaseClient.from('produk').select('*').order('nama_produk', { ascending: true });
         if (error) throw error;
         
         if (produk && produk.length > 0) {
           grid.innerHTML = '';
           produk.forEach((p, index) => {
+            // PERBAIKAN UTAMA: Mengubah p.foto_url menjadi p.link_foto sesuai kolom di database Supabase
+            // Ditambahkan onerror fallback ke gambar placeholder jika link rusak.
+            const urlGambar = (p.link_foto && p.link_foto.trim() !== '') ? p.link_foto : 'https://placehold.co/300x280?text=Nusantara+Cuy';
+            
             grid.innerHTML += `
               <article class="product-card">
                 <div class="product-image">
-                  <img class="product-main" src="${p.foto_url || 'https://via.placeholder.com/300'}" alt="${p.nama_produk}" />
+                  <img class="product-main" src="${urlGambar}" alt="${p.nama_produk}" onerror="this.src='https://placehold.co/300x280?text=Error+Loading'" />
                 </div>
                 <div class="product-info">
                   <h3>${p.nama_produk}</h3>
                   <p>${p.deskripsi || 'Sajian ramuan istimewa berkelas persembahan anak bangsa.'}</p>
-                  <div class="price">Rp ${Number(p.harga).toLocaleString('id-ID')}</div>
+                  <div class="price">Rp ${Number(p.harga || 0).toLocaleString('id-ID')}</div>
                   <a class="btn" href="https://wa.me/6289623286195?text=Saya%20ingin%20pesan%20${encodeURIComponent(p.nama_produk)}" target="_blank" rel="noopener">Pesan Sekarang</a>
                 </div>
               </article>
