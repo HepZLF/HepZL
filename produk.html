@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Katalog Produk & Stok - Nusantara Cuy</title>
+  <title>Katalog Produk - Nusantara Cuy</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -144,13 +144,8 @@
     td { padding: 12px 15px; border-bottom: 1px solid #efe9db; color: var(--text); }
     tr:hover { background: #faf9f5; }
     
-    /* BADGE STATUS STOK */
-    .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; }
-    .badge-success { background: #e8f5e9; color: var(--success); }
-    .badge-danger { background: #ffebee; color: var(--danger); }
-    .badge-warning { background: #fff3e0; color: var(--warning); }
-    
-    .btn-action { padding: 4px 8px; border: none; border-radius: 4px; font-size: 0.8rem; cursor: pointer; font-weight: 600; margin-right: 5px; }
+    .btn-action { padding: 4px 10px; border: none; border-radius: 4px; font-size: 0.8rem; cursor: pointer; font-weight: 600; margin-right: 5px; transition: opacity 0.2s; }
+    .btn-action:hover { opacity: 0.85; }
     .btn-edit { background: #e3f2fd; color: #0d47a1; }
     .btn-delete { background: #ffebee; color: var(--danger); }
   </style>
@@ -179,7 +174,7 @@
         <span></span>
         <span></span>
       </button>
-      <h2>Katalog Produk & Stok - Nusantara Cuy</h2>
+      <h2>Katalog Produk - Nusantara Cuy</h2>
     </div>
     <button class="btn-logout" onclick="logoutAdmin()">🚪 Keluar</button>
   </header>
@@ -194,33 +189,12 @@
             <thead>
               <tr>
                 <th>Nama Produk</th>
-                <th>Kategori</th>
                 <th>Harga Jual</th>
                 <th>Aksi</th>
               </tr>
             </thead>
             <tbody id="tabelProduk">
-              <tr><td colspan="4" style="text-align:center; color:#888;">Memuat data produk...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="section-title">📦 Inventaris & Manajemen Stok Bahan</div>
-      <div class="panel-box">
-        <div class="table-responsive">
-          <table>
-            <thead>
-              <tr>
-                <th>Nama Bahan Baku</th>
-                <th>Jumlah Stok</th>
-                <th>Satuan</th>
-                <th>Status</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
-            <tbody id="tabelStok">
-              <tr><td colspan="5" style="text-align:center; color:#888;">Memuat data logistik stok...</td></tr>
+              <tr><td colspan="3" style="text-align:center; color:#888;">Memuat data produk...</td></tr>
             </tbody>
           </table>
         </div>
@@ -236,38 +210,10 @@
             <input type="text" id="inputNamaProduk" class="form-control" placeholder="Contoh: Cendol Sultan Kopi" required>
           </div>
           <div class="form-group">
-            <label>Kategori</label>
-            <select id="inputKategoriProduk" class="form-control" required>
-              <option value="Cendol Series">Cendol Series</option>
-              <option value="Telang Series">Telang Series</option>
-              <option value="Nusantara Soda">Nusantara Soda</option>
-              <option value="Tambahan">Tambahan / Topping</option>
-            </select>
-          </div>
-          <div class="form-group">
             <label>Harga Jual (Rp)</label>
             <input type="number" id="inputHargaProduk" class="form-control" placeholder="Contoh: 15000" required>
           </div>
           <button type="submit" class="btn-block btn-primary">💾 Simpan Produk</button>
-        </form>
-      </div>
-
-      <div class="section-title">📥 Update / Tambah Bahan Baku</div>
-      <div class="panel-box">
-        <form id="formTambahStok" onsubmit="simpanStokBaru(event)">
-          <div class="form-group">
-            <label>Nama Bahan Baku</label>
-            <input type="text" id="inputNamaBahan" class="form-control" placeholder="Contoh: Cup 22oz, Susu, Gula" required>
-          </div>
-          <div class="form-group">
-            <label>Jumlah Stok Awal</label>
-            <input type="number" id="inputJumlahBahan" class="form-control" placeholder="Contoh: 100" required>
-          </div>
-          <div class="form-group">
-            <label>Satuan Barang</label>
-            <input type="text" id="inputSatuanBahan" class="form-control" placeholder="Contoh: Pcs, Kg, Liter" required>
-          </div>
-          <button type="submit" class="btn-block btn-primary">📦 Simpan Stok Bahan</button>
         </form>
       </div>
     </div>
@@ -288,13 +234,8 @@
 
     document.addEventListener("DOMContentLoaded", () => {
       proteksiHalamanDashboard(); // Pastikan sudah login admin
-      muatSemuaDataKatalog();
+      muatTabelProduk();
     });
-
-    async function muatSemuaDataKatalog() {
-      await muatTabelProduk();
-      await muatTabelStok();
-    }
 
     // LOAD DATA PRODUK DARI SUPABASE
     async function muatTabelProduk() {
@@ -304,16 +245,16 @@
         if (error) throw error;
         
         if (!data || data.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#888;">Belum ada menu produk terdaftar.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888;">Belum ada menu produk terdaftar.</td></tr>`;
           return;
         }
 
         tbody.innerHTML = data.map(p => `
           <tr>
             <td style="font-weight:600;">${p.nama_produk}</td>
-            <td><span class="badge" style="background:#f0ebd8; color:var(--primary);">${p.kategori || 'Minuman'}</span></td>
             <td style="font-weight:600; color:var(--secondary)">Rp ${(p.harga || 0).toLocaleString('id-ID')}</td>
             <td>
+              <button class="btn-action btn-edit" onclick="editProduk(${p.id}, '${p.nama_produk}', ${p.harga || 0})">Edit</button>
               <button class="btn-action btn-delete" onclick="hapusProduk(${p.id})">Hapus</button>
             </td>
           </tr>
@@ -321,52 +262,14 @@
       } catch (err) { console.error("Gagal load produk:", err.message); }
     }
 
-    // LOAD DATA STOK BARANG DARI SUPABASE
-    async function muatTabelStok() {
-      try {
-        const { data, error } = await supabaseClient.from('stok_barang').select('*').order('nama_barang', { ascending: true });
-        const tbody = document.getElementById('tabelStok');
-        if (error) throw error;
-
-        if (!data || data.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#888;">Belum ada stok barang terdaftar.</td></tr>`;
-          return;
-        }
-
-        tbody.innerHTML = data.map(s => {
-          let jml = Number(s.jumlah || 0);
-          let badgeStatus = `<span class="badge badge-success">Aman</span>`;
-          if (jml <= 0) {
-            badgeStatus = `<span class="badge badge-danger">Habis</span>`;
-          } else if (jml <= 15) {
-            badgeStatus = `<span class="badge badge-warning">Kritis</span>`;
-          }
-
-          return `
-            <tr>
-              <td style="font-weight:600;">${s.nama_barang}</td>
-              <td style="font-weight:700;">${jml}</td>
-              <td>${s.satuan || 'Pcs'}</td>
-              <td>${badgeStatus}</td>
-              <td>
-                <button class="btn-action btn-edit" onclick="sesuaikanStokBarang(${s.id}, ${jml})">Edit Angka</button>
-                <button class="btn-action btn-delete" onclick="hapusStokBahan(${s.id})">Hapus</button>
-              </td>
-            </tr>
-          `;
-        }).join('');
-      } catch (err) { console.error("Gagal load stok:", err.message); }
-    }
-
     // TAMBAH DATA PRODUK KE SUPABASE
     async function simpanProdukBaru(e) {
       e.preventDefault();
       const nama = document.getElementById('inputNamaProduk').value;
-      const kategori = document.getElementById('inputKategoriProduk').value;
       const harga = document.getElementById('inputHargaProduk').value;
 
       try {
-        const { error } = await supabaseClient.from('produk').insert([{ nama_produk: nama, kategori: kategori, harga: Number(harga) }]);
+        const { error } = await supabaseClient.from('produk').insert([{ nama_produk: nama, harga: Number(harga) }]);
         if (error) throw error;
         
         document.getElementById('formTambahProduk').reset();
@@ -375,33 +278,23 @@
       } catch (err) { alert('Gagal menyimpan produk: ' + err.message); }
     }
 
-    // TAMBAH DATA STOK BARU KE SUPABASE
-    async function simpanStokBaru(e) {
-      e.preventDefault();
-      const nama = document.getElementById('inputNamaBahan').value;
-      const jumlah = document.getElementById('inputJumlahBahan').value;
-      const satuan = document.getElementById('inputSatuanBahan').value;
+    // EDIT PRODUK (NAMA & HARGA) VIA PROMPT INTERAKTIF
+    async function editProduk(id, namaLama, hargaLama) {
+      const namaBaru = prompt("Ubah Nama Produk:", namaLama);
+      if (namaBaru === null || namaBaru.trim() === "") return;
+
+      const hargaBaru = prompt("Ubah Harga Jual (Rp):", hargaLama);
+      if (hargaBaru === null || hargaBaru.trim() === "") return;
 
       try {
-        const { error } = await supabaseClient.from('stok_barang').insert([{ nama_barang: nama, jumlah: Number(jumlah), satuan: satuan }]);
+        const { error } = await supabaseClient.from('produk')
+          .update({ nama_produk: namaBaru, harga: Number(hargaBaru) })
+          .eq('id', id);
+        
         if (error) throw error;
-
-        document.getElementById('formTambahStok').reset();
-        alert('Data stok bahan baku berhasil disimpan!');
-        muatTabelStok();
-      } catch (err) { alert('Gagal menyimpan bahan baku: ' + err.message); }
-    }
-
-    // UPDATE ANGKA STOK CEPAT VIA PROMPT
-    async function sesuaikanStokBarang(id, stokLama) {
-      const angkaBaru = prompt("Masukkan jumlah stok fisik terbaru di toko saat ini:", stokLama);
-      if (angkaBaru === null || angkaBaru.trim() === "") return;
-
-      try {
-        const { error } = await supabaseClient.from('stok_barang').update({ jumlah: Number(angkaBaru) }).eq('id', id);
-        if (error) throw error;
-        muatTabelStok();
-      } catch (err) { alert('Gagal memperbarui stok: ' + err.message); }
+        alert('Data produk berhasil diperbarui!');
+        muatTabelProduk();
+      } catch (err) { alert('Gagal memperbarui produk: ' + err.message); }
     }
 
     // HAPUS PRODUK
@@ -412,16 +305,6 @@
         if (error) throw error;
         muatTabelProduk();
       } catch (err) { alert('Gagal menghapus produk: ' + err.message); }
-    }
-
-    // HAPUS BAHAN BAKU
-    async function hapusStokBahan(id) {
-      if (!confirm("Apakah Anda yakin ingin menghapus bahan baku ini dari inventaris logistik?")) return;
-      try {
-        const { error } = await supabaseClient.from('stok_barang').delete().eq('id', id);
-        if (error) throw error;
-        muatTabelStok();
-      } catch (err) { alert('Gagal menghapus bahan baku: ' + err.message); }
     }
   </script>
 </body>
