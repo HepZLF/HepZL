@@ -224,6 +224,9 @@
   <script src="db.js"></script>
   <script src="auth.js"></script>
   <script>
+    // Variabel penampung status mode edit produk
+    let idProdukYangDiedit = null;
+
     // CONTROL ANIMASI PANEL SIDEBAR GARIS 3
     function toggleSidebarMenu() {
       const panel = document.getElementById('sidebarMenuPanel');
@@ -254,7 +257,7 @@
             <td style="font-weight:600;">${p.nama_produk}</td>
             <td style="font-weight:600; color:var(--secondary)">Rp ${(p.harga || 0).toLocaleString('id-ID')}</td>
             <td>
-              <button class="btn-action btn-edit" onclick="editProduk(${p.id}, '${p.nama_produk}', ${p.harga || 0})">Edit</button>
+              <button class="btn-action btn-edit" onclick="alirkanKeFormEdit(${p.id}, '${p.nama_produk}', ${p.harga || 0})">Edit</button>
               <button class="btn-action btn-delete" onclick="hapusProduk(${p.id})">Hapus</button>
             </td>
           </tr>
@@ -262,49 +265,77 @@
       } catch (err) { console.error("Gagal load produk:", err.message); }
     }
 
-    // TAMBAH DATA PRODUK KE SUPABASE
+    // OPER DATA KE FORM TAMBAH MENU PRODUK BARU
+    function alirkanKeFormEdit(id, namaLama, hargaLama) {
+      idProdukYangDiedit = id; // Mengunci ID produk lama yang mau diganti
+      document.getElementById('inputNamaProduk').value = namaLama;
+      document.getElementById('inputHargaProduk').value = hargaLama;
+      
+      // Gulir & fokus layar otomatis ke input nama produk
+      document.getElementById('inputNamaProduk').focus();
+      
+      // Ganti tulisan tombol simpan agar memberi tanda sedang dalam mode edit
+      document.querySelector('#formTambahProduk button[type="submit"]').innerHTML = "💾 Perbarui & Simpan Produk";
+    }
+
+    // LOGIKA SIMPAN BARU ATAU EDIT TIMPA PRODUK LAMA (PROTEKSI RIWAYAT PENJUALAN)
     async function simpanProdukBaru(e) {
       e.preventDefault();
       const nama = document.getElementById('inputNamaProduk').value;
       const harga = document.getElementById('inputHargaProduk').value;
 
       try {
-        const { error } = await supabaseClient.from('produk').insert([{ nama_produk: nama, harga: Number(harga) }]);
-        if (error) throw error;
+        // 1. TAMBAH SEBAGAI PRODUK BARU TERLEBIH DAHULU (INSERT BARU)
+        const { error: insertError } = await supabaseClient
+          .from('produk')
+          .insert([{ nama_produk: nama, harga: Number(harga) }]);
         
+        if (insertError) throw insertError;
+
+        // 2. JIKA SEBELUMNYA MENGKLIK TOMBOL EDIT, LAKUKAN PROSES HAPUS PRODUK LAMA
+        if (idProdukYangDiedit !== null) {
+          try {
+            const { error: deleteError } = await supabaseClient
+              .from('produk')
+              .delete()
+              .eq('id', idProdukYangDiedit);
+            
+            if (deleteError) {
+              // Jika gagal hapus karena ID produk mengikat di penjualan (Foreign Key Error),
+              // sistem membiarkan produk lama tetap ada di database demi menjaga histori penjualan Anda.
+              console.warn("Produk lama dibiarkan tetap ada karena memiliki riwayat penjualan aktif.");
+            }
+          } catch (delErr) {
+            console.warn("Proses hapus dilewati otomatis untuk mengamankan data penjualan.");
+          }
+        }
+        
+        // Kembalikan kondisi form ke mode normal semula
         document.getElementById('formTambahProduk').reset();
-        alert('Produk baru berhasil ditambahkan!');
-        muatTabelProduk();
-      } catch (err) { alert('Gagal menyimpan produk: ' + err.message); }
-    }
-
-    // EDIT PRODUK (NAMA & HARGA) VIA PROMPT INTERAKTIF
-    async function editProduk(id, namaLama, hargaLama) {
-      const namaBaru = prompt("Ubah Nama Produk:", namaLama);
-      if (namaBaru === null || namaBaru.trim() === "") return;
-
-      const hargaBaru = prompt("Ubah Harga Jual (Rp):", hargaLama);
-      if (hargaBaru === null || hargaBaru.trim() === "") return;
-
-      try {
-        const { error } = await supabaseClient.from('produk')
-          .update({ nama_produk: namaBaru, harga: Number(hargaBaru) })
-          .eq('id', id);
+        document.querySelector('#formTambahProduk button[type="submit"]').innerHTML = "💾 Simpan Produk";
         
-        if (error) throw error;
-        alert('Data produk berhasil diperbarui!');
-        muatTabelProduk();
-      } catch (err) { alert('Gagal memperbarui produk: ' + err.message); }
+        alert(idProdukYangDiedit !== null ? 'Data produk berhasil diperbarui!' : 'Produk baru berhasil ditambahkan!');
+        
+        idProdukYangDiedit = null; // Reset status ID edit menjadi kosong kembali
+        muatTabelProduk(); // Refresh data tabel produk terdaftar
+      } catch (err) { 
+        alert('Gagal memproses perubahan produk: ' + err.message); 
+      }
     }
 
-    // HAPUS PRODUK
+    // HAPUS MANUAL VIA TOMBOL HAPUS
     async function hapusProduk(id) {
       if (!confirm("Apakah Anda yakin ingin menghapus produk ini dari katalog?")) return;
       try {
         const { error } = await supabaseClient.from('produk').delete().eq('id', id);
-        if (error) throw error;
+        if (error) {
+          alert("Gagal menghapus! Produk ini sudah masuk ke dalam data riwayat penjualan aktif toko Anda.");
+          return;
+        }
         muatTabelProduk();
-      } catch (err) { alert('Gagal menghapus produk: ' + err.message); }
+      } catch (err) { 
+        alert('Gagal menghapus produk: ' + err.message); 
+      }
     }
   </script>
 </body>
